@@ -31,6 +31,7 @@
 		4CF4332224B3E7EB00D3E939 /* Items.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CF4332124B3E7EB00D3E939 /* Items.swift */; };
 		4CF4332424B445C000D3E939 /* ShowPromo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CF4332324B445C000D3E939 /* ShowPromo.swift */; };
 		4CF4332624B55D1900D3E939 /* ItemDetails.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CF4332524B55D1900D3E939 /* ItemDetails.swift */; };
+		4CF4332924B5958B00D3E939 /* ItemOptionsCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CF4332824B5958B00D3E939 /* ItemOptionsCell.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -81,6 +82,7 @@
 		4CF4332124B3E7EB00D3E939 /* Items.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Items.swift; sourceTree = "<group>"; };
 		4CF4332324B445C000D3E939 /* ShowPromo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShowPromo.swift; sourceTree = "<group>"; };
 		4CF4332524B55D1900D3E939 /* ItemDetails.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ItemDetails.swift; sourceTree = "<group>"; };
+		4CF4332824B5958B00D3E939 /* ItemOptionsCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ItemOptionsCell.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -193,6 +195,7 @@
 				4CF4330924AE572500D3E939 /* SettingCell.swift */,
 				4CF4330B24AEC41500D3E939 /* PrimaryCell.swift */,
 				4CF4331724B38E0100D3E939 /* CartItemCell.swift */,
+				4CF4332824B5958B00D3E939 /* ItemOptionsCell.swift */,
 			);
 			path = Cells;
 			sourceTree = "<group>";
@@ -367,6 +370,7 @@
 				4CF4330A24AE572500D3E939 /* SettingCell.swift in Sources */,
 				4CF4331A24B38EC200D3E939 /* ItemStructure.swift in Sources */,
 				4CF4330724AE55D000D3E939 /* SettingsViewController.swift in Sources */,
+				4CF4332924B5958B00D3E939 /* ItemOptionsCell.swift in Sources */,
 				4CF4330324AE531400D3E939 /* MenuCell.swift in Sources */,
 				4CC0575124A2E8D20094B2EB /* AppDelegate.swift in Sources */,
 				4CF4331424B2266700D3E939 /* ShoppingCartVC.swift in Sources */,

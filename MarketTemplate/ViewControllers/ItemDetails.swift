@@ -12,13 +12,25 @@ import UIKit
 class ItemDetails: UIViewController {
     
     var selectedItem : [Items] = []
+    let cellId = "cellId"
+    
+    
+    var tableView : UITableView = {
+        let view = UITableView()
+        view.translatesAutoresizingMaskIntoConstraints = false
+        view.backgroundColor = .clear
+        return view
+    }()
     
     var image : UIImageView = {
         let img = UIImageView()
         img.translatesAutoresizingMaskIntoConstraints = false
         img.layer.masksToBounds = true
+        img.layer.cornerRadius = 5
         return img
     }()
+    
+    
     
     var addToCartButton : UIButton = {
         let btn = UIButton()
@@ -42,6 +54,7 @@ class ItemDetails: UIViewController {
         setupAttributes()
         setupNavigation()
         setupConstraints()
+        setupTableView()
     }
     
     func setupViews() {
@@ -81,8 +94,36 @@ class ItemDetails: UIViewController {
         }
     }
     
+    func setupTableView() {
+        
+        tableView.delegate = self
+        tableView.dataSource = self
+        tableView.register(ItemOptionsCell.self, forCellReuseIdentifier: cellId)
+        tableView.backgroundColor = UIColor.clear
+        tableView.layer.zPosition = 1
+        
+        tableView.allowsMultipleSelectionDuringEditing = false
+        tableView.layoutMargins = UIEdgeInsets.init(top: 12, left: 12, bottom: 12, right: 10)
+        tableView.separatorColor = .black
+        
+        self.view.addSubview(tableView)
+    }
+
+    
     
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
     }
+}
+
+extension ItemDetails : UITableViewDelegate, UITableViewDataSource {
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        <#code#>
+    }
+    
+    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        <#code#>
+    }
+    
+    
 }

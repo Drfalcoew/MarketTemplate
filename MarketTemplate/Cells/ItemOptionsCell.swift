@@ -11,32 +11,48 @@ import UIKit
 
 class ItemOptionsCell: UITableViewCell {
     
-    let nameLabel : UILabel = {
+    let containerView : UIView = {
+        let view = UIView()
+        view.translatesAutoresizingMaskIntoConstraints = false
+        view.layer.masksToBounds = true
+        view.backgroundColor = .white
+        return view
+    }()
+    
+    let optionLabel : UILabel = {
         let label = UILabel()
         //label.text = "Goal Name"
-        label.textColor = .black
-        label.font = UIFont(name: "Palatino", size: 18)
+        label.font = UIFont(name: "Palatino", size: 16)
         label.layer.masksToBounds = true
-        label.numberOfLines = 0
+        label.numberOfLines = 1
+        label.adjustsFontSizeToFitWidth = true
+        label.minimumScaleFactor = 0.5
         label.textColor = UIColor(r: 75, g: 80, b: 120)
-        label.textAlignment = .center
+        label.textAlignment = .left
+        label.lineBreakMode = .byTruncatingTail
+        label.translatesAutoresizingMaskIntoConstraints = false
+        return label
+    }()
+    
+    let priceLabel : UILabel = {
+        let label = UILabel()
+        //label.text = "Goal Name"
+        label.textColor = UIColor.black//(r: 30, g: 30, b: 30)
+        label.font = UIFont(name: "Palatino", size: 16)
+        label.layer.masksToBounds = true
+        label.numberOfLines = 1
+        label.adjustsFontSizeToFitWidth = true
+        label.minimumScaleFactor = 0.5
+        label.textAlignment = .right
         //label.adjustsFontForContentSizeCategory = true
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
     
-    let customImageView : UIImageView = {
-        let img = UIImageView()
-        img.image = UIImage(named: "person")
-        img.translatesAutoresizingMaskIntoConstraints = false
-        img.tintImageColor(color: .white)
-        img.layer.masksToBounds = true
-        img.isHidden = true
-        return img
-    }()
-    
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
+        self.containerView.layer.cornerRadius = self.frame.height / 2
+        self.backgroundColor = .clear
         
         setupViews()
         setupConstraints()
@@ -47,26 +63,31 @@ class ItemOptionsCell: UITableViewCell {
     }
     
     func setupViews() {
-        self.contentView.addSubview(nameLabel)
-        self.contentView.addSubview(customImageView)
+        self.contentView.addSubview(containerView)
+        self.containerView.addSubview(optionLabel)
+        self.containerView.addSubview(priceLabel)
         
         
-        self.backgroundColor = UIColor(r: 240, g: 240, b: 240)
         self.selectionStyle = .none
     }
     
-    
     func setupConstraints() {
-        nameLabel.centerXAnchor.constraint(equalTo: self.centerXAnchor, constant: 0).isActive = true
-        nameLabel.centerYAnchor.constraint(equalTo: self.centerYAnchor, constant: 0).isActive = true
-        nameLabel.widthAnchor.constraint(equalTo: self.widthAnchor, multiplier: 3/5, constant: -10).isActive = true
-        nameLabel.heightAnchor.constraint(equalToConstant: self.frame.height + 10).isActive = true
+        containerView.centerXAnchor.constraint(equalTo: self.centerXAnchor, constant: 0).isActive = true
+        containerView.centerYAnchor.constraint(equalTo: self.centerYAnchor, constant: 0).isActive = true
+        containerView.widthAnchor.constraint(equalTo: self.widthAnchor, multiplier: 1).isActive = true
+        containerView.heightAnchor.constraint(equalTo: self.heightAnchor, multiplier: 0.8).isActive = true
         
-        customImageView.centerXAnchor.constraint(equalTo: self.centerXAnchor, constant: 0).isActive = true
-        customImageView.centerYAnchor.constraint(equalTo: self.centerYAnchor, constant: 0).isActive = true
-        customImageView.widthAnchor.constraint(equalTo: self.heightAnchor, multiplier: 0.6).isActive = true
-        customImageView.heightAnchor.constraint(equalTo: self.heightAnchor, multiplier: 0.6).isActive = true
+        optionLabel.leftAnchor.constraint(equalTo: self.containerView.leftAnchor, constant: 8).isActive = true
+        optionLabel.centerYAnchor.constraint(equalTo: self.centerYAnchor, constant: 0).isActive = true
+        optionLabel.widthAnchor.constraint(equalTo: self.widthAnchor, multiplier: 2/3, constant: -5).isActive = true
+        optionLabel.heightAnchor.constraint(equalToConstant: self.frame.height + 10).isActive = true
         
+        priceLabel.rightAnchor.constraint(equalTo: self.containerView.rightAnchor, constant: -8).isActive = true
+        priceLabel.centerYAnchor.constraint(equalTo: self.centerYAnchor, constant: 0).isActive = true
+        priceLabel.widthAnchor.constraint(equalTo: self.widthAnchor, multiplier: 1/3).isActive = true
+        priceLabel.heightAnchor.constraint(equalTo: self.heightAnchor, multiplier: 0.6).isActive = true
     }
+    
+    
     
 }

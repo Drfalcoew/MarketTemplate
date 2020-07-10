@@ -22,7 +22,7 @@ class SelectedMenuItem: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
+         
         self.view.backgroundColor = UIColor(r: 240, g: 240, b: 240)
         
         setupViews()
@@ -63,7 +63,7 @@ class SelectedMenuItem: UIViewController {
         collectionView.layer.zPosition = 2
         
         
-        self.collectionView.register(PrimaryCell.self, forCellWithReuseIdentifier: "menu")
+        self.collectionView.register(SecondaryCell.self, forCellWithReuseIdentifier: "menu")
         
         self.view.addSubview(collectionView)
     }
@@ -125,28 +125,28 @@ extension SelectedMenuItem : UICollectionViewDelegate, UICollectionViewDataSourc
     
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return 20
+        return Menu().items.count
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "menu", for: indexPath) as! PrimaryCell
-            cell.backgroundColor = .white
-        cell.image.image = UIImage(named: "category_\(indexPath.row)")
-            cell.layer.cornerRadius = 12
-            cell.layer.shadowColor = UIColor.black.cgColor
-            cell.layer.shadowOffset = CGSize(width: 3.0, height: 5.0)
-            cell.layer.shadowOpacity = 0.2
-            cell.layer.shadowRadius = 5.0
-            
-            cell.contentView.alpha = 0
-            cell.title.text = "Category_\(indexPath.row)"
-            DispatchQueue.main.async {
-                UIView.animate(withDuration: 1.0, animations: {
-                    cell.contentView.alpha = 1.0
-                })
-            }
-            return cell
+        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "menu", for: indexPath) as! SecondaryCell
+        cell.backgroundColor = .white
+        cell.image.image = UIImage(named: "item_\(indexPath.row)")
+        cell.layer.cornerRadius = 12
+        cell.layer.shadowColor = UIColor.black.cgColor
+        cell.layer.shadowOffset = CGSize(width: 3.0, height: 5.0)
+        cell.layer.shadowOpacity = 0.2
+        cell.layer.shadowRadius = 5.0
+        
+        cell.contentView.alpha = 0
+        cell.title.text = "item_\(indexPath.row)"
+        DispatchQueue.main.async {
+            UIView.animate(withDuration: 1.0, animations: {
+                cell.contentView.alpha = 1.0
+            })
         }
+        return cell
+    }
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         self.navigationController?.customPush(viewController: ItemDetails())

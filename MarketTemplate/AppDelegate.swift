@@ -16,7 +16,19 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         // Override point for customization after application launch.
-        
+/*
+        window = UIWindow(frame: UIScreen.main.bounds)
+        //window?.addSubview(backgroundImage)
+        window?.backgroundColor = UIColor(r: 255, g: 255, b: 255)
+        let mainController = ViewController() as UIViewController
+        let navigationController = UINavigationController(rootViewController: mainController)
+        navigationController.navigationBar.tintColor = UIColor(r: 40, g: 43, b: 53)
+        navigationController.navigationBar.isTranslucent = false
+        mainController.title = "Sower"
+        window?.rootViewController = navigationController
+        window?.makeKeyAndVisible()
+    */
+                
         
         return true
     }

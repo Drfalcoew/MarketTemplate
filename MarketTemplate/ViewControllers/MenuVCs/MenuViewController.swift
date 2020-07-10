@@ -51,7 +51,7 @@ class MenuViewController: UIViewController {
         collectionView.layer.zPosition = 2
         
         
-        self.collectionView.register(PrimaryCell.self, forCellWithReuseIdentifier: "menu")
+        self.collectionView.register(SecondaryCell.self, forCellWithReuseIdentifier: "menu")
         
         self.view.addSubview(collectionView)
     }
@@ -130,13 +130,13 @@ extension MenuViewController : UICollectionViewDelegate, UICollectionViewDataSou
     
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return 20
+        return Menu().categories.count
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "menu", for: indexPath) as! PrimaryCell
+        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "menu", for: indexPath) as! SecondaryCell
             cell.backgroundColor = .white
-        cell.image.image = UIImage(named: "category_\(indexPath.row)")
+            cell.image.image = UIImage(named: "pizzaStockImg")//)(named: "category_\(indexPath.row)")
             cell.layer.cornerRadius = 12
             cell.layer.shadowColor = UIColor.black.cgColor
             cell.layer.shadowOffset = CGSize(width: 3.0, height: 5.0)

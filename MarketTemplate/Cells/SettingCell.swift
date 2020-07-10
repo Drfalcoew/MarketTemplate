@@ -68,5 +68,4 @@ class SettingCell: UITableViewCell {
         customImageView.heightAnchor.constraint(equalTo: self.heightAnchor, multiplier: 0.6).isActive = true
         
     }
-    
 }

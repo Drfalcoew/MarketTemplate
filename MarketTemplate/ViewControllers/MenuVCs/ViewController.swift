@@ -13,6 +13,21 @@ class ViewController: UIViewController {
     
     var collectionView : UICollectionView!
     
+    var orderNowButton : UIButton = {
+        let btn = UIButton()
+        btn.translatesAutoresizingMaskIntoConstraints = false
+        //btn.layer.masksToBounds = true
+        btn.layer.cornerRadius = 5
+        btn.backgroundColor = UIColor(r: 255, g: 89, b: 89)
+        btn.setTitle("Order Now", for: .normal)
+        btn.layer.shadowColor = UIColor.black.cgColor
+        btn.layer.shadowOffset = CGSize(width: 3.0, height: 5.0)
+        btn.layer.shadowOpacity = 0.2
+        btn.layer.shadowRadius = 5.0
+        btn.addTarget(self, action: #selector(handleOrderNow), for: .touchUpInside)
+        return btn
+    }()
+    
     var titleView : UILabel = {
         let lbl = UILabel()
         lbl.translatesAutoresizingMaskIntoConstraints = false
@@ -45,10 +60,14 @@ class ViewController: UIViewController {
         super.viewDidLoad()
         // Do any additional setup after loading the view.
         
+        for item in Menu().items {
+            print(item)
+        }
+        
+        
         self.title = "Home"
         self.view.tag = 0
         self.view.backgroundColor = UIColor(r: 240, g: 240, b: 240)
-        print("hello World")
         
         setupNavigation()
         setupCollectionView()
@@ -58,6 +77,7 @@ class ViewController: UIViewController {
     
     func setupViews() {
         //self.view.addSubview(titleView)
+        self.view.addSubview(orderNowButton)
         self.view.addSubview(eventView)
     }
     
@@ -68,13 +88,17 @@ class ViewController: UIViewController {
         titleView.heightAnchor.constraint(equalTo: self.view.heightAnchor, multiplier: 1/12).isActive = true
         titleView.centerXAnchor.constraint(equalTo: self.view.centerXAnchor, constant: 0).isActive = true*/
         
-        collectionView.topAnchor.constraint(equalTo: self.view.topAnchor, constant: 30).isActive = true
+        /*collectionView.topAnchor.constraint(equalTo: self.view.topAnchor, constant: 30).isActive = true
         collectionView.widthAnchor.constraint(equalTo: self.view.widthAnchor, constant: 0).isActive = true
         collectionView.heightAnchor.constraint(equalTo: self.view.widthAnchor, multiplier: 1/1.8).isActive = true
-        collectionView.centerXAnchor.constraint(equalTo: self.view.centerXAnchor, constant: 0).isActive = true
+        collectionView.centerXAnchor.constraint(equalTo: self.view.centerXAnchor, constant: 0).isActive = true*/
         
+        orderNowButton.topAnchor.constraint(equalTo: self.view.topAnchor, constant: 30).isActive = true
+        orderNowButton.widthAnchor.constraint(equalTo: self.view.widthAnchor, multiplier: 0.8).isActive = true
+        orderNowButton.centerXAnchor.constraint(equalTo: self.view.centerXAnchor, constant: 0).isActive = true
+        orderNowButton.heightAnchor.constraint(equalTo: self.orderNowButton.widthAnchor, multiplier: 1/4).isActive = true
         
-        eventView.topAnchor.constraint(equalTo: self.collectionView.bottomAnchor, constant: 25).isActive = true
+        eventView.topAnchor.constraint(equalTo: self.view.centerYAnchor, constant: 0).isActive = true
         eventView.widthAnchor.constraint(equalTo: self.view.widthAnchor, multiplier: 9/10).isActive = true
         eventView.bottomAnchor.constraint(equalTo: self.view.bottomAnchor, constant: (self.view.frame.height * -0.05)).isActive = true
         eventView.centerXAnchor.constraint(equalTo: self.view.centerXAnchor, constant: 0).isActive = true
@@ -105,7 +129,7 @@ class ViewController: UIViewController {
         
         self.collectionView.register(PrimaryCell.self, forCellWithReuseIdentifier: "custom")
         
-        self.view.addSubview(collectionView)
+        //self.view.addSubview(collectionView)
     }
 
 
@@ -154,6 +178,10 @@ class ViewController: UIViewController {
     
     @objc func handleCartTouch() {
         self.navigationController?.customPush(viewController: ShoppingCartVC())
+    }
+    
+    @objc func handleOrderNow() {
+        self.navigationController?.customPush(viewController: MenuViewController())
     }
 }
 

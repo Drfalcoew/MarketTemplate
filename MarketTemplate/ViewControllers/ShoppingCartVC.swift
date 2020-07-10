@@ -11,7 +11,7 @@ import UIKit
 
 class ShoppingCartVC: UIViewController {
     
-    var cartItems : [Items] = []
+    var cartItems : [Item] = []
     var collectionView : UICollectionView!
     
     var totalView : CartTotalView = {

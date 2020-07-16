@@ -11,7 +11,7 @@ import UIKit
 
 class ItemDetails: UIViewController {
     
-    var selectedItem : [Item] = []
+    var selectedItem : Item!
     let cellId = "cellId"
     
     var selectedOption : Int?
@@ -89,7 +89,6 @@ class ItemDetails: UIViewController {
         lbl.adjustsFontSizeToFitWidth = true
         lbl.minimumScaleFactor = 0.4
         lbl.textAlignment = .left
-        lbl.text = "Hand Tossed Pizza"
         lbl.font = UIFont(name: "Helvetica Neue", size: 36)
         lbl.font = UIFont.boldSystemFont(ofSize: 36)
         lbl.textColor = UIColor(r: 75, g: 80, b: 120)
@@ -127,6 +126,8 @@ class ItemDetails: UIViewController {
     func setupViews() {
         self.view.backgroundColor = UIColor(r: 240, g: 240, b: 240)
         
+        print(selectedItem)
+        
         self.view.addSubview(image)
         self.view.addSubview(mainTitle)
         self.view.addSubview(spacerView)
@@ -138,6 +139,8 @@ class ItemDetails: UIViewController {
     
     func setupAttributes() -> Void {
         image.image = UIImage(named: "pizzaStockImg")
+        mainTitle.text = selectedItem.name
+        itemDescription.text = selectedItem.description
         //image.image = UIImage(named: "image_\()")
     }
     
@@ -169,8 +172,8 @@ class ItemDetails: UIViewController {
         image.heightAnchor.constraint(equalTo: self.image.widthAnchor, multiplier: 0.5).isActive = true
         
         sizeCollectionView.centerYAnchor.constraint(equalTo: self.image.bottomAnchor, constant: 0).isActive = true
-        sizeCollectionView.leftAnchor.constraint(equalTo: self.image.leftAnchor, constant: 10).isActive = true
-        sizeCollectionView.rightAnchor.constraint(equalTo: self.image.rightAnchor, constant: -10).isActive = true
+        sizeCollectionView.leftAnchor.constraint(equalTo: self.view.leftAnchor, constant: 0).isActive = true
+        sizeCollectionView.rightAnchor.constraint(equalTo: self.view.rightAnchor, constant: 0).isActive = true
         sizeCollectionView.heightAnchor.constraint(equalTo: self.view.heightAnchor, multiplier: 1/6).isActive = true
         
         mainTitle.widthAnchor.constraint(equalTo: self.view.widthAnchor, multiplier: 2/3).isActive = true
@@ -261,28 +264,14 @@ extension ItemDetails : UICollectionViewDelegate, UICollectionViewDataSource {
     }
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return 3
+        return selectedItem.size
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: cellId, for: indexPath) as! ItemOptionsCell
         
-        switch indexPath.row {
-        case 0:
-            cell.optionLabel.text = "Small"
-            cell.priceLabel.text = "$4.99"
-            break
-        case 1:
-            cell.optionLabel.text = "Med"
-            cell.priceLabel.text = "$6.49"
-            break
-        case 2:
-            cell.optionLabel.text = "Large"
-            cell.priceLabel.text = "$8.00"
-            break
-        default: break
-        }
-
+        cell.optionLabel.text = "Small"
+        cell.priceLabel.text = "\(selectedItem.price[indexPath.row])"
         
         return cell
 

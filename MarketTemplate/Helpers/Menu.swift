@@ -13,16 +13,18 @@ struct Item {
     
     let name: String
     let category: Int
-    let price: Double
+    let price: [Double]
     let toppings: [String]?
     let size : Int
+    let description : String
                 
-    init(name: String, category: Int, price: Double, toppings: [String], size: Int) {
+    init(name: String, category: Int, price: [Double], toppings: [String], size: Int, description : String) {
         self.name = name
         self.category = category
         self.price = price
         self.toppings = toppings
         self.size = size
+        self.description = description
     }
 }
 
@@ -48,7 +50,7 @@ class Menu: NSObject {
     }
     
     func initItems() {
-        items.append(Item(name: "Fiesta", category: 0, price: 17.99, toppings: ["Pepperoni", "Canadian Bacon", "Sausage", "Mushroom", "Onion", "Green Pepper", "Olive", "Extra Cheese"], size: 3))
-        items.append(Item(name: "Testing", category: 2, price: 12.49, toppings: ["Cheese", "Tomatoes"], size: 2))
+        items.append(Item(name: "Fiesta", category: 0, price: [13.99, 15.99, 17.99, 20.99, 22.99, 24.99], toppings: ["Pepperoni", "Canadian Bacon", "Sausage", "Mushroom", "Onion", "Green Pepper", "Olive", "Extra Cheese"], size: 6, description: "Hand tossed pizza, baked with fresh ingredients."))
+        items.append(Item(name: "Testing", category: 2, price: [4.59, 7.99], toppings: ["Cheese", "Tomatoes"], size: 2, description: "Hello, this is a test description. One, two, three."))
     }
 }

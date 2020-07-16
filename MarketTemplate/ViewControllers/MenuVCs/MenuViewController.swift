@@ -12,6 +12,8 @@ import UIKit
 class MenuViewController: UIViewController {
     
     var collectionView : UICollectionView!
+    var categories : [String] = []
+    
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -19,9 +21,17 @@ class MenuViewController: UIViewController {
         self.view.backgroundColor = UIColor(r: 240, g: 240, b: 240)
         self.view.tag = 1
         
+        setupAttributes()
         setupNavigation()
         setupCollectionView()
         setupConstraints()
+    }
+    
+    func setupAttributes() {
+        for category in Menu().categories {
+            categories.append(category)
+            print(category)
+        }
     }
     
     func setupCollectionView() {
@@ -144,7 +154,7 @@ extension MenuViewController : UICollectionViewDelegate, UICollectionViewDataSou
             cell.layer.shadowRadius = 5.0
             
             cell.contentView.alpha = 0
-            cell.title.text = "Category_\(indexPath.row)"
+        cell.title.text = "\(categories[indexPath.row])"
             DispatchQueue.main.async {
                 UIView.animate(withDuration: 1.0, animations: {
                     cell.contentView.alpha = 1.0
@@ -154,9 +164,16 @@ extension MenuViewController : UICollectionViewDelegate, UICollectionViewDataSou
         }
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        var selectedCategory : String
+        var selectedIndex : Int
+                
         let vc = SelectedMenuItem()
-        vc.selectedCategory = String(indexPath.row)
-        self.navigationController?.customPush(viewController: SelectedMenuItem())
+        selectedCategory = categories[indexPath.row]
+        selectedIndex = indexPath.row
+        
+        vc.selectedCategoryName = selectedCategory
+        vc.selectedCategoryIndex = selectedIndex
+        self.navigationController?.customPush(viewController: vc)
     }
     
 }

@@ -16,7 +16,7 @@ class SettingsViewController: UIViewController, UITableViewDataSource, UITableVi
     let cellId = "cellId"
     var y : Int?
     let notification = NotificationCenter.default
-
+    
     
     var tableView : UITableView = {
         let view = UITableView()

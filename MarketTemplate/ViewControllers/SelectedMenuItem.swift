@@ -12,7 +12,10 @@ import Foundation
 class SelectedMenuItem: UIViewController {
 
     var collectionView : UICollectionView!
-    var selectedCategory : String!
+    var selectedCategoryName : String = "" // title
+    var selectedCategoryIndex : Int = 1000 // categoryIndex
+    var categoryItems : [Item] = []
+    
     
     lazy var showItem : ShowItem = {
         let item = ShowItem()
@@ -22,18 +25,22 @@ class SelectedMenuItem: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-         
         self.view.backgroundColor = UIColor(r: 240, g: 240, b: 240)
         
-        setupViews()
+        setupAttributes()
         setupNavigation()
         setupCollectionView()
         setupConstraints()
     }
     
-    func setupViews() {
-        
-        
+    func setupAttributes() {
+        if selectedCategoryIndex != 1000 {
+            for item in Menu().items {
+                if item.category == selectedCategoryIndex {
+                    categoryItems.append(item)
+                }
+            }
+        }
     }
     
     func setupCollectionView() {
@@ -79,7 +86,7 @@ class SelectedMenuItem: UIViewController {
     }
     
     func setupNavigation() {
-        self.title = selectedCategory
+        self.title = selectedCategoryName
         
         navigationController?.navigationBar.titleTextAttributes = [NSAttributedString.Key(rawValue: NSAttributedString.Key.foregroundColor.rawValue): UIColor(r: 75, g: 80, b: 120)]
         
@@ -125,7 +132,7 @@ extension SelectedMenuItem : UICollectionViewDelegate, UICollectionViewDataSourc
     
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return Menu().items.count
+        return categoryItems.count
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
@@ -139,7 +146,7 @@ extension SelectedMenuItem : UICollectionViewDelegate, UICollectionViewDataSourc
         cell.layer.shadowRadius = 5.0
         
         cell.contentView.alpha = 0
-        cell.title.text = "item_\(indexPath.row)"
+        cell.title.text = "\(categoryItems[indexPath.row].name)"
         DispatchQueue.main.async {
             UIView.animate(withDuration: 1.0, animations: {
                 cell.contentView.alpha = 1.0
@@ -149,7 +156,12 @@ extension SelectedMenuItem : UICollectionViewDelegate, UICollectionViewDataSourc
     }
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        self.navigationController?.customPush(viewController: ItemDetails())
+        var item : Item
+        
+        let vc = ItemDetails()
+        item = categoryItems[indexPath.row]
+        vc.selectedItem = item
+        self.navigationController?.customPush(viewController: vc)
     }
     
 }

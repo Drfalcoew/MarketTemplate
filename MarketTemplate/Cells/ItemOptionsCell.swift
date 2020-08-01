@@ -80,4 +80,19 @@ class ItemOptionsCell: UICollectionViewCell {
         priceLabel.heightAnchor.constraint(equalTo: self.heightAnchor, multiplier: 0.4).isActive = true
     }
     
+    override var isSelected: Bool {
+        didSet{
+            if self.isSelected {
+                UIView.animate(withDuration: 0.3) {
+                    self.backgroundColor = UIColor(r: 175, g: 175, b: 175)
+                }
+            }
+            else {
+                UIView.animate(withDuration: 0.3) {
+                    self.backgroundColor = UIColor.white
+                }
+            }
+        }
+    }
+    
 }

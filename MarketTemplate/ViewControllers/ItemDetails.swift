@@ -8,13 +8,18 @@
 
 import Foundation
 import UIKit
+import CoreData
 
 class ItemDetails: UIViewController {
     
     var selectedItem : Item!
+    var selectedItemCategory : String!
     let cellId = "cellId"
-    
+    var items : [NSManagedObject] = []
     var selectedOption : Int?
+    var quantity : Int = 1
+    
+    var notes : String?
     
     var itemDescription : UITextView = {
         let text = UITextView()
@@ -126,7 +131,6 @@ class ItemDetails: UIViewController {
     func setupViews() {
         self.view.backgroundColor = UIColor(r: 240, g: 240, b: 240)
         
-        print(selectedItem)
         
         self.view.addSubview(image)
         self.view.addSubview(mainTitle)
@@ -138,14 +142,13 @@ class ItemDetails: UIViewController {
     }
     
     func setupAttributes() -> Void {
-        image.image = UIImage(named: "pizzaStockImg")
+        image.image = UIImage(named: ("image_\(selectedItem.name)"))
         mainTitle.text = selectedItem.name
         itemDescription.text = selectedItem.description
-        //image.image = UIImage(named: "image_\()")
     }
     
     @objc func handleStep(_ sender: UIStepper) {
-        print(sender.value)
+        quantity = Int(sender.value)
         quantityLabel.text = "Quantity: \(Int(sender.value))"
     }
     
@@ -229,7 +232,154 @@ class ItemDetails: UIViewController {
     }
 
     @objc func handleAddToCart() {
+        
+        if selectedItem.size.count > 1 { // more than one option, user needs to select an option.
+            if selectedOption != nil { // size option is selected
+                saveItemToCart()
+                popView()
+            } else { // size option is selected
+                alert(message: "Please select a size above.")
+                // ItemOptionsCell.flashCellsRed()
+            }
+        } else { // only 1 option; nothing to select.
+            popView()
+        }
+    }
+    
+    
+    func saveItemToCart() {
+//        let date = Date() // getting raw date
+        let newItem : [String : Any]
+        let twoSize_Array = ["small", "large"]
+        let threeSize_Array = ["small", "med", "large"]
+        
+        if let x = selectedOption { // init var item, x = selected index
+            
+            if selectedItem.size[selectedItem.size.count - 1] <= 3 {
+                if selectedItem.size.count == 2 {
+                    notes = "\(twoSize_Array[x]) "
+                } else {
+                    notes = "\(threeSize_Array[x]) "
+                }
+            } else {
+                notes = "\(selectedItem.size[x])\" "
+            }
+            
+            newItem = ["name" : selectedItem.name, "price" : selectedItem.price[x], "notes" : notes, "category" : selectedItemCategory, "quantity" : quantity]
+        } else { // size/price wasn't selected
+            return
+        }
+        
+     
+        guard let appDelegate =
+          UIApplication.shared.delegate as? AppDelegate else {
+          return
+        }
+        
+        let managedContext =
+          appDelegate.persistentContainer.viewContext
+
+        
+//        Check double items
+        if checkDuplicateItems(newItemName: selectedItem.name, itemSize: notes!) == true {
+            return
+        } // else, good to save as a separate item
+        
+//        save to core data
+        let entity =
+          NSEntityDescription.entity(forEntityName: "ShoppingCartItems",
+                                     in: managedContext)!
+        
+        let item = NSManagedObject(entity: entity,
+                                     insertInto: managedContext)
+        
+        item.setValuesForKeys(newItem)
+        
+        do {
+          try managedContext.save()
+          items.append(item)
+            //UserDefaults.standard.set(true, forKey: "savedToCart")
+        } catch let error as NSError {
+          print("Could not save. \(error), \(error.userInfo)")
+        }
+    }
+    
+    
+    func checkDuplicateItems(newItemName: String, itemSize: String) -> Bool {
+        var name : String
+        var size : String
+        var quant : Int
+        var dup : Bool = false
+        var newItemSize = itemSize
+        
+        guard let appDelegate =
+          UIApplication.shared.delegate as? AppDelegate else {
+            return true // exit
+        }
+        
+       let managedContext =
+         appDelegate.persistentContainer.viewContext
+       
+       let fetchRequest =
+         NSFetchRequest<NSManagedObject>(entityName: "ShoppingCartItems")
+       
+       do {
+         items = try managedContext.fetch(fetchRequest)
+       } catch let error as NSError {
+         print("Could not fetch. \(error), \(error.userInfo)")
+       }
+       
+        for item in items {
+            name = item.value(forKeyPath: "name") as! String
+            size = item.value(forKeyPath: "notes") as! String
+           
+            size = getSubstrBeforeChar(String: size, Char: " ")
+            newItemSize = getSubstrBeforeChar(String: itemSize, Char: " ")
+            
+            if newItemName == name && newItemSize == size {
+                dup = true
+                quant = item.value(forKeyPath: "quantity") as! Int
+                item.setValue(quant + quantity, forKey: "quantity")
+            }
+        }
+        do {
+            try managedContext.save()
+           }
+        catch {
+            print("Saving Core Data Failed: \(error)")
+        }
+        
+        if dup {
+            return true
+        } else {
+            return false
+        }
+    }
+    
+    func getSubstrBeforeChar(String: String, Char: Character) -> String {
+        var newStr : String
+        var j : Int = 0 // final
+        var i : Int = 0 // iterator
+        
+        for char in String {
+            if char == Char {
+                j = i // char == Char @ index j
+                break
+            } else {
+                i += 1 // char of index != Char, go to next index
+            }
+        }
+        
+        let index = String.index(String.startIndex, offsetBy: j)
+        newStr = String.prefix(upTo: index).description
+        
+        return newStr
+    }
+    
+    
+    func popView() {
         let viewControllers: [UIViewController] = self.navigationController!.viewControllers as [UIViewController]
+
         if self.navigationController!.viewControllers.count >= 3 {
             self.navigationController!.popToViewController(viewControllers[viewControllers.count - 3], animated: true)
             //        Make sure there are atleast 3 on top of the view hierarchy. (SafeGuard)
@@ -238,7 +388,15 @@ class ItemDetails: UIViewController {
         }
     }
     
-    
+    func alert(message: String) {
+        let myAlert = UIAlertController(title: "Alert", message: message, preferredStyle: UIAlertController.Style.alert)
+        
+        let okAction = UIAlertAction(title: "Ok", style: UIAlertAction.Style.cancel, handler: nil)
+        
+        myAlert.addAction(okAction)
+        
+        self.present(myAlert, animated: true, completion: nil)
+    }
 
     
     
@@ -252,25 +410,46 @@ extension ItemDetails : UICollectionViewDelegate, UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         let cell = collectionView.cellForItem(at: indexPath) as! ItemOptionsCell
         
-        if selectedOption == nil {
-            UIView.animate(withDuration: 0.5) {
-                
-            }
-        } else {
-            
-        }
-
+        
+        
         selectedOption = indexPath.row
     }
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return selectedItem.size
+        if selectedItem.price.count > 1 {
+            return selectedItem.price.count
+        } else {
+            return 0
+        }
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: cellId, for: indexPath) as! ItemOptionsCell
         
-        cell.optionLabel.text = "Small"
+        if selectedItem.size[selectedItem.size.count - 1] <= 3 {
+            if selectedItem.size.count == 2 {
+                switch indexPath.row {
+                case 0:
+                    cell.optionLabel.text = "small"
+                    break
+                default:
+                    cell.optionLabel.text = "large"
+                    break
+                }
+            } else {
+                switch indexPath.row {
+                case 0:
+                    cell.optionLabel.text = "small"
+                    break
+                case 1:
+                    cell.optionLabel.text = "med"
+                default:
+                    cell.optionLabel.text = "large"
+                }
+            }
+        } else {
+            cell.optionLabel.text = "\(selectedItem.size[indexPath.row])\""
+        }
         cell.priceLabel.text = "\(selectedItem.price[indexPath.row])"
         
         return cell

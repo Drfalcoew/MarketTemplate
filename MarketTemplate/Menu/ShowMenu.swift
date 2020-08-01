@@ -128,7 +128,6 @@ class ShowMenu: NSObject, UICollectionViewDelegate, UICollectionViewDataSource, 
     }
     
     @objc func settingsHandler() {
-        print("Settings button touched")
         
         title.textColor = UIColor(r: 75, g: 80, b: 120)
         image.tintImageColor(color: UIColor(r: 75, g: 80, b: 120))

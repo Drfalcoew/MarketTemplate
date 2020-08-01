@@ -8,10 +8,13 @@
 
 import Foundation
 import UIKit
+import CoreData
 
 class ShoppingCartVC: UIViewController {
     
-    var cartItems : [Item] = []
+//    var cartItems : [Item] = []
+    var cartItems : [NSManagedObject] = [NSManagedObject]()
+    var cartTotal : Double = 0.0
     var collectionView : UICollectionView!
     
     var totalView : CartTotalView = {
@@ -24,7 +27,7 @@ class ShoppingCartVC: UIViewController {
         view.layer.shadowOffset = CGSize(width: 3.0, height: 5.0)
         view.layer.shadowOpacity = 0.2
         view.layer.shadowRadius = 5.0
-
+        view.subTotal.text = "0"
         return view
     }()
     
@@ -44,7 +47,12 @@ class ShoppingCartVC: UIViewController {
         super.viewDidLoad()
         
         self.view.backgroundColor = UIColor(r: 240, g: 240, b: 240)
+        
+        let nc = NotificationCenter.default
+        nc.addObserver(self, selector: #selector(reloadCV), name: Notification.Name("reloadCV"), object: nil)
 
+        
+        getItems()
         setupViews()
         setupCollectionView()
         setupConstraints()
@@ -52,10 +60,62 @@ class ShoppingCartVC: UIViewController {
         
     }
     
+    @objc func reloadCV(notification: NSNotification) {
+        if let boolean = notification.userInfo?["removedItem"] as? Bool {
+            if boolean {
+                getItems()
+            }
+        }
+        collectionView.reloadData()
+        addSubtotal()
+    }
+    
+    func getItems() {
+        cartItems.removeAll()
+        
+        
+        guard let appDelegate =
+          UIApplication.shared.delegate as? AppDelegate else {
+            return
+        }
+        
+        let managedContext =
+          appDelegate.persistentContainer.viewContext
+        
+        let fetchRequest =
+          NSFetchRequest<NSManagedObject>(entityName: "ShoppingCartItems")
+        
+        do {
+          cartItems = try managedContext.fetch(fetchRequest)
+        } catch let error as NSError {
+          print("Could not fetch. \(error), \(error.userInfo)")
+        }
+        
+        
+        
+        DispatchQueue.main.async {
+            //self.collectionView.reloadData()
+            UIView.animate(withDuration: 1.00, delay: 0.0, options: .curveEaseOut, animations: {
+                
+                
+            }, completion: nil)
+        }
+    }
+    
+    func alert(title: String, message: String) {
+        let myAlert = UIAlertController(title: title, message: message, preferredStyle: UIAlertController.Style.alert)
+        
+        let okAction = UIAlertAction(title: "Ok", style: UIAlertAction.Style.cancel, handler: nil)
+        
+        myAlert.addAction(okAction)
+        
+        self.present(myAlert, animated: true, completion: nil)
+    }
+    
     func setupCollectionView() {
         
         let layout = UICollectionViewFlowLayout()
-        layout.itemSize = CGSize(width: (self.view.frame.width/1.125), height: (self.view.frame.width)/4.5)
+        layout.itemSize = CGSize(width: (self.view.frame.width/1.125), height: (self.view.frame.width)/4.0)
         layout.minimumInteritemSpacing = 0
         layout.minimumLineSpacing = 10
         layout.scrollDirection = .vertical
@@ -119,6 +179,24 @@ class ShoppingCartVC: UIViewController {
          self.navigationItem.rightBarButtonItem = UIBarButtonItem(customView: settingsButton)
     }
     
+    var showMenu : AddRemoveItemMenu = {
+        let showMenu = AddRemoveItemMenu()
+        showMenu.quantity = 0
+        showMenu.quantityLbl.text = "\(showMenu.quantity)"
+        return showMenu
+    }()
+    
+    @objc func showSettings(maxQuantity: Int, index: Int) {
+        showMenu.maxQuantity = maxQuantity
+        showMenu.index = index
+        showMenu.Settings()
+    }
+    
+    func addSubtotal() {
+        cartTotal = round(100.0 * cartTotal) / 100.0
+        totalView.subTotal.text = String(cartTotal)
+    }
+    
     @objc func handleCheckout() {
         self.navigationController?.customPush(viewController: CheckoutVC())
     }
@@ -131,25 +209,58 @@ class ShoppingCartVC: UIViewController {
 extension ShoppingCartVC : UICollectionViewDelegate, UICollectionViewDataSource {
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        //let cell = collectionView.cellForItem(at: indexPath) as! PrimaryCell
+
+        let item = cartItems[indexPath.row]
+        let quant = item.value(forKeyPath: "quantity") as? Int
         
+        showSettings(maxQuantity: quant!, index: indexPath.row)
     }
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         
-        return 5//cartItems.count
+        return cartItems.count
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "cartItem", for: indexPath) as! CartItemCell
-        cell.backgroundColor = .white
-        cell.image.image = UIImage(named: "pizzaStockImg")
-        cell.layer.cornerRadius = 12
-        cell.layer.shadowColor = UIColor.black.cgColor
-        cell.layer.shadowOffset = CGSize(width: 3.0, height: 5.0)
-        cell.layer.shadowOpacity = 0.2
-        cell.layer.shadowRadius = 5.0
-        cell.contentView.alpha = 0
+        
+
+        
+        if self.cartItems.isEmpty == false { // safeGuard, because it returns nil when cells are reloaded
+
+            if indexPath.row == 0 {
+                cartTotal = 0.0
+            }
+            let item = cartItems[indexPath.row]
+            
+            let name = item.value(forKeyPath: "name") as? String
+            let category = item.value(forKeyPath: "category") as? String
+            let quantity = item.value(forKeyPath: "quantity") as! Int
+            let notes = item.value(forKeyPath: "notes") as! String
+            let price = item.value(forKeyPath: "price") as? Double
+            
+            var total = price! * Double(quantity)
+            total = round(100.0 * total) / 100.0
+            
+            
+            cell.image.image = UIImage(named: "image_\(name!)")
+            cell.title.text = name
+            cell.category.text = category
+            cell.quantity.text = "quantity: \(quantity)"
+            cell.notes.text = "Notes: \(notes)"
+            cell.price.text = "\(total)"
+            
+            cartTotal = cartTotal + total
+            print("item: \(total)")
+            print("total: \(cartTotal)")
+            
+            
+            
+        }
+        
+        if indexPath.row == cartItems.count - 1 {
+            addSubtotal()
+        }
         
         DispatchQueue.main.async {
             UIView.animate(withDuration: 1.0, animations: {

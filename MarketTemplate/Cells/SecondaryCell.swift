@@ -49,7 +49,7 @@ class SecondaryCell: UICollectionViewCell {
         
         title.centerXAnchor.constraint(equalTo: self.image.centerXAnchor, constant: 0).isActive = true
         title.widthAnchor.constraint(equalTo: self.widthAnchor, multiplier: 0.9).isActive = true
-        title.bottomAnchor.constraint(equalTo: self.bottomAnchor, constant: -8).isActive = true
+        title.bottomAnchor.constraint(equalTo: self.bottomAnchor, constant: -5).isActive = true
         title.heightAnchor.constraint(equalTo: self.heightAnchor, multiplier: 1/5).isActive = true
         
     }

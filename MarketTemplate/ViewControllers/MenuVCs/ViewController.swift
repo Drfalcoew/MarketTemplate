@@ -61,7 +61,7 @@ class ViewController: UIViewController {
         // Do any additional setup after loading the view.
         
         for item in Menu().items {
-            print(item)
+            //print(item)
         }
         
         

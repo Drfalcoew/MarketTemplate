@@ -30,7 +30,6 @@ class MenuViewController: UIViewController {
     func setupAttributes() {
         for category in Menu().categories {
             categories.append(category)
-            print(category)
         }
     }
     

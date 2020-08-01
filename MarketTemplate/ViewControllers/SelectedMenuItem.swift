@@ -138,7 +138,7 @@ extension SelectedMenuItem : UICollectionViewDelegate, UICollectionViewDataSourc
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "menu", for: indexPath) as! SecondaryCell
         cell.backgroundColor = .white
-        cell.image.image = UIImage(named: "item_\(indexPath.row)")
+        cell.image.image = UIImage(named: "image_\(categoryItems[indexPath.row].name)")
         cell.layer.cornerRadius = 12
         cell.layer.shadowColor = UIColor.black.cgColor
         cell.layer.shadowOffset = CGSize(width: 3.0, height: 5.0)
@@ -161,6 +161,7 @@ extension SelectedMenuItem : UICollectionViewDelegate, UICollectionViewDataSourc
         let vc = ItemDetails()
         item = categoryItems[indexPath.row]
         vc.selectedItem = item
+        vc.selectedItemCategory = selectedCategoryName
         self.navigationController?.customPush(viewController: vc)
     }
     

@@ -64,7 +64,7 @@ class CartItemCell: UICollectionViewCell {
         lbl.translatesAutoresizingMaskIntoConstraints = false
         lbl.layer.masksToBounds = true
         lbl.textAlignment = .right
-        lbl.font = UIFont(name: "Helvetica Neue", size: 14)
+        lbl.font = UIFont(name: "Helvetica Neue", size: 15)
         lbl.adjustsFontSizeToFitWidth = true
         lbl.minimumScaleFactor = 0.5
         lbl.textColor = UIColor(r: 75, g: 80, b: 120)
@@ -98,7 +98,18 @@ class CartItemCell: UICollectionViewCell {
         self.addSubview(price)
         self.addSubview(notes)
         
+        setupView()
         setupConstraints()
+    }
+    
+    func setupView() {
+        self.backgroundColor = .white
+        self.layer.cornerRadius = 12
+        self.layer.shadowColor = UIColor.black.cgColor
+        self.layer.shadowOffset = CGSize(width: 3.0, height: 5.0)
+        self.layer.shadowOpacity = 0.2
+        self.layer.shadowRadius = 5.0
+        self.contentView.alpha = 0
     }
     
     func setupConstraints() {
@@ -108,7 +119,7 @@ class CartItemCell: UICollectionViewCell {
         image.topAnchor.constraint(equalTo: self.topAnchor, constant: 10).isActive = true
         
         price.topAnchor.constraint(equalTo: self.image.topAnchor, constant: 0).isActive = true
-        price.rightAnchor.constraint(equalTo: self.rightAnchor, constant: -5).isActive = true
+        price.rightAnchor.constraint(equalTo: self.rightAnchor, constant: -15).isActive = true
         price.widthAnchor.constraint(equalTo: self.widthAnchor, multiplier: 1/6).isActive = true
         price.heightAnchor.constraint(equalTo: self.heightAnchor, multiplier: 1/5).isActive = true
         

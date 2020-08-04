@@ -9,7 +9,7 @@
 import Foundation
 import UIKit
 
-class ShowItem: NSObject, UIGestureRecognizerDelegate {
+class HoursView: UIView, UIGestureRecognizerDelegate {
     
     
     let blackView = UIView()
@@ -24,9 +24,8 @@ class ShowItem: NSObject, UIGestureRecognizerDelegate {
         return view
     }()
 
-    
-    override init() {
-        super.init()
+    override init(frame: CGRect) {
+        super.init(frame: frame)
         
         tap = UITapGestureRecognizer(target: self, action: #selector(dismissView))
         
@@ -35,7 +34,11 @@ class ShowItem: NSObject, UIGestureRecognizerDelegate {
         blackView.addGestureRecognizer(tap!)
         
     }
-
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
     
     func setupViews() {
         

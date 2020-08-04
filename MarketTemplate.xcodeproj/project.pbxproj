@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		4C44688B24C8DE06008736FD /* ShoppingCartItems+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C44688924C8DE06008736FD /* ShoppingCartItems+CoreDataClass.swift */; };
 		4C450DF624D372B500BA8DE2 /* AddRemoveItemMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C450DF524D372B500BA8DE2 /* AddRemoveItemMenu.swift */; };
+		4CAAD3D524D7826700646623 /* LoginViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CAAD3D424D7826700646623 /* LoginViewController.swift */; };
 		4CC0575124A2E8D20094B2EB /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CC0575024A2E8D20094B2EB /* AppDelegate.swift */; };
 		4CC0575324A2E8D20094B2EB /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CC0575224A2E8D20094B2EB /* SceneDelegate.swift */; };
 		4CC0575524A2E8D20094B2EB /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CC0575424A2E8D20094B2EB /* ViewController.swift */; };
@@ -17,6 +18,8 @@
 		4CC0576024A2E8D40094B2EB /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 4CC0575E24A2E8D40094B2EB /* LaunchScreen.storyboard */; };
 		4CC0576B24A2E8D40094B2EB /* MarketTemplateTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CC0576A24A2E8D40094B2EB /* MarketTemplateTests.swift */; };
 		4CC0577624A2E8D40094B2EB /* MarketTemplateUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CC0577524A2E8D40094B2EB /* MarketTemplateUITests.swift */; };
+		4CEC62B124D9097E007E385F /* HoursSubview.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CEC62B024D9097E007E385F /* HoursSubview.swift */; };
+		4CEC62B324D91479007E385F /* HoursSubviewSmall.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CEC62B224D91479007E385F /* HoursSubviewSmall.swift */; };
 		4CF4330124AE52A100D3E939 /* ShowMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CF4330024AE52A100D3E939 /* ShowMenu.swift */; };
 		4CF4330324AE531400D3E939 /* MenuCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CF4330224AE531400D3E939 /* MenuCell.swift */; };
 		4CF4330724AE55D000D3E939 /* SettingsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CF4330624AE55D000D3E939 /* SettingsViewController.swift */; };
@@ -30,11 +33,10 @@
 		4CF4331824B38E0100D3E939 /* CartItemCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CF4331724B38E0100D3E939 /* CartItemCell.swift */; };
 		4CF4331D24B3908500D3E939 /* CartTotalView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CF4331C24B3908500D3E939 /* CartTotalView.swift */; };
 		4CF4332224B3E7EB00D3E939 /* Menu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CF4332124B3E7EB00D3E939 /* Menu.swift */; };
-		4CF4332424B445C000D3E939 /* ShowPromo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CF4332324B445C000D3E939 /* ShowPromo.swift */; };
+		4CF4332424B445C000D3E939 /* HoursView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CF4332324B445C000D3E939 /* HoursView.swift */; };
 		4CF4332624B55D1900D3E939 /* ItemDetails.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CF4332524B55D1900D3E939 /* ItemDetails.swift */; };
 		4CF4332924B5958B00D3E939 /* ItemOptionsCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CF4332824B5958B00D3E939 /* ItemOptionsCell.swift */; };
 		4CF4332B24B6510E00D3E939 /* SecondaryCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CF4332A24B6510E00D3E939 /* SecondaryCell.swift */; };
-		4CF4332D24B69D8F00D3E939 /* LoginViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CF4332C24B69D8E00D3E939 /* LoginViewController.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -57,6 +59,7 @@
 /* Begin PBXFileReference section */
 		4C44688924C8DE06008736FD /* ShoppingCartItems+CoreDataClass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ShoppingCartItems+CoreDataClass.swift"; sourceTree = SOURCE_ROOT; };
 		4C450DF524D372B500BA8DE2 /* AddRemoveItemMenu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddRemoveItemMenu.swift; sourceTree = "<group>"; };
+		4CAAD3D424D7826700646623 /* LoginViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginViewController.swift; sourceTree = "<group>"; };
 		4CC0574D24A2E8D20094B2EB /* MarketTemplate.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MarketTemplate.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		4CC0575024A2E8D20094B2EB /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		4CC0575224A2E8D20094B2EB /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -71,6 +74,8 @@
 		4CC0577124A2E8D40094B2EB /* MarketTemplateUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = MarketTemplateUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		4CC0577524A2E8D40094B2EB /* MarketTemplateUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarketTemplateUITests.swift; sourceTree = "<group>"; };
 		4CC0577724A2E8D40094B2EB /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		4CEC62B024D9097E007E385F /* HoursSubview.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HoursSubview.swift; sourceTree = "<group>"; };
+		4CEC62B224D91479007E385F /* HoursSubviewSmall.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HoursSubviewSmall.swift; sourceTree = "<group>"; };
 		4CF4330024AE52A100D3E939 /* ShowMenu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShowMenu.swift; sourceTree = "<group>"; };
 		4CF4330224AE531400D3E939 /* MenuCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuCell.swift; sourceTree = "<group>"; };
 		4CF4330624AE55D000D3E939 /* SettingsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsViewController.swift; sourceTree = "<group>"; };
@@ -84,11 +89,10 @@
 		4CF4331724B38E0100D3E939 /* CartItemCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CartItemCell.swift; sourceTree = "<group>"; };
 		4CF4331C24B3908500D3E939 /* CartTotalView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CartTotalView.swift; sourceTree = "<group>"; };
 		4CF4332124B3E7EB00D3E939 /* Menu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Menu.swift; sourceTree = "<group>"; };
-		4CF4332324B445C000D3E939 /* ShowPromo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShowPromo.swift; sourceTree = "<group>"; };
+		4CF4332324B445C000D3E939 /* HoursView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HoursView.swift; sourceTree = "<group>"; };
 		4CF4332524B55D1900D3E939 /* ItemDetails.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ItemDetails.swift; sourceTree = "<group>"; };
 		4CF4332824B5958B00D3E939 /* ItemOptionsCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ItemOptionsCell.swift; sourceTree = "<group>"; };
 		4CF4332A24B6510E00D3E939 /* SecondaryCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SecondaryCell.swift; sourceTree = "<group>"; };
-		4CF4332C24B69D8E00D3E939 /* LoginViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginViewController.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -179,10 +183,20 @@
 			path = MarketTemplateUITests;
 			sourceTree = "<group>";
 		};
+		4CEC62AF24D9096A007E385F /* Hours */ = {
+			isa = PBXGroup;
+			children = (
+				4CF4332324B445C000D3E939 /* HoursView.swift */,
+				4CEC62B024D9097E007E385F /* HoursSubview.swift */,
+				4CEC62B224D91479007E385F /* HoursSubviewSmall.swift */,
+			);
+			path = Hours;
+			sourceTree = "<group>";
+		};
 		4CF4330424AE531D00D3E939 /* Menu */ = {
 			isa = PBXGroup;
 			children = (
-				4CF4332324B445C000D3E939 /* ShowPromo.swift */,
+				4CEC62AF24D9096A007E385F /* Hours */,
 				4CF4330024AE52A100D3E939 /* ShowMenu.swift */,
 				4C450DF524D372B500BA8DE2 /* AddRemoveItemMenu.swift */,
 			);
@@ -198,7 +212,6 @@
 				4CF4331324B2266700D3E939 /* ShoppingCartVC.swift */,
 				4CF4331524B2283A00D3E939 /* CheckoutVC.swift */,
 				4CF4332524B55D1900D3E939 /* ItemDetails.swift */,
-				4CF4332C24B69D8E00D3E939 /* LoginViewController.swift */,
 			);
 			path = ViewControllers;
 			sourceTree = "<group>";
@@ -232,6 +245,7 @@
 				4CC0575424A2E8D20094B2EB /* ViewController.swift */,
 				4CF4330D24AEEF8800D3E939 /* MenuViewController.swift */,
 				4CF4330F24AFBA1300D3E939 /* ProfileViewController.swift */,
+				4CAAD3D424D7826700646623 /* LoginViewController.swift */,
 			);
 			path = MenuVCs;
 			sourceTree = "<group>";
@@ -369,7 +383,6 @@
 				4CF4331624B2283A00D3E939 /* CheckoutVC.swift in Sources */,
 				4CC0575524A2E8D20094B2EB /* ViewController.swift in Sources */,
 				4CF4332B24B6510E00D3E939 /* SecondaryCell.swift in Sources */,
-				4CF4332D24B69D8F00D3E939 /* LoginViewController.swift in Sources */,
 				4CF4331D24B3908500D3E939 /* CartTotalView.swift in Sources */,
 				4C450DF624D372B500BA8DE2 /* AddRemoveItemMenu.swift in Sources */,
 				4CF4331824B38E0100D3E939 /* CartItemCell.swift in Sources */,
@@ -377,11 +390,14 @@
 				4CF4330E24AEEF8800D3E939 /* MenuViewController.swift in Sources */,
 				4CF4331224AFCF1200D3E939 /* SelectedMenuItem.swift in Sources */,
 				4C44688B24C8DE06008736FD /* ShoppingCartItems+CoreDataClass.swift in Sources */,
-				4CF4332424B445C000D3E939 /* ShowPromo.swift in Sources */,
+				4CF4332424B445C000D3E939 /* HoursView.swift in Sources */,
 				4CF4330C24AEC41500D3E939 /* PrimaryCell.swift in Sources */,
+				4CAAD3D524D7826700646623 /* LoginViewController.swift in Sources */,
 				4CF4330124AE52A100D3E939 /* ShowMenu.swift in Sources */,
 				4CF4330A24AE572500D3E939 /* SettingCell.swift in Sources */,
 				4CF4330724AE55D000D3E939 /* SettingsViewController.swift in Sources */,
+				4CEC62B124D9097E007E385F /* HoursSubview.swift in Sources */,
+				4CEC62B324D91479007E385F /* HoursSubviewSmall.swift in Sources */,
 				4CF4332924B5958B00D3E939 /* ItemOptionsCell.swift in Sources */,
 				4CF4330324AE531400D3E939 /* MenuCell.swift in Sources */,
 				4CC0575124A2E8D20094B2EB /* AppDelegate.swift in Sources */,

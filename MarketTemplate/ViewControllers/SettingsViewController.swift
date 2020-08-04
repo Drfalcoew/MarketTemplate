@@ -88,7 +88,7 @@ class SettingsViewController: UIViewController, UITableViewDataSource, UITableVi
     }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return 8
+        return 3
     }
     
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
@@ -97,32 +97,23 @@ class SettingsViewController: UIViewController, UITableViewDataSource, UITableVi
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = self.tableView.dequeueReusableCell(withIdentifier: cellId) as! SettingCell
-        if indexPath.row == 0 {
-            cell.nameLabel.textColor = UIColor(r: 125, g: 200, b: 180)
-            cell.nameLabel.font = UIFont.boldSystemFont(ofSize: 18)
-        }
+
         switch indexPath.row {
         case 0:
-            cell.nameLabel.text = "HEROISM"
-            break
-        case 1:
-            cell.nameLabel.text = "Learn More"
-            break
-        case 2:
             cell.nameLabel.text = "Setup Notifications"
             if y != 1 {
                 cell.contentView.addSubview(badgeIcon)
                 badgeIcon.isHidden = false
-                badgeIcon.centerXAnchor.constraint(equalTo: cell.nameLabel.rightAnchor, constant: 0).isActive = true
+                badgeIcon.centerXAnchor.constraint(equalTo: cell.nameLabel.rightAnchor, constant: -5).isActive = true
                 badgeIcon.centerYAnchor.constraint(equalTo: cell.contentView.centerYAnchor, constant: -10).isActive = true
                 badgeIcon.widthAnchor.constraint(equalToConstant: 28).isActive = true
                 badgeIcon.heightAnchor.constraint(equalToConstant: 28).isActive = true
             }
             break
-        case 3:
+        case 1:
             cell.nameLabel.text = "Feedback"
             break
-        case 4:
+        case 2:
             cell.nameLabel.text = "Logout"
             break
         default: break
@@ -143,14 +134,7 @@ class SettingsViewController: UIViewController, UITableViewDataSource, UITableVi
         case 2:
             //navigationController?.customPush(viewController: RequestNotifications())
             break
-        case 3:
-            //navigationController?.customPush(viewController: FeedbackViewController())
-            break
-        case 4:
-            //navigationController?.customPush(viewController: LoginController())
-            break
         default:
-            functionUnavailable()
             break
         }
     }

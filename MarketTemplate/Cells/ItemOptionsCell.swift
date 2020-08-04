@@ -83,8 +83,18 @@ class ItemOptionsCell: UICollectionViewCell {
     override var isSelected: Bool {
         didSet{
             if self.isSelected {
-                UIView.animate(withDuration: 0.3) {
-                    self.backgroundColor = UIColor(r: 175, g: 175, b: 175)
+                self.transform = CGAffineTransform(scaleX: 0.6, y: 0.6)
+                
+            
+                UIView.animate(withDuration: 0.5,
+                                           delay: 0,
+                                           usingSpringWithDamping: CGFloat(0.5),
+                                           initialSpringVelocity: CGFloat(1.0),
+                                           options: UIView.AnimationOptions.allowUserInteraction,
+                                           animations: {
+                                            self.backgroundColor = UIColor(r: 200, g: 200, b: 200)
+                                            self.transform = CGAffineTransform.identity
+                    }) { (true) in
                 }
             }
             else {

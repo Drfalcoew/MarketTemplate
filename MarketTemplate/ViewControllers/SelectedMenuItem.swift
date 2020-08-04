@@ -16,13 +16,6 @@ class SelectedMenuItem: UIViewController {
     var selectedCategoryIndex : Int = 1000 // categoryIndex
     var categoryItems : [Item] = []
     
-    
-    lazy var showItem : ShowItem = {
-        let item = ShowItem()
-        
-        return item
-    }()
-    
     override func viewDidLoad() {
         super.viewDidLoad()
         self.view.backgroundColor = UIColor(r: 240, g: 240, b: 240)

@@ -7,11 +7,15 @@
 //
 
 import UIKit
+import MapKit
 
-
-class ViewController: UIViewController {
+class ViewController: UIViewController, UIGestureRecognizerDelegate {
     
     var collectionView : UICollectionView!
+    var tap : UITapGestureRecognizer!
+    
+    var hour : Int?
+    
     
     var orderNowButton : UIButton = {
         let btn = UIButton()
@@ -42,7 +46,7 @@ class ViewController: UIViewController {
         return lbl
     }()
     
-    var eventView : UIView = {
+    var mapContainerView : UIView = {
         let view = UIView()
         view.layer.cornerRadius = 10
         view.layer.shadowColor = UIColor.black.cgColor
@@ -51,9 +55,37 @@ class ViewController: UIViewController {
         view.layer.shadowRadius = 5.0
         view.backgroundColor = .white
         view.translatesAutoresizingMaskIntoConstraints = false
-        //view.layer.masksToBounds = true
+        //view.clipsToBounds = true
         return view
     }()
+    
+    
+    
+    var mapView : MKMapView = {
+        let map = MKMapView()
+        map.translatesAutoresizingMaskIntoConstraints = false
+        map.layer.masksToBounds = true
+        let location = CLLocationCoordinate2D(latitude: Attributes().location_Latitude, longitude: Attributes().location_Longitude)
+        let region = MKCoordinateRegion(center: location, span: MKCoordinateSpan(latitudeDelta: 0.001, longitudeDelta: 0.001))
+        map.setRegion(region, animated: true)
+        
+        let pin = customPin(pinTitle: Attributes().name, pinSubTitle: Attributes().location, location: location)
+        map.addAnnotation(pin)
+        return map
+    }()
+    
+    var hourView : HoursSubviewSmall = {
+        let view = HoursSubviewSmall()
+        view.translatesAutoresizingMaskIntoConstraints = false
+        view.layer.cornerRadius = 10
+        view.layer.shadowColor = UIColor.black.cgColor
+        view.layer.shadowOffset = CGSize(width: 3.0, height: 5.0)
+        view.layer.shadowOpacity = 0.2
+        view.layer.shadowRadius = 5.0
+        view.backgroundColor = .white
+        return view
+    }()
+    
     
     
     override func viewDidLoad() {
@@ -64,21 +96,59 @@ class ViewController: UIViewController {
             //print(item)
         }
         
+        let date = Date()
+        let calendar = Calendar.current
+        
+        hour = calendar.component(.hour, from: date)
+        
+        tap = UITapGestureRecognizer(target: self, action: #selector(showHours))
+        
         
         self.title = "Home"
         self.view.tag = 0
         self.view.backgroundColor = UIColor(r: 240, g: 240, b: 240)
         
+        setupHours()
         setupNavigation()
         setupCollectionView()
         setupViews()
         setupConstraints()
     }
     
+    func setupHours() {
+        hourView.addGestureRecognizer(tap)
+        let closes = Attributes().closes
+        let opens = Attributes().opens
+        // if realTime < opening time, show opening time.
+        // if realTime < closing time but also > opening, show closing time.
+        if hour! > Attributes().opens && hour! < Attributes().closes {
+            hourView.statusValue.text = "Open"
+            hourView.statusValue.textColor = UIColor(r: 89, g: 200, b: 89)
+            
+            hourView.hoursLbl.text = "Closes:"
+            hourView.hoursValue.text = timeConversion12(time24: "\(String(closes)):00")
+            
+            
+        } else {
+            hourView.statusValue.text = "Closed"
+            hourView.statusValue.textColor = UIColor(r: 255, g: 89, b: 89)
+            hourView.hoursLbl.text = "Opens:"
+            hourView.hoursValue.text = timeConversion12(time24: "\(String(opens)):00")
+
+        }
+    }
+    
+    @objc func showHours() {
+        self.present(HoursSubview(), animated: true, completion: nil)
+    }
+    
     func setupViews() {
         //self.view.addSubview(titleView)
         self.view.addSubview(orderNowButton)
-        self.view.addSubview(eventView)
+        self.view.addSubview(mapContainerView)
+        self.view.addSubview(hourView)
+        
+        self.mapContainerView.addSubview(mapView)
     }
     
     func setupConstraints() {
@@ -98,10 +168,20 @@ class ViewController: UIViewController {
         orderNowButton.centerXAnchor.constraint(equalTo: self.view.centerXAnchor, constant: 0).isActive = true
         orderNowButton.heightAnchor.constraint(equalTo: self.orderNowButton.widthAnchor, multiplier: 1/4).isActive = true
         
-        eventView.topAnchor.constraint(equalTo: self.view.centerYAnchor, constant: 0).isActive = true
-        eventView.widthAnchor.constraint(equalTo: self.view.widthAnchor, multiplier: 9/10).isActive = true
-        eventView.bottomAnchor.constraint(equalTo: self.view.bottomAnchor, constant: (self.view.frame.height * -0.05)).isActive = true
-        eventView.centerXAnchor.constraint(equalTo: self.view.centerXAnchor, constant: 0).isActive = true
+        mapContainerView.topAnchor.constraint(equalTo: self.orderNowButton.bottomAnchor, constant: 30).isActive = true
+        mapContainerView.widthAnchor.constraint(equalTo: self.view.widthAnchor, multiplier: 9/10).isActive = true
+        mapContainerView.bottomAnchor.constraint(equalTo: self.view.centerYAnchor, constant: self.view.frame.height * 0.15).isActive = true
+        mapContainerView.centerXAnchor.constraint(equalTo: self.view.centerXAnchor, constant: 0).isActive = true
+        
+        mapView.widthAnchor.constraint(equalTo: self.mapContainerView.widthAnchor, multiplier: 0.95).isActive = true
+        mapView.heightAnchor.constraint(equalTo: self.mapContainerView.heightAnchor, multiplier: 0.95).isActive = true
+        mapView.centerXAnchor.constraint(equalTo: self.view.centerXAnchor, constant: 0).isActive = true
+        mapView.centerYAnchor.constraint(equalTo: self.mapContainerView.centerYAnchor, constant: 0).isActive = true
+        
+        hourView.topAnchor.constraint(equalTo: self.mapContainerView.bottomAnchor, constant: 15).isActive = true
+        hourView.heightAnchor.constraint(equalTo: self.orderNowButton.heightAnchor, constant: 0).isActive = true
+        hourView.centerXAnchor.constraint(equalTo: self.view.centerXAnchor, constant: 0).isActive = true
+        hourView.widthAnchor.constraint(equalTo: self.mapContainerView.widthAnchor, multiplier: 1).isActive = true
     }
     
     func setupCollectionView() {
@@ -131,8 +211,7 @@ class ViewController: UIViewController {
         
         //self.view.addSubview(collectionView)
     }
-
-
+    
     func setupNavigation() {
            //self.navigationController?.navigationBar.titleTextAttributes = [NSAttributedString.Key.foregroundColor : UIColor.blue]
            
@@ -181,8 +260,36 @@ class ViewController: UIViewController {
     }
     
     @objc func handleOrderNow() {
-        self.navigationController?.customPush(viewController: MenuViewController())
+        
+
+        orderNowButton.transform = CGAffineTransform(scaleX: 0.6, y: 0.6)
+        
+    
+        UIView.animate(withDuration: 0.5,
+                                   delay: 0,
+                                   usingSpringWithDamping: CGFloat(0.5),
+                                   initialSpringVelocity: CGFloat(1.0),
+                                   options: UIView.AnimationOptions.allowUserInteraction,
+                                   animations: {
+                                    self.orderNowButton.transform = CGAffineTransform.identity
+            }) { (true) in
+                self.navigationController?.customPush(viewController: MenuViewController())
+        }
+        
     }
+    
+    func timeConversion12(time24: String) -> String {
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "HH:mm"
+
+        let date = dateFormatter.date(from: time24)
+        dateFormatter.dateFormat = "h:mm a"
+        let date12 = dateFormatter.string(from: date!)
+
+        return date12
+    }
+    
+    
 }
 
 
@@ -221,7 +328,17 @@ extension ViewController : UICollectionViewDelegate, UICollectionViewDataSource 
     }
 }
 
-
+class customPin: NSObject, MKAnnotation {
+    var coordinate: CLLocationCoordinate2D
+    var title: String?
+    var subtitle: String?
+    
+    init(pinTitle: String, pinSubTitle : String, location : CLLocationCoordinate2D) {
+        self.title = pinTitle
+        self.subtitle = pinSubTitle
+        self.coordinate = location
+    }
+}
 
 public extension UINavigationController {
     
@@ -249,4 +366,3 @@ public extension UINavigationController {
         self.view.layer.add(transition, forKey: nil)
     }
 }
-

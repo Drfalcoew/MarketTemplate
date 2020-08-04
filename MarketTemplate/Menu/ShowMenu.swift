@@ -11,11 +11,11 @@ import UIKit
 
 class ShowMenu: NSObject, UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout, UIGestureRecognizerDelegate {
     
-    let titleText : [String] = ["Home", "Menu", "Profile", "Settings"]
+    let titleText : [String] = ["Home", "Menu", "Sign in", "Settings"]
     let cellId = "cellId"
     let blackView = UIView()
     var viewController : UIViewController?
-    let vc : [UIViewController] = [ViewController(), MenuViewController(), ProfileViewController()]
+    let vc : [UIViewController] = [ViewController(), MenuViewController(), LoginViewController()]
     
     var tap : UITapGestureRecognizer?
     

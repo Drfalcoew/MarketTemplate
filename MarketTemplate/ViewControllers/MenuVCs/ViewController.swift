@@ -15,8 +15,7 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
     var tap : UITapGestureRecognizer!
     
     var hour : Int?
-    
-    
+        
     var orderNowButton : UIButton = {
         let btn = UIButton()
         btn.translatesAutoresizingMaskIntoConstraints = false
@@ -53,7 +52,7 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
         view.layer.shadowOffset = CGSize(width: 3.0, height: 5.0)
         view.layer.shadowOpacity = 0.2
         view.layer.shadowRadius = 5.0
-        view.backgroundColor = .white
+        view.checkMode()
         view.translatesAutoresizingMaskIntoConstraints = false
         //view.clipsToBounds = true
         return view
@@ -82,7 +81,7 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
         view.layer.shadowOffset = CGSize(width: 3.0, height: 5.0)
         view.layer.shadowOpacity = 0.2
         view.layer.shadowRadius = 5.0
-        view.backgroundColor = .white
+        view.checkMode()
         return view
     }()
     
@@ -117,23 +116,24 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
     
     func setupHours() {
         hourView.addGestureRecognizer(tap)
-        let closes = Attributes().closes
-        let opens = Attributes().opens
+        let closes = Attributes().closingHours
+        let opens = Attributes().openingHours
+        let index = Calendar.current.component(.weekday, from: Date()) // this returns an Int
         // if realTime < opening time, show opening time.
         // if realTime < closing time but also > opening, show closing time.
-        if hour! > Attributes().opens && hour! < Attributes().closes {
+        if hour! > opens[index - 1] && hour! < closes[index - 1] {
             hourView.statusValue.text = "Open"
             hourView.statusValue.textColor = UIColor(r: 89, g: 200, b: 89)
             
             hourView.hoursLbl.text = "Closes:"
-            hourView.hoursValue.text = timeConversion12(time24: "\(String(closes)):00")
+            hourView.hoursValue.text = timeConversion12(time24: "\(String(closes[index - 1])):00")
             
             
         } else {
             hourView.statusValue.text = "Closed"
             hourView.statusValue.textColor = UIColor(r: 255, g: 89, b: 89)
             hourView.hoursLbl.text = "Opens:"
-            hourView.hoursValue.text = timeConversion12(time24: "\(String(opens)):00")
+            hourView.hoursValue.text = timeConversion12(time24: "\(String(opens[index - 1])):00")
 
         }
     }
@@ -152,17 +152,7 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
     }
     
     func setupConstraints() {
-        
-        /*titleView.topAnchor.constraint(equalTo: self.view.topAnchor, constant: 10).isActive = true
-        titleView.widthAnchor.constraint(equalTo: self.view.widthAnchor, constant: -40).isActive = true
-        titleView.heightAnchor.constraint(equalTo: self.view.heightAnchor, multiplier: 1/12).isActive = true
-        titleView.centerXAnchor.constraint(equalTo: self.view.centerXAnchor, constant: 0).isActive = true*/
-        
-        /*collectionView.topAnchor.constraint(equalTo: self.view.topAnchor, constant: 30).isActive = true
-        collectionView.widthAnchor.constraint(equalTo: self.view.widthAnchor, constant: 0).isActive = true
-        collectionView.heightAnchor.constraint(equalTo: self.view.widthAnchor, multiplier: 1/1.8).isActive = true
-        collectionView.centerXAnchor.constraint(equalTo: self.view.centerXAnchor, constant: 0).isActive = true*/
-        
+       
         orderNowButton.topAnchor.constraint(equalTo: self.view.topAnchor, constant: 30).isActive = true
         orderNowButton.widthAnchor.constraint(equalTo: self.view.widthAnchor, multiplier: 0.8).isActive = true
         orderNowButton.centerXAnchor.constraint(equalTo: self.view.centerXAnchor, constant: 0).isActive = true
@@ -213,36 +203,37 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
     }
     
     func setupNavigation() {
-           //self.navigationController?.navigationBar.titleTextAttributes = [NSAttributedString.Key.foregroundColor : UIColor.blue]
            
-           navigationController?.navigationBar.titleTextAttributes = [NSAttributedString.Key(rawValue: NSAttributedString.Key.foregroundColor.rawValue): UIColor(r: 75, g: 80, b: 120)]
-           
-           
-           let settingsButton = UIButton(type: .system)
-           settingsButton.setImage(UIImage(named: "menu")?.withRenderingMode(.alwaysOriginal), for: .normal)
-           //settingsButton.imageView?.tintImageColor(color: UIColor(r: 40, g: 43, b: 53))
-           if #available(iOS 9.0, *) {
-               settingsButton.widthAnchor.constraint(equalToConstant: 28).isActive = true
-               settingsButton.heightAnchor.constraint(equalToConstant: 28).isActive = true
-           } else {
-               settingsButton.frame = CGRect(x: 0, y: 0, width: 28, height: 28)
-           }
-           settingsButton.contentMode = .scaleAspectFit
-           settingsButton.addTarget(self, action: #selector(showSettings), for: .touchDown)
+        let settingsButton = UIButton(type: .system)
+        settingsButton.setImage(UIImage(named: "menu")?.withRenderingMode(.alwaysTemplate), for: .normal)
+        settingsButton.checkModeBtn()
+        //settingsButton.imageView?.tintImageColor(color: UIColor(r: 40, g: 43, b: 53))
+        if #available(iOS 9.0, *) {
+            settingsButton.widthAnchor.constraint(equalToConstant: 28).isActive = true
+            settingsButton.heightAnchor.constraint(equalToConstant: 28).isActive = true
+        } else {
+            settingsButton.frame = CGRect(x: 0, y: 0, width: 28, height: 28)
+        }
+        settingsButton.contentMode = .scaleAspectFit
+        settingsButton.addTarget(self, action: #selector(showSettings), for: .touchDown)
           
-           self.navigationItem.leftBarButtonItem = UIBarButtonItem(customView: settingsButton)
+        self.navigationItem.leftBarButtonItem = UIBarButtonItem(customView: settingsButton)
            
-           let cart = UIButton(type: .system)
-           cart.setImage(UIImage(named: "cart")?.withRenderingMode(.alwaysOriginal), for: .normal)
-           if #available(iOS 9.0, *) {
-               cart.widthAnchor.constraint(equalToConstant: 32).isActive = true
-               cart.heightAnchor.constraint(equalToConstant: 32).isActive = true
-           } else {
-               cart.frame = CGRect(x: 0, y: 0, width: 32, height: 32)
-           }
-           cart.contentMode = .scaleAspectFit
-           cart.addTarget(self, action: #selector(handleCartTouch), for: .touchUpInside)
-           self.navigationItem.rightBarButtonItem = UIBarButtonItem(customView: cart)
+        let cart = UIButton(type: .system)
+        cart.setImage(UIImage(named: "cart")?.withRenderingMode(.alwaysTemplate), for: .normal)
+        cart.checkModeBtn()
+        if #available(iOS 9.0, *) {
+            cart.widthAnchor.constraint(equalToConstant: 32).isActive = true
+            cart.heightAnchor.constraint(equalToConstant: 32).isActive = true
+        } else {
+            cart.frame = CGRect(x: 0, y: 0, width: 32, height: 32)
+        }
+        cart.contentMode = .scaleAspectFit
+        cart.addTarget(self, action: #selector(handleCartTouch), for: .touchUpInside)
+        self.navigationItem.rightBarButtonItem = UIBarButtonItem(customView: cart)
+        
+        
+        
     }
     
     lazy var showMenu : ShowMenu = {
@@ -292,7 +283,24 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
     
 }
 
+extension UIApplication {
+    @available(iOS 13.0, *)
+    var userInterfaceStyle: UIUserInterfaceStyle? {
+        return self.keyWindow?.traitCollection.userInterfaceStyle
+    }
+}
 
+@available(iOS 13.0, *)
+    func setSystemTheme() {
+        switch UIApplication.shared.userInterfaceStyle {
+        case .dark?:
+            break
+        case .light?:
+            break
+        default:
+            break
+        }
+    }
 
 extension ViewController : UICollectionViewDelegate, UICollectionViewDataSource {
     
@@ -364,5 +372,48 @@ public extension UINavigationController {
         transition.timingFunction = CAMediaTimingFunction(name: CAMediaTimingFunctionName(rawValue: CAMediaTimingFunctionName.easeInEaseOut.rawValue))
         transition.type = CATransitionType(rawValue: type)
         self.view.layer.add(transition, forKey: nil)
+    }
+}
+
+extension UIView {
+    func checkMode() -> UIView {
+        if traitCollection.userInterfaceStyle == .light {
+            self.backgroundColor = .white
+            return self
+        } else {
+            self.backgroundColor = UIColor(r: 50, g: 50, b: 50)
+            return self
+        }
+    }
+}
+
+extension UILabel {
+    func checkMode_0() -> UILabel {
+        if traitCollection.userInterfaceStyle == .light {
+            self.textColor = .white
+
+            return self
+        } else {
+            self.textColor = UIColor.black//(r: 50, g: 50, b: 50)
+            return self
+        }
+    }
+}
+
+extension UIButton {
+    func checkModeBtn() {
+        guard let image = imageView?.image else { return }
+        self.imageView?.image = image.withRenderingMode(UIImage.RenderingMode.alwaysTemplate)
+        if traitCollection.userInterfaceStyle == .light {
+            self.tintColor = UIColor(r: 75, g: 80, b: 120)
+            UINavigationController().navigationBar.titleTextAttributes = [NSAttributedString.Key(rawValue: NSAttributedString.Key.foregroundColor.rawValue): UIColor(r: 75, g: 80, b: 120)]
+            
+
+        } else { // dark
+            self.tintColor = .white
+            UINavigationController().navigationBar.titleTextAttributes = [NSAttributedString.Key(rawValue: NSAttributedString.Key.foregroundColor.rawValue): UIColor(r: 50, g: 50, b: 50)]
+
+        }
+
     }
 }

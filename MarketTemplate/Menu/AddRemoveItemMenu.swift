@@ -166,6 +166,24 @@ class AddRemoveItemMenu: NSObject, UIGestureRecognizerDelegate {
     override init() {
         super.init()
                 
+        switch addRemoveButton.traitCollection.userInterfaceStyle {
+        case .dark:
+            self.menuView.backgroundColor = UIColor(r: 50, g: 50, b: 50)
+            self.addButton.backgroundColor = UIColor(r: 240, g: 240, b: 240)
+            self.removeButton.backgroundColor = UIColor(r: 240, g: 240, b: 240)
+            break
+        case .light, .unspecified:
+            self.menuView.backgroundColor = UIColor(r: 240, g: 240, b: 240)
+            self.addButton.backgroundColor = UIColor(r: 50, g: 50, b: 50)
+            self.removeButton.backgroundColor = UIColor(r: 50, g: 50, b: 50)
+            
+            break
+        default:
+            break
+        }
+
+        
+        
         self.blackView.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(dismissSettings)))
         quantity = 0
         quantityLbl.text = "\(quantity)"

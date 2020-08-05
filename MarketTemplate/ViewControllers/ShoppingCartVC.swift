@@ -165,15 +165,20 @@ class ShoppingCartVC: UIViewController {
     }
     
     func setupNavigation() {
-        navigationController?.navigationBar.titleTextAttributes = [NSAttributedString.Key(rawValue: NSAttributedString.Key.foregroundColor.rawValue): UIColor(r: 75, g: 80, b: 120)]
-        self.navigationController?.navigationBar.titleTextAttributes = [NSAttributedString.Key.foregroundColor : UIColor(r: 75, g: 80, b: 120)]
 
-         
-         
         let settingsButton = UIButton(type: .system)
         settingsButton.setTitle("Checkout", for: .normal)
-        
-        
+        settingsButton.checkModeBtn()
+        switch settingsButton.traitCollection.userInterfaceStyle {
+        case .dark:
+            navigationController?.navigationBar.tintColor = UIColor.white//(r: 75, g: 80, b: 120)
+            break
+        case .light, .unspecified:
+            navigationController?.navigationBar.tintColor = UIColor(r: 75, g: 80, b: 120)
+            break
+        default:
+            break
+        }
         settingsButton.addTarget(self, action: #selector(handleCheckout), for: .touchDown)
         
          self.navigationItem.rightBarButtonItem = UIBarButtonItem(customView: settingsButton)

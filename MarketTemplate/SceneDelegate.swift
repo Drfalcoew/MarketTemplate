@@ -22,8 +22,10 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         self.window = UIWindow(windowScene: windowScene)
         let vc = ViewController()
         let navigationController = UINavigationController(rootViewController: vc)
-        navigationController.navigationBar.tintColor = UIColor(r: 75, g: 80, b: 120)
         navigationController.navigationBar.isTranslucent = false
+        
+
+
         self.window?.rootViewController = navigationController
         self.window?.makeKeyAndVisible()
     }

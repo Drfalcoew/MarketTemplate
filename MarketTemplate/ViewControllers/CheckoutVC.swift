@@ -24,7 +24,8 @@ class CheckoutVC: UIViewController {
         btn.layer.shadowOffset = CGSize(width: 3.0, height: 5.0)
         btn.layer.shadowOpacity = 0.2
         btn.layer.shadowRadius = 5.0
-//        btn.addTarget(self, action: #selector(handleOrderNow), for: .touchUpInside)
+        btn.tag = 1
+        btn.addTarget(self, action: #selector(handleOrderNow(sender:)), for: .touchUpInside)
         return btn
     }()
     
@@ -65,7 +66,8 @@ class CheckoutVC: UIViewController {
         btn.layer.shadowOffset = CGSize(width: 3.0, height: 5.0)
         btn.layer.shadowOpacity = 0.2
         btn.layer.shadowRadius = 5.0
-//        btn.addTarget(self, action: #selector(handleOrderNow), for: .touchUpInside)
+        btn.tag = 0
+        btn.addTarget(self, action: #selector(handleOrderNow(sender:)), for: .touchUpInside)
         return btn
     }()
     
@@ -90,8 +92,16 @@ class CheckoutVC: UIViewController {
     }
     
     func setupNavigation() {
-        navigationController?.navigationBar.titleTextAttributes = [NSAttributedString.Key(rawValue: NSAttributedString.Key.foregroundColor.rawValue): UIColor(r: 75, g: 80, b: 120)]
-        self.navigationController?.navigationBar.titleTextAttributes = [NSAttributedString.Key.foregroundColor : UIColor(r: 75, g: 80, b: 120)]
+        switch self.traitCollection.userInterfaceStyle {
+        case .dark:
+            navigationController?.navigationBar.tintColor = UIColor.white//(r: 75, g: 80, b: 120)
+            break
+        case .light, .unspecified:
+            navigationController?.navigationBar.tintColor = UIColor(r: 75, g: 80, b: 120)
+            break
+        default:
+            break
+        }
 
     }
     
@@ -122,6 +132,23 @@ class CheckoutVC: UIViewController {
             deliveryButton.heightAnchor.constraint(equalTo: self.deliveryButton.widthAnchor, multiplier: 1/4),
             deliveryButton.topAnchor.constraint(equalTo: self.containerView.bottomAnchor, constant: 0)
         ])
+    }
+    
+    @objc func handleOrderNow(sender: UIButton) {
+        sender.transform = CGAffineTransform(scaleX: 0.6, y: 0.6)
+
+        UIView.animate(withDuration: 0.5, delay: 0, usingSpringWithDamping: CGFloat(0.5), initialSpringVelocity: CGFloat(1.0), options: UIView.AnimationOptions.allowUserInteraction, animations: {
+            sender.transform = CGAffineTransform.identity
+            }) { (true) in
+                switch sender.tag {
+                case 0: // carry out
+                    
+                    break
+                default: // deliver
+                    
+                    break
+                }
+        }
     }
     
     override func didReceiveMemoryWarning() {

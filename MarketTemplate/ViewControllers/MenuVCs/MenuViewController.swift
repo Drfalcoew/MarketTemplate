@@ -82,7 +82,8 @@ class MenuViewController: UIViewController {
         
         
         let settingsButton = UIButton(type: .system)
-        settingsButton.setImage(UIImage(named: "menu")?.withRenderingMode(.alwaysOriginal), for: .normal)
+        settingsButton.setImage(UIImage(named: "menu")?.withRenderingMode(.alwaysTemplate), for: .normal)
+        settingsButton.checkModeBtn()
         //settingsButton.imageView?.tintImageColor(color: UIColor(r: 221, g: 221, b: 221))
         if #available(iOS 9.0, *) {
             settingsButton.widthAnchor.constraint(equalToConstant: 28).isActive = true
@@ -98,7 +99,8 @@ class MenuViewController: UIViewController {
         self.navigationItem.leftBarButtonItem = UIBarButtonItem(customView: settingsButton)
         
         let cart = UIButton(type: .system)
-        cart.setImage(UIImage(named: "cart")?.withRenderingMode(.alwaysOriginal), for: .normal)
+        cart.setImage(UIImage(named: "cart")?.withRenderingMode(.alwaysTemplate), for: .normal)
+        cart.checkModeBtn()
         if #available(iOS 9.0, *) {
             cart.widthAnchor.constraint(equalToConstant: 32).isActive = true
             cart.heightAnchor.constraint(equalToConstant: 32).isActive = true

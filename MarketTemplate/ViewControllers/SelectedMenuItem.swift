@@ -81,7 +81,6 @@ class SelectedMenuItem: UIViewController {
     func setupNavigation() {
         self.title = selectedCategoryName
         
-        navigationController?.navigationBar.titleTextAttributes = [NSAttributedString.Key(rawValue: NSAttributedString.Key.foregroundColor.rawValue): UIColor(r: 75, g: 80, b: 120)]
         
         let cart = UIButton(type: .system)
         cart.setImage(UIImage(named: "cart")?.withRenderingMode(.alwaysOriginal), for: .normal)

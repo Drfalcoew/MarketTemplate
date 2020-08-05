@@ -36,8 +36,9 @@ struct Attributes {
     let location : String = "10400 Beaumont Ave, Cherry Valley, CA 92223"
     let location_Longitude : CLLocationDegrees = -116.9768625
     let location_Latitude : CLLocationDegrees = 33.9704476
-    let opens : Int = 10 //10:00AM
-    let closes : Int = 22 //10:00PM
+    let openingHours : [Int] = [10, 10, 10, 10, 10, 10, 10] // index will be day of the week
+    let closingHours : [Int] = [22, 22, 22, 22, 22, 22, 22] //(Keep these 2 digits or else crash)
+    
 }
 
 class Menu: NSObject {

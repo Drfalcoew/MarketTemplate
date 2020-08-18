@@ -8,7 +8,9 @@
 
 import Foundation
 import UIKit
-//import Firebase
+import GoogleSignIn
+import FirebaseAuth
+import CoreData
 //import GoogleMobileAds
 
 class SettingsViewController: UIViewController, UITableViewDataSource, UITableViewDelegate {
@@ -16,7 +18,7 @@ class SettingsViewController: UIViewController, UITableViewDataSource, UITableVi
     let cellId = "cellId"
     var y : Int?
     let notification = NotificationCenter.default
-    
+    var user : FirebaseAuth.User?
     
     var tableView : UITableView = {
         let view = UITableView()
@@ -43,6 +45,7 @@ class SettingsViewController: UIViewController, UITableViewDataSource, UITableVi
     
     
     override func viewDidAppear(_ animated: Bool) {
+        user = Auth.auth().currentUser
         self.tabBarController?.tabBar.isHidden = true
     }
     
@@ -114,7 +117,11 @@ class SettingsViewController: UIViewController, UITableViewDataSource, UITableVi
             cell.nameLabel.text = "Feedback"
             break
         case 2:
-            cell.nameLabel.text = "Logout"
+            if GIDSignIn.sharedInstance()?.currentUser != nil || user != nil {
+                cell.nameLabel.text = "Sign out"
+            } else {
+                cell.nameLabel.text = "Sign in"
+            }
             break
         default: break
         }
@@ -132,10 +139,43 @@ class SettingsViewController: UIViewController, UITableViewDataSource, UITableVi
             //navigationController?.customPush(viewController: LearnMoreViewController())
             break
         case 2:
-            //navigationController?.customPush(viewController: RequestNotifications())
+            if GIDSignIn.sharedInstance()?.currentUser != nil || user != nil {
+                if user != nil {
+                    do {
+                        try Auth.auth().signOut()
+                        
+                    } catch let error {
+                        displayAlert(error.localizedDescription)
+                        return
+                    }
+                } else {
+                    GIDSignIn.sharedInstance()?.signOut()
+                }
+                removeCoreData()
+                displayAlert("Successfully signed out.")
+            } else {
+                navigationController?.customPush(viewController: LoginViewController())
+            }
             break
         default:
             break
+        }
+    }
+    
+    func removeCoreData() {
+        guard let appDelegate =
+          UIApplication.shared.delegate as? AppDelegate else {
+            return
+        }
+        let managedContext = appDelegate.persistentContainer.viewContext
+        let fetchRequest: NSFetchRequest<NSFetchRequestResult> = NSFetchRequest(entityName: "ShoppingCartItems")
+        let deleteRequest = NSBatchDeleteRequest(fetchRequest: fetchRequest)
+        
+        do {
+            try managedContext.execute(deleteRequest)
+        } catch let error as NSError {
+            // TODO: handle the error
+            print(error.localizedDescription)
         }
     }
     
@@ -143,13 +183,21 @@ class SettingsViewController: UIViewController, UITableViewDataSource, UITableVi
     func functionUnavailable() {
         
         //post notification here
-
-        
-        
         let myAlert = UIAlertController(title: "Function Unavailable", message: "Please check back in the future.", preferredStyle: UIAlertController.Style.alert)
         let cancelAction = UIAlertAction(title: "Ok", style: UIAlertAction.Style.default, handler: nil)
         
         myAlert.addAction(cancelAction)
         present(myAlert, animated: true, completion: nil)
     }
+    
+    func displayAlert(_ userMessage: String){
+        
+        let myAlert = UIAlertController(title: "Alert", message: userMessage, preferredStyle: UIAlertController.Style.alert)
+        let act = UIAlertAction(title: "OK", style: .default) { (action) in
+            self.navigationController?.customPush(viewController: ViewController())
+        }
+        myAlert.addAction(act)
+        self.present(myAlert, animated: true, completion: nil)
+    }
+
 }

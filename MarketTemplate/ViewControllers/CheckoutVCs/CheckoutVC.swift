@@ -92,17 +92,8 @@ class CheckoutVC: UIViewController {
     }
     
     func setupNavigation() {
-        switch self.traitCollection.userInterfaceStyle {
-        case .dark:
-            navigationController?.navigationBar.tintColor = UIColor.white//(r: 75, g: 80, b: 120)
-            break
-        case .light, .unspecified:
-            navigationController?.navigationBar.tintColor = UIColor(r: 75, g: 80, b: 120)
-            break
-        default:
-            break
-        }
-
+        
+        navigationController?.navigationBar.tintColor = UIColor(r: 75, g: 80, b: 120)
     }
     
     func setupConstraints() {
@@ -142,10 +133,12 @@ class CheckoutVC: UIViewController {
             }) { (true) in
                 switch sender.tag {
                 case 0: // carry out
-                    
+                    let vc = PlaceOrderVC()
+                    vc.carryout = true
+                    self.navigationController?.customPush(viewController: vc)
                     break
                 default: // deliver
-                    
+                    self.navigationController?.customPush(viewController: Checkout_Delivery())
                     break
                 }
         }

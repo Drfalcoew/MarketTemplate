@@ -20,7 +20,7 @@ class HoursSubview: UIViewController {
         btn.setTitle("< Back", for: .normal)
         btn.setTitleColor(UIColor(r: 75, g: 80, b: 120), for: .normal)
         btn.addTarget(self, action: #selector(handleBack), for: .touchUpInside)
-        btn.titleLabel?.font = UIFont(name: "Helvetica Nueue", size: 24)
+        btn.titleLabel?.font = UIFont(name: "Helvetica Neue", size: 24)
         btn.titleLabel?.minimumScaleFactor = 0.2
         btn.titleLabel?.adjustsFontSizeToFitWidth = true
         return btn
@@ -40,6 +40,8 @@ class HoursSubview: UIViewController {
     
     
     
+    
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -49,7 +51,6 @@ class HoursSubview: UIViewController {
         let calendar = Calendar.current
         hour = calendar.component(.hour, from: date)
         self.view.backgroundColor = UIColor(r: 240, g: 240, b: 240)
-        self.view.checkMode()
         
         setupViews()
         setupHours()

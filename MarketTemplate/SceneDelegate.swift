@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import Firebase
 
 class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
@@ -18,17 +19,25 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         // If using a storyboard, the `window` property will automatically be initialized and attached to the scene.
         // This delegate does not imply the connecting scene or session are new (see `application:configurationForConnectingSceneSession` instead).
         
+        //FirebaseApp.configure()
+
+        
+        if #available(iOS 13.0, *) {
+            window?.overrideUserInterfaceStyle = .light
+        }
+        
+        
         guard let windowScene = (scene as? UIWindowScene) else { return }
         self.window = UIWindow(windowScene: windowScene)
         let vc = ViewController()
         let navigationController = UINavigationController(rootViewController: vc)
+        navigationController.navigationBar.tintColor = UIColor(r: 75, g: 80, b: 120)
         navigationController.navigationBar.isTranslucent = false
-        
-
-
         self.window?.rootViewController = navigationController
         self.window?.makeKeyAndVisible()
     }
+    
+    
 
     func sceneDidDisconnect(_ scene: UIScene) {
         // Called as the scene is being released by the system.

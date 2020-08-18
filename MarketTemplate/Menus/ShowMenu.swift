@@ -8,6 +8,7 @@
 
 import Foundation
 import UIKit
+import FirebaseAuth
 
 class ShowMenu: NSObject, UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout, UIGestureRecognizerDelegate {
     
@@ -15,6 +16,7 @@ class ShowMenu: NSObject, UICollectionViewDelegate, UICollectionViewDataSource, 
     let cellId = "cellId"
     let blackView = UIView()
     var viewController : UIViewController?
+    var userLogged : Bool?
     let vc : [UIViewController] = [ViewController(), MenuViewController(), LoginViewController()]
     
     var tap : UITapGestureRecognizer?
@@ -69,6 +71,7 @@ class ShowMenu: NSObject, UICollectionViewDelegate, UICollectionViewDataSource, 
     }()
     
     @objc func Settings() {
+        
         
         if let window = UIApplication.shared.keyWindow {
             blackView.backgroundColor = .black
@@ -196,7 +199,12 @@ class ShowMenu: NSObject, UICollectionViewDelegate, UICollectionViewDataSource, 
                 self.menuView.removeFromSuperview()
                 self.blackView.removeFromSuperview()
                 if self.viewController?.view.tag != indexPath.row {
-                    self.viewController?.navigationController?.customPush(viewController: self.vc[indexPath.row])
+                    if indexPath.row == 2 && (self.userLogged ?? false) {
+                        self.viewController?.navigationController?.customPush(viewController: ProfileViewController())
+                    } else {
+                        self.viewController?.navigationController?.customPush(viewController: self.vc[indexPath.row])
+
+                    }
                 }
             }
         } else {
@@ -213,7 +221,11 @@ class ShowMenu: NSObject, UICollectionViewDelegate, UICollectionViewDataSource, 
         //cell.backgroundColor = UIColor(r: 221, g: 221, b: 221)
         cell.image.image = UIImage(named: "tab_\(indexPath.row)")
         cell.title.text = titleText[indexPath.row]
-    
+        
+        if indexPath.row == 2 && (userLogged ?? false) {
+            cell.title.text = "Profile"
+        }
+
         return cell
     }
     

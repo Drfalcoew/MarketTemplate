@@ -12,7 +12,7 @@ import CoreData
 
 class ShoppingCartVC: UIViewController {
     
-//    var cartItems : [Item] = []
+    // var cartItems : [Item] = []
     var cartItems : [NSManagedObject] = [NSManagedObject]()
     var cartTotal : Double = 0.0
     var collectionView : UICollectionView!
@@ -24,24 +24,14 @@ class ShoppingCartVC: UIViewController {
         view.layer.masksToBounds = false
         view.layer.cornerRadius = 12
         view.layer.shadowColor = UIColor.black.cgColor
-        view.layer.shadowOffset = CGSize(width: 3.0, height: 5.0)
+        view.layer.shadowOffset = CGSize(width: 0, height: -5.0)
         view.layer.shadowOpacity = 0.2
         view.layer.shadowRadius = 5.0
+        view.layer.zPosition = 4
         view.subTotal.text = "0"
         return view
     }()
     
-    var checkoutButton : UIButton = {
-        let btn = UIButton()
-        btn.translatesAutoresizingMaskIntoConstraints = false
-        btn.layer.masksToBounds = true
-        btn.layer.cornerRadius = 5
-        btn.setTitle("Checkout", for: .normal)
-        btn.setTitleColor(.white, for: .normal)
-        btn.addTarget(self, action: #selector(handleCheckout), for: .touchUpInside)
-        btn.backgroundColor = UIColor(r: 255, g: 89, b: 89)
-        return btn
-    }()
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -50,8 +40,9 @@ class ShoppingCartVC: UIViewController {
         
         let nc = NotificationCenter.default
         nc.addObserver(self, selector: #selector(reloadCV), name: Notification.Name("reloadCV"), object: nil)
+        nc.addObserver(self, selector: #selector(handleCheckout(sender:)), name: Notification.Name("handleCheckout"), object: nil)
+        nc.addObserver(self, selector: #selector(handlePopToRoot), name: Notification.Name("popToRoot"), object: nil)
 
-        
         getItems()
         setupViews()
         setupCollectionView()
@@ -91,15 +82,25 @@ class ShoppingCartVC: UIViewController {
           print("Could not fetch. \(error), \(error.userInfo)")
         }
         
+        getTotal()
+    }
+    
+    func getTotal() {
+        var total : Double = 0
+        var price : Double
+        var quantity : Int
         
-        
-        DispatchQueue.main.async {
-            //self.collectionView.reloadData()
-            UIView.animate(withDuration: 1.00, delay: 0.0, options: .curveEaseOut, animations: {
-                
-                
-            }, completion: nil)
+        for item in cartItems {
+            quantity = item.value(forKeyPath: "quantity") as! Int
+            price = item.value(forKeyPath: "price") as! Double
+            
+            total = total + price * Double(quantity)
+            total = round(100.0 * total) / 100.0
         }
+        
+        cartTotal = cartTotal + total
+
+        addSubtotal()
     }
     
     func alert(title: String, message: String) {
@@ -134,33 +135,26 @@ class ShoppingCartVC: UIViewController {
         //collectionView.isPagingEnabled = true
         collectionView.layer.zPosition = 2
         
-        
         self.collectionView.register(CartItemCell.self, forCellWithReuseIdentifier: "cartItem")
         
         self.view.addSubview(collectionView)
     }
 
-    
     func setupViews() {
         self.title = "Cart"
         self.view.addSubview(totalView)
-        self.view.addSubview(checkoutButton)
     }
     
     func setupConstraints() {
-        checkoutButton.bottomAnchor.constraint(equalTo: self.view.bottomAnchor, constant: -40).isActive = true
-        checkoutButton.widthAnchor.constraint(equalTo: self.view.widthAnchor, multiplier: 0.90).isActive = true
-        checkoutButton.leftAnchor.constraint(equalTo: self.view.leftAnchor, constant: self.view.frame.width * 0.05).isActive = true
-        checkoutButton.heightAnchor.constraint(equalTo: self.view.widthAnchor, multiplier: 0.2).isActive = true
         
-        totalView.bottomAnchor.constraint(equalTo: checkoutButton.topAnchor, constant: -30).isActive = true
-        totalView.widthAnchor.constraint(equalTo: checkoutButton.widthAnchor, constant: 0).isActive = true
+        totalView.bottomAnchor.constraint(equalTo: self.view.bottomAnchor, constant: 0).isActive = true
+        totalView.widthAnchor.constraint(equalTo: self.view.widthAnchor, constant: 0).isActive = true
         totalView.centerXAnchor.constraint(equalTo: view.centerXAnchor, constant: 0).isActive = true
-        totalView.heightAnchor.constraint(equalTo: checkoutButton.heightAnchor, constant: 0).isActive = true
+        totalView.heightAnchor.constraint(equalTo: self.view.heightAnchor, multiplier: 1/4).isActive = true
         
         collectionView.topAnchor.constraint(equalTo: self.view.topAnchor, constant: 30).isActive = true
         collectionView.widthAnchor.constraint(equalTo: self.view.widthAnchor, multiplier: 1.0).isActive = true
-        collectionView.bottomAnchor.constraint(equalTo: self.totalView.topAnchor, constant: -15).isActive = true
+        collectionView.bottomAnchor.constraint(equalTo: self.totalView.topAnchor, constant: 0).isActive = true
         collectionView.centerXAnchor.constraint(equalTo: self.view.centerXAnchor, constant: 0).isActive = true
     }
     
@@ -168,17 +162,9 @@ class ShoppingCartVC: UIViewController {
 
         let settingsButton = UIButton(type: .system)
         settingsButton.setTitle("Checkout", for: .normal)
-        settingsButton.checkModeBtn()
-        switch settingsButton.traitCollection.userInterfaceStyle {
-        case .dark:
-            navigationController?.navigationBar.tintColor = UIColor.white//(r: 75, g: 80, b: 120)
-            break
-        case .light, .unspecified:
-            navigationController?.navigationBar.tintColor = UIColor(r: 75, g: 80, b: 120)
-            break
-        default:
-            break
-        }
+        settingsButton.tag = 1
+
+        navigationController?.navigationBar.tintColor = UIColor(r: 75, g: 80, b: 120)
         settingsButton.addTarget(self, action: #selector(handleCheckout), for: .touchDown)
         
          self.navigationItem.rightBarButtonItem = UIBarButtonItem(customView: settingsButton)
@@ -193,17 +179,28 @@ class ShoppingCartVC: UIViewController {
     
     @objc func showSettings(maxQuantity: Int, index: Int) {
         showMenu.maxQuantity = maxQuantity
+        showMenu.quantity = 0
+        showMenu.quantityLbl.text = "\(showMenu.quantity)"
         showMenu.index = index
         showMenu.Settings()
     }
     
     func addSubtotal() {
         cartTotal = round(100.0 * cartTotal) / 100.0
-        totalView.subTotal.text = String(cartTotal)
+        totalView.subTotal.text = ("$\(String(cartTotal))")
     }
     
-    @objc func handleCheckout() {
-        self.navigationController?.customPush(viewController: CheckoutVC())
+    @objc func handleCheckout(sender: UIButton) {
+        if Attributes().delivery == true {
+            self.navigationController?.customPush(viewController: CheckoutVC())
+        } else {
+            self.navigationController?.customPush(viewController: PlaceOrderVC())
+        }
+        
+    }
+    
+    @objc func handlePopToRoot() {
+        self.navigationController?.customPopToRoot()
     }
     
     override func didReceiveMemoryWarning() {
@@ -255,16 +252,6 @@ extension ShoppingCartVC : UICollectionViewDelegate, UICollectionViewDataSource 
             cell.notes.text = "Notes: \(notes)"
             cell.price.text = "\(total)"
             
-            cartTotal = cartTotal + total
-            print("item: \(total)")
-            print("total: \(cartTotal)")
-            
-            
-            
-        }
-        
-        if indexPath.row == cartItems.count - 1 {
-            addSubtotal()
         }
         
         DispatchQueue.main.async {
@@ -274,7 +261,4 @@ extension ShoppingCartVC : UICollectionViewDelegate, UICollectionViewDataSource 
         }
         return cell
     }
-    
-    
-    
 }

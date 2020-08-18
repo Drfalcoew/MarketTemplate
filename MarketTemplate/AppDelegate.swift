@@ -8,18 +8,89 @@
 
 import UIKit
 import CoreData
+import FirebaseFirestore
+import GoogleSignIn
+import FirebaseCore
+import FirebaseAuth
+import Stripe
+
 
 @UIApplicationMain
- class AppDelegate: UIResponder, UIApplicationDelegate {
+class AppDelegate: UIResponder, UIApplicationDelegate, GIDSignInDelegate {
     
     var window: UIWindow?
     
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         // Override point for customization after application launch.
 
+        Stripe.setDefaultPublishableKey("pk_test_51HDJ6wCOi0VJ8StcWb1qRXC4aGndiD0cIZHyj33u2VzO8alCmC6s5Wt4Ly6UnsJRL2GygtoJi7AkR77BxCynfSV300OwLlt5hG")
+        FirebaseApp.configure()
+        GIDSignIn.sharedInstance().clientID = "234237475768-d424vos3md3910sdulptbt9dtvd4grbj.apps.googleusercontent.com"
+        GIDSignIn.sharedInstance().delegate = self
+
         
         return true
     }
+    
+    @available(iOS 9.0, *)
+    func application(_ application: UIApplication, open url: URL, options: [UIApplication.OpenURLOptionsKey : Any])
+      -> Bool {
+      return GIDSignIn.sharedInstance().handle(url)
+    }
+
+    func application(_ application: UIApplication, open url: URL, sourceApplication: String?, annotation: Any) -> Bool {
+        return GIDSignIn.sharedInstance().handle(url)
+    }
+
+
+    func sign(_ signIn: GIDSignIn!, didSignInFor user: GIDGoogleUser!,
+              withError error: Error!) {
+      if let error = error {
+        if (error as NSError).code == GIDSignInErrorCode.hasNoAuthInKeychain.rawValue {
+          print("The user has not signed in before or they have since signed out.")
+        } else {
+          print("\(error.localizedDescription)")
+        }
+        return
+      } else {
+        let nc = NotificationCenter.default
+        nc.post(name: Notification.Name("UserLoggedIn"), object: nil)
+        
+            let userId = user.userID                  // For client-side use only!
+            let idToken = user.authentication.idToken // Safe to send to the server
+            let fullName = user.profile.name
+            let givenName = user.profile.givenName
+            let familyName = user.profile.familyName
+            let email = user.profile.email
+        
+            print(userId)
+            print(fullName)
+            print(GIDSignIn.sharedInstance()?.currentUser)
+        }
+      // Perform any operations on signed in user here.
+        guard let authentication = user.authentication else { return }
+        let credential = GoogleAuthProvider.credential(withIDToken: authentication.idToken,
+                                                          accessToken: authentication.accessToken)
+        // googleAuthProvider is FirebaseAuth
+        authenticateUser(credentials: credential)
+      // ...
+    }
+    
+    private func authenticateUser(credentials : AuthCredential) {
+        // Authenticate with Firebase using the credential object
+        Auth.auth().signIn(with: credentials) { (authResult, error) in
+            if let error = error {
+                print("authentication error \(error.localizedDescription)")
+            }
+        }
+    }
+    
+    func sign(_ signIn: GIDSignIn!, didDisconnectWith user: GIDGoogleUser!,
+              withError error: Error!) {
+      // Perform any operations when the user disconnects from app here.
+      // ...
+    }
+
 
     // MARK: - Core Data stack
 

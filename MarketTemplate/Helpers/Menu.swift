@@ -38,12 +38,24 @@ struct Attributes {
     let location_Latitude : CLLocationDegrees = 33.9704476
     let openingHours : [Int] = [10, 10, 10, 10, 10, 10, 10] // index will be day of the week
     let closingHours : [Int] = [22, 22, 22, 22, 22, 22, 22] //(Keep these 2 digits or else crash)
+    let delivery : Bool = true
+}
+
+struct Category {
+    
+    let name: String
+    let image: String
+    
+    init(name: String, image: String) {
+        self.name = name
+        self.image = image
+    }
     
 }
 
 class Menu: NSObject {
     var items : [Item] = [Item]()
-    var categories : [String] = [String]()
+    var categories : [Category] = [Category]()
     
     override init() {
         super.init()
@@ -54,11 +66,12 @@ class Menu: NSObject {
     
     func initCategories() {
         // what about corresonding image? should i make a struct Categories with name/imageName?
-        categories.append("Pizza")
-        categories.append("Sandwiches")
-        categories.append("Pastas")
-        categories.append("Salads")
-        categories.append("Drinks")
+        categories.append(Category(name: "Pizza", image: "bagIcon"))
+        categories.append(Category(name: "Sandwiches", image: "bagIcon"))
+        categories.append(Category(name: "Pasta", image: "bagIcon"))
+        categories.append(Category(name: "Salad", image: "bagIcon"))
+        categories.append(Category(name: "Drinks", image: "bagIcon"))
+
     }
     
     func initItems() {

@@ -19,7 +19,6 @@ class AddRemoveItemMenu: NSObject, UIGestureRecognizerDelegate {
     var index : Int?
     var cartItems : [NSManagedObject] = [NSManagedObject]()
     var itemRemoved : Bool?
-
     
     let maxButton : UIButton = {
         let btn = UIButton()
@@ -51,7 +50,7 @@ class AddRemoveItemMenu: NSObject, UIGestureRecognizerDelegate {
         button.backgroundColor = UIColor(r: 75, g: 80, b: 120)
         button.setTitle("+", for: UIControl.State())
         button.titleLabel?.textAlignment = .center
-        button.titleLabel?.font = UIFont(name: "Helvetica Nueue", size: 35)
+        button.titleLabel?.font = UIFont(name: "Helvetica Neue", size: 35)
         button.titleLabel?.adjustsFontSizeToFitWidth = true
         button.titleLabel?.minimumScaleFactor = 0.2
         button.layer.zPosition = 5
@@ -68,7 +67,7 @@ class AddRemoveItemMenu: NSObject, UIGestureRecognizerDelegate {
         button.backgroundColor = UIColor(r: 75, g: 80, b: 120)
         button.setTitle("-", for: UIControl.State())
         button.titleLabel?.textAlignment = .center
-        button.titleLabel?.font = UIFont(name: "Helvetica Nueue", size: 30)
+        button.titleLabel?.font = UIFont(name: "Helvetica Neue", size: 30)
         button.titleLabel?.adjustsFontSizeToFitWidth = true
         button.titleLabel?.minimumScaleFactor = 0.2
         button.layer.zPosition = 5
@@ -83,17 +82,22 @@ class AddRemoveItemMenu: NSObject, UIGestureRecognizerDelegate {
     
     lazy var addRemoveButton: UIButton = {
         let button = UIButton(type: .system)
-        button.backgroundColor = UIColor(r: 75, g: 80, b: 120)
+        button.backgroundColor = UIColor.white//(r: 100, g: 100, b: 100)
         button.setTitle("Add", for: UIControl.State())
         button.titleLabel?.textAlignment = .center
-        button.titleLabel?.font = UIFont(name: "Helvetica Nueue", size: 30)
+        button.titleLabel?.font = UIFont(name: "Helvetica Neue", size: 30)
         button.titleLabel?.adjustsFontSizeToFitWidth = true
         button.titleLabel?.minimumScaleFactor = 0.2
         button.translatesAutoresizingMaskIntoConstraints = false
         button.layer.cornerRadius = 2
-        button.setTitleColor(UIColor(red: 255/255, green: 255/255, blue: 255/255, alpha: 1), for: UIControl.State())
+        button.setTitleColor(UIColor.black, for: UIControl.State())
         button.titleLabel?.font = UIFont.boldSystemFont(ofSize: 16)
         button.layer.cornerRadius = 10
+        button.layer.shadowColor = UIColor.black.cgColor
+        button.layer.shadowOffset = CGSize(width: 3.0, height: 5.0)
+        button.layer.shadowOpacity = 0.2
+        button.layer.shadowRadius = 5.0
+
         button.addTarget(self, action: #selector(handleAddRemove), for: .touchUpInside)
         
         return button
@@ -104,7 +108,7 @@ class AddRemoveItemMenu: NSObject, UIGestureRecognizerDelegate {
         lbl.translatesAutoresizingMaskIntoConstraints = false
         lbl.layer.masksToBounds = true
         lbl.text = "0"
-        lbl.font = UIFont(name: "Helvetica Nueue", size: 40)
+        lbl.font = UIFont(name: "Helvetica Neue", size: 40)
         lbl.minimumScaleFactor = 0.5
         lbl.textAlignment = .center
         lbl.adjustsFontSizeToFitWidth = true
@@ -127,11 +131,11 @@ class AddRemoveItemMenu: NSObject, UIGestureRecognizerDelegate {
             menuView.addSubview(quantityLbl)
             
             
-            let x = window.frame.width * 0.075
-            let y = window.frame.height * 0.2
+            let x = window.frame.width * 0.05
+            let y = window.frame.height * 0.325
              
             self.blackView.frame = window.frame
-            self.menuView.frame = CGRect(x: x, y: y, width: window.frame.width * 0.85, height: window.frame.height * 0.6)
+            self.menuView.frame = CGRect(x: x, y: y, width: window.frame.width * 0.9, height: window.frame.height * 0.35)
              
             setupConstraints()
             
@@ -165,22 +169,6 @@ class AddRemoveItemMenu: NSObject, UIGestureRecognizerDelegate {
     
     override init() {
         super.init()
-                
-        switch addRemoveButton.traitCollection.userInterfaceStyle {
-        case .dark:
-            self.menuView.backgroundColor = UIColor(r: 50, g: 50, b: 50)
-            self.addButton.backgroundColor = UIColor(r: 240, g: 240, b: 240)
-            self.removeButton.backgroundColor = UIColor(r: 240, g: 240, b: 240)
-            break
-        case .light, .unspecified:
-            self.menuView.backgroundColor = UIColor(r: 240, g: 240, b: 240)
-            self.addButton.backgroundColor = UIColor(r: 50, g: 50, b: 50)
-            self.removeButton.backgroundColor = UIColor(r: 50, g: 50, b: 50)
-            
-            break
-        default:
-            break
-        }
 
         
         
@@ -347,11 +335,11 @@ class AddRemoveItemMenu: NSObject, UIGestureRecognizerDelegate {
         addRemoveSegmentedControl.topAnchor.constraint(equalTo: self.menuView.topAnchor, constant: self.menuView.frame.height * 0.1).isActive = true
         addRemoveSegmentedControl.centerXAnchor.constraint(equalTo: self.menuView.centerXAnchor, constant: 0).isActive = true
         addRemoveSegmentedControl.widthAnchor.constraint(equalTo: self.menuView.widthAnchor, multiplier: 0.8).isActive = true
-        addRemoveSegmentedControl.heightAnchor.constraint(equalTo: self.menuView.heightAnchor, multiplier: 1/6.5).isActive = true
+        addRemoveSegmentedControl.heightAnchor.constraint(equalTo: self.menuView.heightAnchor, multiplier: 1/4.5).isActive = true
         
         removeButton.leftAnchor.constraint(equalTo: self.menuView.leftAnchor, constant: self.menuView.frame.width * 1/7).isActive = true
-        removeButton.heightAnchor.constraint(equalTo: self.menuView.heightAnchor, multiplier: 1/6).isActive = true
-        removeButton.widthAnchor.constraint(equalTo: self.menuView.heightAnchor, multiplier: 1/6).isActive = true
+        removeButton.heightAnchor.constraint(equalTo: self.menuView.heightAnchor, multiplier: 1/4.5).isActive = true
+        removeButton.widthAnchor.constraint(equalTo: self.menuView.heightAnchor, multiplier: 1/4.5).isActive = true
         removeButton.centerYAnchor.constraint(equalTo: self.menuView.centerYAnchor, constant: 0).isActive = true
         
         quantityLbl.centerXAnchor.constraint(equalTo: self.menuView.centerXAnchor, constant: 0).isActive = true
@@ -360,18 +348,17 @@ class AddRemoveItemMenu: NSObject, UIGestureRecognizerDelegate {
         quantityLbl.heightAnchor.constraint(equalTo: self.removeButton.heightAnchor, constant: 0).isActive = true
         
         addButton.rightAnchor.constraint(equalTo: self.menuView.rightAnchor, constant: self.menuView.frame.width * -1/7).isActive = true
-        addButton.heightAnchor.constraint(equalTo: self.menuView.heightAnchor, multiplier: 1/6).isActive = true
-        addButton.widthAnchor.constraint(equalTo: self.menuView.heightAnchor, multiplier: 1/6).isActive = true
+        addButton.heightAnchor.constraint(equalTo: self.menuView.heightAnchor, multiplier: 1/4.5).isActive = true
+        addButton.widthAnchor.constraint(equalTo: self.menuView.heightAnchor, multiplier: 1/4.5).isActive = true
         addButton.centerYAnchor.constraint(equalTo: self.menuView.centerYAnchor, constant: 0).isActive = true
-        
         
         addRemoveButton.bottomAnchor.constraint(equalTo: self.menuView.bottomAnchor, constant: self.menuView.frame.height * -0.1).isActive = true
         addRemoveButton.centerXAnchor.constraint(equalTo: self.menuView.centerXAnchor, constant: 0).isActive = true
-        addRemoveButton.heightAnchor.constraint(equalTo: self.menuView.heightAnchor, multiplier: 1/6.5).isActive = true
+        addRemoveButton.heightAnchor.constraint(equalTo: self.menuView.heightAnchor, multiplier: 1/4.5).isActive = true
         addRemoveButton.widthAnchor.constraint(equalTo: self.menuView.widthAnchor, multiplier: 0.8).isActive = true
         
         
-        addButton.layer.cornerRadius = self.menuView.frame.height * 1/12
-        removeButton.layer.cornerRadius = self.menuView.frame.height * 1/12
+        addButton.layer.cornerRadius = self.menuView.frame.height * 1/9
+        removeButton.layer.cornerRadius = self.menuView.frame.height * 1/9
     }
 }

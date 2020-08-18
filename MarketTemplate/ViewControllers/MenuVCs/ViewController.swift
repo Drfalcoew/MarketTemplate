@@ -8,13 +8,21 @@
 
 import UIKit
 import MapKit
+import CoreData
+import Firebase
+import FirebaseFirestore
+import FirebaseAuth
+import GoogleSignIn
+
 
 class ViewController: UIViewController, UIGestureRecognizerDelegate {
     
+    var cartItems : [NSManagedObject] = [NSManagedObject]()
     var collectionView : UICollectionView!
     var tap : UITapGestureRecognizer!
-    
+    let db = Firestore.firestore()
     var hour : Int?
+    var user : FirebaseAuth.User?
         
     var orderNowButton : UIButton = {
         let btn = UIButton()
@@ -52,7 +60,7 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
         view.layer.shadowOffset = CGSize(width: 3.0, height: 5.0)
         view.layer.shadowOpacity = 0.2
         view.layer.shadowRadius = 5.0
-        view.checkMode()
+        view.backgroundColor = .white
         view.translatesAutoresizingMaskIntoConstraints = false
         //view.clipsToBounds = true
         return view
@@ -81,7 +89,7 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
         view.layer.shadowOffset = CGSize(width: 3.0, height: 5.0)
         view.layer.shadowOpacity = 0.2
         view.layer.shadowRadius = 5.0
-        view.checkMode()
+        view.backgroundColor = .white
         return view
     }()
     
@@ -90,6 +98,12 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view.
+        if GIDSignIn.sharedInstance()?.currentUser == nil && Auth.auth().currentUser == nil {
+            DispatchQueue.main.asyncAfter(deadline: .now()) {
+                //GIDSignIn.sharedInstance()?.presentingViewController = self
+                GIDSignIn.sharedInstance()?.restorePreviousSignIn()
+            }
+        }
         
         for item in Menu().items {
             //print(item)
@@ -116,24 +130,25 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
     
     func setupHours() {
         hourView.addGestureRecognizer(tap)
-        let closes = Attributes().closingHours
-        let opens = Attributes().openingHours
+        
         let index = Calendar.current.component(.weekday, from: Date()) // this returns an Int
+        let closes = Attributes().closingHours[index - 1]
+        let opens = Attributes().openingHours[index - 1]
         // if realTime < opening time, show opening time.
         // if realTime < closing time but also > opening, show closing time.
-        if hour! > opens[index - 1] && hour! < closes[index - 1] {
+        if hour! >= opens && hour! < closes {
             hourView.statusValue.text = "Open"
             hourView.statusValue.textColor = UIColor(r: 89, g: 200, b: 89)
             
             hourView.hoursLbl.text = "Closes:"
-            hourView.hoursValue.text = timeConversion12(time24: "\(String(closes[index - 1])):00")
+            hourView.hoursValue.text = timeConversion12(time24: "\(String(closes)):00")
             
             
         } else {
             hourView.statusValue.text = "Closed"
             hourView.statusValue.textColor = UIColor(r: 255, g: 89, b: 89)
             hourView.hoursLbl.text = "Opens:"
-            hourView.hoursValue.text = timeConversion12(time24: "\(String(opens[index - 1])):00")
+            hourView.hoursValue.text = timeConversion12(time24: "\(String(opens)):00")
 
         }
     }
@@ -206,7 +221,6 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
            
         let settingsButton = UIButton(type: .system)
         settingsButton.setImage(UIImage(named: "menu")?.withRenderingMode(.alwaysTemplate), for: .normal)
-        settingsButton.checkModeBtn()
         //settingsButton.imageView?.tintImageColor(color: UIColor(r: 40, g: 43, b: 53))
         if #available(iOS 9.0, *) {
             settingsButton.widthAnchor.constraint(equalToConstant: 28).isActive = true
@@ -221,7 +235,6 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
            
         let cart = UIButton(type: .system)
         cart.setImage(UIImage(named: "cart")?.withRenderingMode(.alwaysTemplate), for: .normal)
-        cart.checkModeBtn()
         if #available(iOS 9.0, *) {
             cart.widthAnchor.constraint(equalToConstant: 32).isActive = true
             cart.heightAnchor.constraint(equalToConstant: 32).isActive = true
@@ -231,9 +244,6 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
         cart.contentMode = .scaleAspectFit
         cart.addTarget(self, action: #selector(handleCartTouch), for: .touchUpInside)
         self.navigationItem.rightBarButtonItem = UIBarButtonItem(customView: cart)
-        
-        
-        
     }
     
     lazy var showMenu : ShowMenu = {
@@ -243,11 +253,17 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
     }()
     
     @objc func showSettings() {
+        user = Auth.auth().currentUser
+        showMenu.userLogged = user != nil
         showMenu.Settings()
     }
     
     @objc func handleCartTouch() {
-        self.navigationController?.customPush(viewController: ShoppingCartVC())
+        if handleCart() {
+            self.navigationController?.customPush(viewController: ShoppingCartVC())
+        } else {
+            self.displayAlert("Add products to your cart before checking out.")
+        }
     }
     
     @objc func handleOrderNow() {
@@ -280,30 +296,48 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
         return date12
     }
     
+    func displayAlert(_ userMessage: String){
+        
+        let myAlert = UIAlertController(title: "Cart Empty", message: userMessage, preferredStyle: UIAlertController.Style.alert)
+        let okAction = UIAlertAction(title: "OK", style: UIAlertAction.Style.default, handler: nil)
+        myAlert.addAction(okAction)
+        self.present(myAlert, animated: true, completion: nil)
+    }
+    
+
     
 }
 
-extension UIApplication {
-    @available(iOS 13.0, *)
-    var userInterfaceStyle: UIUserInterfaceStyle? {
-        return self.keyWindow?.traitCollection.userInterfaceStyle
-    }
-}
-
-@available(iOS 13.0, *)
-    func setSystemTheme() {
-        switch UIApplication.shared.userInterfaceStyle {
-        case .dark?:
-            break
-        case .light?:
-            break
-        default:
-            break
-        }
-    }
 
 extension ViewController : UICollectionViewDelegate, UICollectionViewDataSource {
     
+    public func handleCart() -> Bool {
+            cartItems.removeAll()
+                        
+            guard let appDelegate =
+              UIApplication.shared.delegate as? AppDelegate else {
+                return true
+            }
+            
+            let managedContext =
+              appDelegate.persistentContainer.viewContext
+            
+            let fetchRequest =
+              NSFetchRequest<NSManagedObject>(entityName: "ShoppingCartItems")
+            
+            do {
+              cartItems = try managedContext.fetch(fetchRequest)
+            } catch let error as NSError {
+              print("Could not fetch. \(error), \(error.userInfo)")
+            }
+            
+        if cartItems.count == 0 {
+            return false
+        } else {
+            return true
+        }
+
+    }
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         //let cell = collectionView.cellForItem(at: indexPath) as! PrimaryCell
@@ -372,48 +406,5 @@ public extension UINavigationController {
         transition.timingFunction = CAMediaTimingFunction(name: CAMediaTimingFunctionName(rawValue: CAMediaTimingFunctionName.easeInEaseOut.rawValue))
         transition.type = CATransitionType(rawValue: type)
         self.view.layer.add(transition, forKey: nil)
-    }
-}
-
-extension UIView {
-    func checkMode() -> UIView {
-        if traitCollection.userInterfaceStyle == .light {
-            self.backgroundColor = .white
-            return self
-        } else {
-            self.backgroundColor = UIColor(r: 50, g: 50, b: 50)
-            return self
-        }
-    }
-}
-
-extension UILabel {
-    func checkMode_0() -> UILabel {
-        if traitCollection.userInterfaceStyle == .light {
-            self.textColor = .white
-
-            return self
-        } else {
-            self.textColor = UIColor.black//(r: 50, g: 50, b: 50)
-            return self
-        }
-    }
-}
-
-extension UIButton {
-    func checkModeBtn() {
-        guard let image = imageView?.image else { return }
-        self.imageView?.image = image.withRenderingMode(UIImage.RenderingMode.alwaysTemplate)
-        if traitCollection.userInterfaceStyle == .light {
-            self.tintColor = UIColor(r: 75, g: 80, b: 120)
-            UINavigationController().navigationBar.titleTextAttributes = [NSAttributedString.Key(rawValue: NSAttributedString.Key.foregroundColor.rawValue): UIColor(r: 75, g: 80, b: 120)]
-            
-
-        } else { // dark
-            self.tintColor = .white
-            UINavigationController().navigationBar.titleTextAttributes = [NSAttributedString.Key(rawValue: NSAttributedString.Key.foregroundColor.rawValue): UIColor(r: 50, g: 50, b: 50)]
-
-        }
-
     }
 }

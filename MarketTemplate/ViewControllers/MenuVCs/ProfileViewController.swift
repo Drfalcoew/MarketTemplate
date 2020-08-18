@@ -8,9 +8,13 @@
 
 import Foundation
 import UIKit
+import FirebaseAuth
 
 
 class ProfileViewController: UIViewController {
+    
+    var user : FirebaseAuth.User?
+
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -30,7 +34,6 @@ class ProfileViewController: UIViewController {
         
         let settingsButton = UIButton(type: .system)
         settingsButton.setImage(UIImage(named: "menu")?.withRenderingMode(.alwaysTemplate), for: .normal)
-        settingsButton.checkModeBtn()
         //settingsButton.imageView?.tintImageColor(color: UIColor(r: 221, g: 221, b: 221))
         if #available(iOS 9.0, *) {
             settingsButton.widthAnchor.constraint(equalToConstant: 28).isActive = true
@@ -44,7 +47,6 @@ class ProfileViewController: UIViewController {
         
         let cart = UIButton(type: .system)
         cart.setImage(UIImage(named: "cart")?.withRenderingMode(.alwaysTemplate), for: .normal)
-        cart.checkModeBtn()
         if #available(iOS 9.0, *) {
             cart.widthAnchor.constraint(equalToConstant: 32).isActive = true
             cart.heightAnchor.constraint(equalToConstant: 32).isActive = true
@@ -67,12 +69,27 @@ class ProfileViewController: UIViewController {
     }()
     
     @objc func showSettings() {
+        user = Auth.auth().currentUser
+        showMenu.userLogged = user != nil
         showMenu.Settings()
     }
     
     @objc func handleCartTouch() {
+       if ViewController().handleCart() {
            self.navigationController?.customPush(viewController: ShoppingCartVC())
+       } else {
+           self.displayAlert("Add products to your cart before checking out.")
+       }
     }
+    
+    func displayAlert(_ userMessage: String){
+        
+        let myAlert = UIAlertController(title: "Cart Empty", message: userMessage, preferredStyle: UIAlertController.Style.alert)
+        let okAction = UIAlertAction(title: "OK", style: UIAlertAction.Style.default, handler: nil)
+        myAlert.addAction(okAction)
+        self.present(myAlert, animated: true, completion: nil)
+    }
+
     
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()

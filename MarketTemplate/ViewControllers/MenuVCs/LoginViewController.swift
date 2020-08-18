@@ -8,30 +8,45 @@
 
 import Foundation
 import UIKit
+import GoogleSignIn
+import FirebaseFirestore
+import FirebaseAuth
+
 
 class LoginViewController: UIViewController {
     
+    var user: User?
+    var delivery : Bool?
     var colorPalette : [UIColor] = [UIColor.gray, UIColor.black]
-    
     var infoBlackView = UIView()
+    var db : Firestore?
     
-    //var user: [User] = []
+    var bottomViewHeightAnchor: NSLayoutConstraint?
+    var inputsContainerViewHeightAnchor: NSLayoutConstraint?
+    var nameTextFieldHeightAnchor: NSLayoutConstraint?
+    var emailTextFieldHeightAnchor: NSLayoutConstraint?
+    var passwordTextFieldHeightAnchor: NSLayoutConstraint?
+       
+    let googleBtnContainer : UIButton = {
+        let btn = UIButton()
+        btn.translatesAutoresizingMaskIntoConstraints = false
+        btn.backgroundColor = .white
+        btn.layer.shadowColor = UIColor.black.cgColor
+        btn.layer.shadowOffset = CGSize(width: 3.0, height: 5.0)
+        btn.layer.shadowOpacity = 0.2
+        btn.layer.shadowRadius = 5.0
+        btn.layer.cornerRadius = 5
+        btn.setTitle("Sign in with Google", for: .normal)
+        btn.setTitleColor(UIColor(r: 75, g: 80, b: 120), for: .normal)
+        btn.addTarget(self, action: #selector(handleGoogleSignIn), for: .touchUpInside)
+        return btn
+    }()
     
-    //let infoView = InfoViewController()
-    
-    @objc func dismissKeyboard() {
-        view.endEditing(true)
-        
-    }
-    
-    let firstView: UIView = {
-        let view = UIView()
-        view.backgroundColor = UIColor.init(white: 1.0, alpha: 0.5)
-        view.alpha = 0
-        view.layer.masksToBounds = true
-        view.layer.cornerRadius = 2
-        view.translatesAutoresizingMaskIntoConstraints = false
-        return view
+    let googleSignInIcon : GIDSignInButton = {
+        let btn = GIDSignInButton()
+        btn.translatesAutoresizingMaskIntoConstraints = false
+        btn.style = .iconOnly
+        return btn
     }()
     
     let backgroundView: UIImageView = {
@@ -53,55 +68,19 @@ class LoginViewController: UIViewController {
     
     let forgotPassword: UIButton = {
         let btn = UIButton()
-        btn.backgroundColor = UIColor(r: 215, g: 222, b: 227)
+        btn.backgroundColor = UIColor.white
         btn.setTitle("Forgot password?", for: UIControl.State.normal)
         btn.layer.cornerRadius = 2
-        btn.setTitleColor(UIColor(r: 75, g: 115, b: 148), for: UIControl.State.normal)
+        btn.titleLabel?.font = UIFont(name: "Helvetica Neue", size: 18)
+        btn.setTitleColor(UIColor(r: 75, g: 80, b: 120), for: UIControl.State.normal)
         btn.translatesAutoresizingMaskIntoConstraints = false
-        btn.layer.masksToBounds = true
-        btn.addTarget(self, action: #selector(forgotPasswordView), for: .touchUpInside)
+        btn.layer.shadowColor = UIColor.black.cgColor
+        btn.layer.shadowOffset = CGSize(width: 3.0, height: 5.0)
+        btn.layer.shadowOpacity = 0.2
+        btn.layer.shadowRadius = 5.0
+        btn.layer.cornerRadius = 5
+        btn.addTarget(self, action: #selector(handleForgotPassword(sender:)), for: .touchUpInside)
         return btn
-    }()
-    
-    let infoButton: UIButton = {
-        let btn = UIButton(type: .infoDark) as UIButton
-        btn.alpha = 0
-        btn.tintColor = UIColor.white
-        btn.addTarget(self, action: #selector(handleMore), for: .touchUpInside)
-        btn.translatesAutoresizingMaskIntoConstraints = false
-        btn.layer.masksToBounds = true
-        return btn
-    }()
-    
-    
-    let bottomView: UIView = {
-        let view = UIView()
-        view.backgroundColor = UIColor.clear
-        view.translatesAutoresizingMaskIntoConstraints = false
-        view.layer.cornerRadius = 5
-        view.layer.masksToBounds = true
-        view.alpha = 0
-        return view
-    }()
-    
-    let exitFeedback: UIButton = {
-        let btn = UIButton()
-        btn.layer.masksToBounds = true
-        btn.setImage(UIImage(named: "tab_3"), for: .normal)
-        btn.translatesAutoresizingMaskIntoConstraints = false
-        btn.layer.zPosition = 11
-        btn.addTarget(self, action: #selector(dismissViews), for: .touchUpInside)
-        return btn
-    }()
-    
-    let feedbackView : UIView = {
-        let view = UIView()
-        view.layer.cornerRadius = 5
-        view.backgroundColor = UIColor.init(white: 1.0, alpha: 0.7)
-        view.layer.masksToBounds = true
-        view.alpha = 0
-        view.isHidden = true
-        return view
     }()
     
     let forgotPassView : UIView = {
@@ -114,28 +93,31 @@ class LoginViewController: UIViewController {
         return view
     }()
     
-    let exitForgotPass: UIButton = {
-        let btn = UIButton()
-        btn.layer.masksToBounds = true
-        btn.setImage(UIImage(named: "tab_3"), for: .normal)
+    lazy var loginRegisterButton: UIButton = {
+        let btn = UIButton(type: .system)
+        btn.backgroundColor = UIColor(r: 255, g: 89, b: 89)
+        btn.setTitle("Login", for: UIControl.State())
+        btn.titleLabel?.font = UIFont(name: "Helvetica Neue", size: 18)
         btn.translatesAutoresizingMaskIntoConstraints = false
-        btn.layer.zPosition = 11
-        btn.addTarget(self, action: #selector(dismissViews), for: .touchUpInside)
+        btn.layer.cornerRadius = 2
+        btn.setTitleColor(UIColor(red: 255/255, green: 255/255, blue: 255/255, alpha: 1), for: UIControl.State())
+        btn.titleLabel?.font = UIFont.boldSystemFont(ofSize: 18)
+        btn.addTarget(self, action: #selector(handleLoginRegister), for: .touchUpInside)
+        btn.layer.shadowColor = UIColor.black.cgColor
+        btn.layer.shadowOffset = CGSize(width: 3.0, height: 5.0)
+        btn.layer.shadowOpacity = 0.2
+        btn.layer.shadowRadius = 5.0
+        btn.layer.cornerRadius = 5
         return btn
     }()
     
-    lazy var loginRegisterButton: UIButton = {
-        let button = UIButton(type: .system)
-        button.backgroundColor = UIColor(r: 75, g: 115, b: 148)
-        button.setTitle("Login", for: UIControl.State())
-        button.translatesAutoresizingMaskIntoConstraints = false
-        button.layer.cornerRadius = 2
-        button.setTitleColor(UIColor(red: 255/255, green: 255/255, blue: 255/255, alpha: 1), for: UIControl.State())
-        button.titleLabel?.font = UIFont.boldSystemFont(ofSize: 16)
-        
-        button.addTarget(self, action: #selector(handleLoginRegister), for: .touchUpInside)
-        
-        return button
+    lazy var loginRegisterSegmentedControl: UISegmentedControl = {
+        let sc = UISegmentedControl(items: ["Login", "Register"])
+        sc.translatesAutoresizingMaskIntoConstraints = false
+        sc.tintColor = UIColor(r: 75, g: 115, b: 148)
+        sc.selectedSegmentIndex = 0
+        sc.addTarget(self, action: #selector(handleLoginRegisterChange), for: .valueChanged)
+        return sc
     }()
     
     override func viewDidLoad() {
@@ -143,22 +125,13 @@ class LoginViewController: UIViewController {
         
         self.view.backgroundColor = UIColor(r: 240, g: 240, b: 240)
         
-       /* let controller: UIViewController = SupportViewController() as UIViewController
-        feedbackView.addSubview(controller.view)
-        controller.view.frame = feedbackView.bounds
-        controller.view.autoresizingMask = [.flexibleWidth, .flexibleHeight]
-        controller.didMove(toParentViewController: self)
-        addChildViewController(controller) */
-      
-        /*let controllerA: UIViewController = ForgotPasswordViewController() as UIViewController
-        forgotPassView.addSubview(controllerA.view)
-        controllerA.view.frame = forgotPassView.bounds
-        controllerA.view.autoresizingMask = [.flexibleWidth, .flexibleHeight]
-        controllerA.didMove(toParentViewController: self)
-        addChildViewController(controllerA)*/
-
+        self.title = Attributes().name
+        
         infoBlackView.isHidden = true
         
+        let nc = NotificationCenter.default
+        nc.addObserver(self, selector: #selector(userLoggedIn), name: Notification.Name("UserLoggedIn"), object: nil)
+        /*
         let toolbar = UIToolbar()
         toolbar.sizeToFit()
         
@@ -169,42 +142,38 @@ class LoginViewController: UIViewController {
         nameTextField.inputAccessoryView = toolbar
         emailTextField.inputAccessoryView = toolbar
         passwordTextField.inputAccessoryView = toolbar
+        */
         
-        /*NotificationCenter.default.addObserver(self, selector: #selector(LoginController.displayFeedbackAlert), name: NSNotification.Name(rawValue: "feedbackAlert"), object: nil)
-        NotificationCenter.default.addObserver(self, selector: #selector(LoginController.feedbackHandler), name: NSNotification.Name(rawValue: "feedbackHandler"), object: nil) */
-        infoBlackView.backgroundColor = UIColor.init(white: 0, alpha: 0.7)
-        
-        view.addSubview(backgroundView)
-        view.addSubview(firstView)
-        view.addSubview(infoButton)
-        view.addSubview(bottomView)
-        view.addSubview(infoBlackView)
-        view.addSubview(feedbackView)
         view.addSubview(forgotPassView)
-       
-        
-        firstView.addSubview(inputsContainerView)
-        firstView.addSubview(loginRegisterButton)
-        firstView.addSubview(loginRegisterSegmentedControl)
-        firstView.addSubview(mainLogo)
-        firstView.addSubview(subLabel)
-        firstView.addSubview(forgotPassword)
-        
-        forgotPassView.addSubview(exitForgotPass)
-        feedbackView.addSubview(exitFeedback)
-        
+        view.addSubview(googleBtnContainer)
+        self.googleBtnContainer.addSubview(googleSignInIcon)
+        view.addSubview(inputsContainerView)
+        view.addSubview(loginRegisterButton)
+        view.addSubview(loginRegisterSegmentedControl)
+        view.addSubview(subLabel)
+        view.addSubview(forgotPassword)
+                
+        inputsContainerView.addSubview(nameTextField)
+        inputsContainerView.addSubview(nameSeparatorView)
+        inputsContainerView.addSubview(emailTextField)
+        inputsContainerView.addSubview(emailSeparatorView)
+        inputsContainerView.addSubview(passwordTextField)
+
         
         let tap: UITapGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(LoginViewController.dismissKeyboard))
         view.addGestureRecognizer(tap)
         
         
-        let bVTap : UITapGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(LoginViewController.dismissViews))
         
-        infoBlackView.addGestureRecognizer(bVTap)
-        
-        setupInputsConstraints()
-        setupmainLogo()
-        setupBackground()
+        setupDatabase()
+        setupConstraints()
+    }
+    
+    func setupDatabase() {
+        db = Firestore.firestore()
+        let settings = db?.settings
+        //settings?.areTimestampsInSnapshotsEnabled = true
+        db?.settings = settings!
     }
     
     @objc func handleMore(){
@@ -219,15 +188,6 @@ class LoginViewController: UIViewController {
         self.present(myAlert, animated: true, completion: nil)
     }
     
-    func displayFeedbackAlert(){
-        
-        dismissViews()
-        
-        let myAlert = UIAlertController(title: "Successfully Submitted", message: "Thank you for your feedback!", preferredStyle: .alert)
-        let okAction = UIAlertAction(title: "OK", style: UIAlertAction.Style.default, handler: nil)
-        myAlert.addAction(okAction)
-        self.present(myAlert, animated: true, completion: nil)
-    }
     
     func displayAlertWithOutCancel(_ userMessage: String){
         
@@ -277,54 +237,154 @@ class LoginViewController: UIViewController {
         return tf
     }()
     
+    @objc func handleGoogleSignIn() {
+        googleBtnContainer.transform = CGAffineTransform(scaleX: 0.6, y: 0.6)
+        
+        UIView.animate(withDuration: 0.5,
+                                   delay: 0,
+                                   usingSpringWithDamping: CGFloat(0.5),
+                                   initialSpringVelocity: CGFloat(1.0),
+                                   options: UIView.AnimationOptions.allowUserInteraction,
+                                   animations: {
+                                    self.googleBtnContainer.transform = CGAffineTransform.identity
+            }) { (true) in
+                GIDSignIn.sharedInstance()?.presentingViewController = self
+                GIDSignIn.sharedInstance().signIn()
+            }
+    }
     
     @objc func handleLoginRegister() {
-        print("In handleLoginRegister")
-        
-        
-        if loginRegisterSegmentedControl.selectedSegmentIndex == 0 {
-            if (passwordTextField.text == "" || emailTextField.text == ""){
-                displayAlert("One or more text fields are empty")
-                return
-            }
-            else {
-                handleLogin()
-            }
-        } else {
-            if (passwordTextField.text == "" || emailTextField.text == "" || nameTextField.text == ""){
-                displayAlert("One or more text fields are empty")
-                return
-            }
-            else {
-                handleRegister()
+        loginRegisterButton.transform = CGAffineTransform(scaleX: 0.6, y: 0.6)
+                    
+        UIView.animate(withDuration: 0.5,
+                                   delay: 0,
+                                   usingSpringWithDamping: CGFloat(0.5),
+                                   initialSpringVelocity: CGFloat(1.0),
+                                   options: UIView.AnimationOptions.allowUserInteraction,
+                                   animations: {
+                                    self.loginRegisterButton.transform = CGAffineTransform.identity
+            }) { (true) in
+                if self.loginRegisterSegmentedControl.selectedSegmentIndex == 0 {
+                    if (self.passwordTextField.text == "" || self.emailTextField.text == ""){
+                        self.displayAlert("One or more text fields are empty")
+                    return
+                }
+                else {
+                    self.handleLogin()
+                }
+            } else {
+                    if (self.passwordTextField.text == "" || self.emailTextField.text == "" || self.nameTextField.text == ""){
+                        self.displayAlert("One or more text fields are empty")
+                    return
+                }
+                else {
+                    self.handleRegister()
+                }
             }
         }
     }
     
+    @objc func handleForgotPassword(sender: UIButton) {
+        
+        forgotPassword.transform = CGAffineTransform(scaleX: 0.6, y: 0.6)
+        
     
-    func handleRegister() {
-        let viewController: UIViewController? = ViewController()
-        print("In handleRegister")
+        UIView.animate(withDuration: 0.5,
+                                   delay: 0,
+                                   usingSpringWithDamping: CGFloat(0.5),
+                                   initialSpringVelocity: CGFloat(1.0),
+                                   options: UIView.AnimationOptions.allowUserInteraction,
+                                   animations: {
+                                    self.forgotPassword.transform = CGAffineTransform.identity
+            }) { (true) in
+                //self.navigationController?.customPush(viewController: MenuViewController())
+        }
+    }
+    
+    @objc func handleRegister() {
         view.endEditing(true)
-        displayAlertWithOutCancel("Registering")
+        displayAlert("Registering..")
+        
+        
         
         guard let email = emailTextField.text, let password = passwordTextField.text, let name = nameTextField.text else {
-            print("Form is not valid")
+            self.dismiss(animated: true, completion: {
+                self.errorAlert(error: "One or more text fields are empty.")
+            })
             return
         }
-        let values = ["name": name, "email": email]
+        //print ("email: \(email), password: \(password), name: \(name)")
+        
+        
+        Auth.auth().createUser(withEmail: email, password: password, completion: { (user, error) in
+            if error != nil {
+                print(error as Any)
+                
+                self.dismiss(animated: true, completion: {
+                    self.errorAlert(error: error?.localizedDescription ?? "An unknown error occured. Please try again.")
+                })
+                /*self.dismiss(animated: true, completion: {
+                    self.displayAlert((error?.localizedDescription)!)
+                })*/
+                
+            }
+            
+            guard let uid = user?.user.uid else {
+                return
+            }
+            
+            //successfully authenticated user
+            
+            
+            let values = ["name": name, "email": email, "rep": 0.0] as [String : Any]
+            self.registerUserIntoDatabaseWithUID(uid, values: values as [String : AnyObject])
+            
+            
+            // dismissing register alert
 
+            self.dismiss(animated: true, completion: {
+                self.handleLogin()
+            })
+        })
     }
-    
-    
+
     
     fileprivate func registerUserIntoDatabaseWithUID(_ uid: String, values: [String: AnyObject]) {
+        db?.collection("users").document(uid).setData([
+            "userName" : values["name"] ?? "Could not load userName",
+            "email" : values["email"] ?? "Could not load email",
+            "completed" : 0,
+            "premium" : false
+            //"rep" : values["rep"] ?? 0.0
+        ])
         
-//        let loggedUser = User(uid: uid, email: self.emailTextField.text!, name: self.nameTextField.text!)
-//        self.user.append(loggedUser)
- 
+        print(values)
+        
+        let loggedUser = User(uid: uid, email: self.emailTextField.text!, userName: self.nameTextField.text!, rep: 0.0)
+        self.user = loggedUser
     }
     
+    
+    @objc func userLoggedIn() {
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.35) {
+                self.dismiss(animated: true) {
+                    if self.delivery == true {
+                        self.navigationController?.customPush(viewController: Checkout_Delivery())
+                    } else {
+                        self.navigationController?.customPopToRoot()
+                    }
+            }
+        }
+    }
+    
+    func errorAlert(error: String) {
+        let myAlert = UIAlertController(title: "Error!", message: error, preferredStyle: UIAlertController.Style.alert)
+        let oK = UIAlertAction(title: "Ok", style: UIAlertAction.Style.cancel, handler: nil)
+        
+        myAlert.addAction(oK)
+        present(myAlert, animated: true, completion: nil)
+    }
+
     
     @objc func handleLoginRegisterChange(){
         
@@ -346,8 +406,6 @@ class LoginViewController: UIViewController {
         let title = loginRegisterSegmentedControl.titleForSegment(at: loginRegisterSegmentedControl.selectedSegmentIndex)
         loginRegisterButton.setTitle(title, for: UIControl.State())
         
-        // change height of inputContainerView, but how???
-        //inputsContainerViewHeightAnchor?.constant = loginRegisterSegmentedControl.selectedSegmentIndex == 1 ? 15 : 10
         
         // change height of nameTextField
         nameTextFieldHeightAnchor?.isActive = false
@@ -362,183 +420,89 @@ class LoginViewController: UIViewController {
         passwordTextFieldHeightAnchor = passwordTextField.heightAnchor.constraint(equalTo: inputsContainerView.heightAnchor, multiplier: loginRegisterSegmentedControl.selectedSegmentIndex == 1 ? 1/3 : 1/2)
         passwordTextFieldHeightAnchor?.isActive = true
     }
-
-    @objc func forgotPasswordView() {
-        
-        
-        infoBlackView.alpha = 0
-        forgotPassView.isHidden = false
-        infoBlackView.isHidden = false
-        infoBlackView.layer.zPosition = 9
-        forgotPassView.layer.zPosition = 10
-        UIView.animate(withDuration: 0.5, delay: 0.5, options: .curveEaseIn, animations: {
-            self.forgotPassView.alpha = 1
-            self.infoBlackView.alpha = 1
-        }, completion: nil)
-        // Send to View
-    }
-    
-    @objc func dismissViews() {
-        UIView.animate(withDuration: 0.5, animations: {
-            self.infoBlackView.alpha = 0
-            self.feedbackView.alpha = 0
-            self.forgotPassView.alpha = 0
-        }) { (true) in
-            self.infoBlackView.isHidden = true
-            self.feedbackView.isHidden = true
-            self.forgotPassView.isHidden = true
-        }
-    }
-    
-    func feedbackHandler() {
-        
-
-        infoBlackView.alpha = 0
-        feedbackView.isHidden = false
-        infoBlackView.isHidden = false
-        infoBlackView.layer.zPosition = 9
-        feedbackView.layer.zPosition = 10
-        UIView.animate(withDuration: 0.5, delay: 0.5, options: .curveEaseIn, animations: {
-            self.feedbackView.alpha = 1
-            self.infoBlackView.alpha = 1
-        }, completion: nil)
-    }
    
-    let mainLogo: UIImageView = {
-        let ml = UIImageView()
-        ml.image = UIImage(named: "image_Fiesta")
-        ml.layer.masksToBounds = true
-        ml.layer.cornerRadius = 2
-        ml.translatesAutoresizingMaskIntoConstraints = false
-        return ml
-    }()
+   
     
     let subLabel: UILabel = {
         let ml = UILabel()
         ml.text = "Please login or register"
-        ml.font = UIFont (name: "Baskerville", size: 19)
+        ml.font = UIFont (name: "Helvetica Neue", size: 34)
         ml.textAlignment = .center
-        ml.textColor = UIColor(r: 26, g: 62, b: 91)
+        ml.textColor = UIColor(r: 75, g: 80, b: 120)
+        ml.adjustsFontSizeToFitWidth = true
+        ml.minimumScaleFactor = 0.5
         ml.translatesAutoresizingMaskIntoConstraints = false
         return ml
     }()
     
-    
-    
-    
     func handleLogin() {
-        print("in Handle Login")
-        let viewController : UIViewController? = ViewController()
-        
-        view.endEditing(true)
-        
         displayAlertWithOutCancel("Logging In")
         
         guard let email = emailTextField.text, let password = passwordTextField.text else {
-            print("Form is not valid")
+            print("Form is invalid")
             return
         }
         
-        print("successfully logged in")
-        self.dismiss(animated: true, completion: nil)
-        //successfully logged in our user
-        UIView.animate(withDuration: 0.5, animations: {
-            self.firstView.alpha = 0
-            self.infoButton.alpha = 0
-            self.bottomView.alpha = 0
-        }) { (true) in
-            self.dismiss(animated: false, completion: {
-                if viewController != nil {
-                    UserDefaults.standard.set(false, forKey: "Guest")
-                    UserDefaults.standard.synchronize()
-                    self.dismiss(animated: false, completion: {
-                        let storyboard = UIStoryboard(name: "Main", bundle: nil)
-                        let controller = storyboard.instantiateViewController(withIdentifier: "ViewController")
-                        self.present(controller, animated: false, completion: nil)
-                    })
-                }
-                else {
-                    self.displayAlert("Crashed")
-                }
-            })
-        }
+        Auth.auth().signIn(withEmail: email, password: password, completion: { (user, error) in
+           if error != nil {
+               print(error as Any)
+               self.dismiss(animated: true, completion: {
+                   self.errorAlert(error: error?.localizedDescription ?? "An unknown error occured. Please try again.")
+               })
+               
+               //self.dismiss(animated: true, completion: {
+                   //self.displayAlert("Incorrect Login")
+               //})
+               return
+           }
+           self.dismiss(animated: true, completion: {
+               self.navigationController?.customPopToRoot()
+           })
+           //successfully logged in our user
+       })
     }
     
     
-    func setupInputsConstraints() {
-        
-        
+    func setupConstraints() {
         infoBlackView.frame = view.frame
         
+        subLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
+        subLabel.topAnchor.constraint(equalTo: view.topAnchor, constant: 10).isActive = true
+        subLabel.widthAnchor.constraint(equalTo: view.widthAnchor, multiplier: 0.5).isActive = true
+        subLabel.heightAnchor.constraint(equalTo: view.widthAnchor, multiplier: 1/7).isActive = true
         
+        inputsContainerView.topAnchor.constraint(equalTo: loginRegisterSegmentedControl.bottomAnchor, constant: 10).isActive = true
+        inputsContainerView.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
+        inputsContainerView.widthAnchor.constraint(equalTo: view.widthAnchor, multiplier: 0.9).isActive = true
+        inputsContainerViewHeightAnchor = inputsContainerView.heightAnchor.constraint(equalTo: view.heightAnchor, multiplier: 0.3)
+        inputsContainerViewHeightAnchor?.isActive = true
+                                
+        loginRegisterButton.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
+        loginRegisterButton.topAnchor.constraint(equalTo: inputsContainerView.bottomAnchor, constant: 10).isActive = true
+        loginRegisterButton.widthAnchor.constraint(equalTo: inputsContainerView.widthAnchor).isActive = true
+        loginRegisterButton.heightAnchor.constraint(equalTo: view.heightAnchor, multiplier: 1/10).isActive = true
+        
+        googleBtnContainer.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
+        googleBtnContainer.topAnchor.constraint(equalTo: loginRegisterButton.bottomAnchor, constant: 10).isActive = true
+        googleBtnContainer.widthAnchor.constraint(equalTo: self.inputsContainerView.widthAnchor, multiplier: 1).isActive = true
+        googleBtnContainer.heightAnchor.constraint(equalTo: self.view.heightAnchor, multiplier: 1/10).isActive = true
+
+        googleSignInIcon.leftAnchor.constraint(equalTo: googleBtnContainer.leftAnchor, constant: 5).isActive = true
+        googleSignInIcon.heightAnchor.constraint(equalToConstant: 48).isActive = true
+        googleSignInIcon.widthAnchor.constraint(equalToConstant: 48).isActive = true
+        googleSignInIcon.centerYAnchor.constraint(equalTo: self.googleBtnContainer.centerYAnchor, constant: 0).isActive = true
         
         forgotPassword.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
-        forgotPassword.bottomAnchor.constraint(equalTo: firstView.bottomAnchor, constant: -24).isActive = true
+        forgotPassword.topAnchor.constraint(equalTo: googleBtnContainer.bottomAnchor, constant: 10).isActive = true
         forgotPassword.widthAnchor.constraint(equalTo: inputsContainerView.widthAnchor).isActive = true
-        forgotPassword.heightAnchor.constraint(equalTo: firstView.heightAnchor, multiplier: 1/11).isActive = true
+        forgotPassword.heightAnchor.constraint(equalTo: view.heightAnchor, multiplier: 1/10).isActive = true
         
-        
-        loginRegisterButton.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
-        loginRegisterButton.bottomAnchor.constraint(equalTo: forgotPassword.topAnchor, constant: -12).isActive = true
-        loginRegisterButton.widthAnchor.constraint(equalTo: inputsContainerView.widthAnchor).isActive = true
-        loginRegisterButton.heightAnchor.constraint(equalTo: firstView.heightAnchor, multiplier: 1/11).isActive = true
-        
-        
-        inputsContainerView.bottomAnchor.constraint(equalTo: loginRegisterButton.topAnchor, constant: -12).isActive = true
-        inputsContainerView.centerXAnchor.constraint(equalTo: firstView.centerXAnchor).isActive = true
-        inputsContainerView.widthAnchor.constraint(equalTo: firstView.widthAnchor, constant: -24).isActive = true
-        inputsContainerViewHeightAnchor = inputsContainerView.heightAnchor.constraint(equalTo: firstView.heightAnchor, multiplier: 1/4)
-        inputsContainerViewHeightAnchor?.isActive = true
-        
-        //var num = view.frame.width / 2
-        
-        
-        loginRegisterSegmentedControl.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
-        loginRegisterSegmentedControl.bottomAnchor.constraint(equalTo: inputsContainerView.topAnchor, constant: -12).isActive = true
-        loginRegisterSegmentedControl.widthAnchor.constraint(equalTo: inputsContainerView.widthAnchor, multiplier: 1).isActive = true
-        loginRegisterSegmentedControl.heightAnchor.constraint(equalTo: firstView.heightAnchor, multiplier: 1/13).isActive = true
-        
-        feedbackView.layer.anchorPoint = CGPoint(x: 0.5, y: 0.5)
-        feedbackView.frame = CGRect(x: view.frame.width / 10, y: view.frame.height / 20 * 3, width: view.frame.width / 10 * 8, height: view.frame.height / 10 * 7)
-       
-        exitFeedback.topAnchor.constraint(equalTo: feedbackView.topAnchor, constant: 10).isActive = true
-        exitFeedback.leftAnchor.constraint(equalTo: feedbackView.leftAnchor, constant: 10).isActive = true
-        exitFeedback.heightAnchor.constraint(equalToConstant: 40).isActive = true
-        exitFeedback.widthAnchor.constraint(equalToConstant: 40).isActive = true
-        
-        forgotPassView.frame = CGRect(x: view.frame.width / 10, y: view.frame.height / 20 * 7, width: view.frame.width / 10 * 8, height: view.frame.height / 10 * 3)
-        
-        exitForgotPass.topAnchor.constraint(equalTo: forgotPassView.topAnchor, constant: 10).isActive = true
-        exitForgotPass.leftAnchor.constraint(equalTo: forgotPassView.leftAnchor, constant: 10).isActive = true
-        exitForgotPass.heightAnchor.constraint(equalToConstant: 40).isActive = true
-        exitForgotPass.widthAnchor.constraint(equalToConstant: 40).isActive = true
-        
-        bottomView.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
-        bottomView.widthAnchor.constraint(equalTo: view.widthAnchor).isActive = true
 
-        if (view.frame.height <= 400){
-            bottomViewHeightAnchor = bottomView.heightAnchor.constraint(equalToConstant: 32)
-            bottomView.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: 0).isActive = true
-            print("<= 400")
-        } else if (view.frame.height > 400 && view.frame.height <= 720) {
-            bottomViewHeightAnchor = bottomView.heightAnchor.constraint(equalToConstant: 50)
-            bottomView.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: 0).isActive = true
-            print(">400&&<=720")
-        } else if (view.frame.height > 720){
-            bottomViewHeightAnchor = bottomView.heightAnchor.constraint(equalToConstant: 90)
-            bottomView.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: 0).isActive = true
-            print(">720")
-        }
-        
-        bottomViewHeightAnchor?.isActive = true
-        
- 
-        
-        inputsContainerView.addSubview(nameTextField)
-        inputsContainerView.addSubview(nameSeparatorView)
-        inputsContainerView.addSubview(emailTextField)
-        inputsContainerView.addSubview(emailSeparatorView)
-        inputsContainerView.addSubview(passwordTextField)
+                
+        loginRegisterSegmentedControl.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
+        loginRegisterSegmentedControl.topAnchor.constraint(equalTo: subLabel.bottomAnchor, constant: 12).isActive = true
+        loginRegisterSegmentedControl.widthAnchor.constraint(equalTo: inputsContainerView.widthAnchor, multiplier: 1).isActive = true
+        loginRegisterSegmentedControl.heightAnchor.constraint(equalTo: view.heightAnchor, multiplier: 1/13).isActive = true
         
         //need x, y, width, height constraints
         nameTextField.leftAnchor.constraint(equalTo: inputsContainerView.leftAnchor, constant: 12).isActive = true
@@ -561,7 +525,6 @@ class LoginViewController: UIViewController {
         emailTextField.widthAnchor.constraint(equalTo: inputsContainerView.widthAnchor).isActive = true
         
         emailTextFieldHeightAnchor = emailTextField.heightAnchor.constraint(equalTo: inputsContainerView.heightAnchor, multiplier: 1/2)
-        
         emailTextFieldHeightAnchor?.isActive = true
         
         //need x, y, width, height constraints
@@ -577,83 +540,12 @@ class LoginViewController: UIViewController {
         passwordTextField.widthAnchor.constraint(equalTo: inputsContainerView.widthAnchor).isActive = true
         passwordTextFieldHeightAnchor = passwordTextField.heightAnchor.constraint(equalTo: inputsContainerView.heightAnchor, multiplier: 1/2)
         passwordTextFieldHeightAnchor?.isActive = true
-                
-        
-        
-        
-        infoButton.topAnchor.constraint(equalTo: view.topAnchor, constant: UIApplication.shared.statusBarFrame.height + ((UIApplication.shared.statusBarFrame.height)/2)).isActive = true
-        
-        infoButton.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 12).isActive = true
-        
-        
-        
-       
-
-        
-    }
+        }
     
-    
-    
-    
-    lazy var loginRegisterSegmentedControl: UISegmentedControl = {
-        let sc = UISegmentedControl(items: ["Login", "Register"])
-        sc.translatesAutoresizingMaskIntoConstraints = false
-        sc.tintColor = UIColor(r: 75, g: 115, b: 148)
-        sc.selectedSegmentIndex = 0
-        sc.addTarget(self, action: #selector(handleLoginRegisterChange), for: .valueChanged)
-        return sc
-    }()
-    
-    var bottomViewHeightAnchor: NSLayoutConstraint?
-    var inputsContainerViewHeightAnchor: NSLayoutConstraint?
-    var nameTextFieldHeightAnchor: NSLayoutConstraint?
-    var emailTextFieldHeightAnchor: NSLayoutConstraint?
-    var passwordTextFieldHeightAnchor: NSLayoutConstraint?
-    
-    override func viewDidAppear(_ animated: Bool) {
-        UIView.animate(withDuration: 0.5, animations: {
-            self.firstView.alpha = 1.0
-            self.infoButton.alpha = 1.0
-            self.bottomView.alpha = 1.0
-        }, completion: nil)
-    }
-    
+   @objc func dismissKeyboard() {
+       view.endEditing(true)
+   }
    
-
-    func setupBackground(){
-        
-        backgroundView.heightAnchor.constraint(equalToConstant: view.frame.height).isActive = true
-        backgroundView.widthAnchor.constraint(equalToConstant: (view.frame.height * 0.5625)).isActive = true
-        backgroundView.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
-        backgroundView.centerYAnchor.constraint(equalTo: view.centerYAnchor).isActive = true
-        
-        
-        firstView.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
-        firstView.topAnchor.constraint(equalTo: view.topAnchor, constant: 30).isActive = true
-        firstView.widthAnchor.constraint(equalTo: view.widthAnchor, multiplier: 0.9).isActive = true
-        firstView.heightAnchor.constraint(equalTo: view.heightAnchor, multiplier: 0.8).isActive = true
-        
-    }
-    
-    
-    func setupmainLogo(){
-
-        mainLogo.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
-        mainLogo.topAnchor.constraint(equalTo: firstView.topAnchor, constant: 0).isActive = true
-        mainLogo.widthAnchor.constraint(equalTo: firstView.widthAnchor, multiplier: 1).isActive = true
-        mainLogo.heightAnchor.constraint(equalTo: mainLogo.widthAnchor, multiplier: 1/3).isActive = true
-        
-        subLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
-        subLabel.topAnchor.constraint(equalTo: mainLogo.bottomAnchor, constant: -5).isActive = true
-        subLabel.bottomAnchor.constraint(equalTo: loginRegisterSegmentedControl.topAnchor, constant: -8).isActive = true
-        subLabel.widthAnchor.constraint(equalTo: view.widthAnchor).isActive = true
-    }
-    
-  
-    override var preferredStatusBarStyle: UIStatusBarStyle {
-        return .lightContent
-        
-    }
 }
 
 extension String {

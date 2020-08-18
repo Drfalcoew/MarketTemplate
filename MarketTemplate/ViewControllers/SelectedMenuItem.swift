@@ -8,6 +8,7 @@
 
 import UIKit
 import Foundation
+import FirebaseAuth
 
 class SelectedMenuItem: UIViewController {
 
@@ -15,6 +16,8 @@ class SelectedMenuItem: UIViewController {
     var selectedCategoryName : String = "" // title
     var selectedCategoryIndex : Int = 1000 // categoryIndex
     var categoryItems : [Item] = []
+    var user : FirebaseAuth.User?
+
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -106,13 +109,28 @@ class SelectedMenuItem: UIViewController {
     }()
     
     @objc func showSettings() {
+        user = Auth.auth().currentUser
+        showMenu.userLogged = user != nil
         showMenu.Settings()
     }
     
     
     @objc func handleCartTouch() {
-        self.navigationController?.customPush(viewController: ShoppingCartVC())
+        if ViewController().handleCart() {
+            self.navigationController?.customPush(viewController: ShoppingCartVC())
+        } else {
+            self.displayAlert("Add products to your cart before checking out.")
+        }
     }
+    
+    func displayAlert(_ userMessage: String){
+        
+        let myAlert = UIAlertController(title: "Cart Empty", message: userMessage, preferredStyle: UIAlertController.Style.alert)
+        let okAction = UIAlertAction(title: "OK", style: UIAlertAction.Style.default, handler: nil)
+        myAlert.addAction(okAction)
+        self.present(myAlert, animated: true, completion: nil)
+    }
+
     
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
@@ -149,12 +167,24 @@ extension SelectedMenuItem : UICollectionViewDelegate, UICollectionViewDataSourc
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         var item : Item
-        
         let vc = ItemDetails()
         item = categoryItems[indexPath.row]
         vc.selectedItem = item
         vc.selectedItemCategory = selectedCategoryName
-        self.navigationController?.customPush(viewController: vc)
+        let cell = collectionView.cellForItem(at: indexPath) as! SecondaryCell
+        cell.transform = CGAffineTransform(scaleX: 0.6, y: 0.6)
+        
+        
+        UIView.animate(withDuration: 0.5,
+                                   delay: 0,
+                                   usingSpringWithDamping: CGFloat(0.5),
+                                   initialSpringVelocity: CGFloat(1.0),
+                                   options: UIView.AnimationOptions.allowUserInteraction,
+                                   animations: {
+                                    cell.transform = CGAffineTransform.identity
+            }) { (true) in
+                self.navigationController?.customPush(viewController: vc)
+        }
     }
     
 }

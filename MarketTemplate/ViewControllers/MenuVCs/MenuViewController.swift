@@ -8,12 +8,14 @@
 
 import Foundation
 import UIKit
+import FirebaseAuth
 
 class MenuViewController: UIViewController {
     
     var collectionView : UICollectionView!
-    var categories : [String] = []
-    
+    var categories : [Category] = []
+    var user : FirebaseAuth.User?
+
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -83,7 +85,6 @@ class MenuViewController: UIViewController {
         
         let settingsButton = UIButton(type: .system)
         settingsButton.setImage(UIImage(named: "menu")?.withRenderingMode(.alwaysTemplate), for: .normal)
-        settingsButton.checkModeBtn()
         //settingsButton.imageView?.tintImageColor(color: UIColor(r: 221, g: 221, b: 221))
         if #available(iOS 9.0, *) {
             settingsButton.widthAnchor.constraint(equalToConstant: 28).isActive = true
@@ -100,7 +101,6 @@ class MenuViewController: UIViewController {
         
         let cart = UIButton(type: .system)
         cart.setImage(UIImage(named: "cart")?.withRenderingMode(.alwaysTemplate), for: .normal)
-        cart.checkModeBtn()
         if #available(iOS 9.0, *) {
             cart.widthAnchor.constraint(equalToConstant: 32).isActive = true
             cart.heightAnchor.constraint(equalToConstant: 32).isActive = true
@@ -123,12 +123,27 @@ class MenuViewController: UIViewController {
     }()
     
     @objc func showSettings() {
+        user = Auth.auth().currentUser
+        showMenu.userLogged = user != nil
         showMenu.Settings()
     }
 
     @objc func handleCartTouch() {
-        self.navigationController?.customPush(viewController: ShoppingCartVC())
+        if ViewController().handleCart() {
+            self.navigationController?.customPush(viewController: ShoppingCartVC())
+        } else {
+            self.displayAlert("Add products to your cart before checking out.")
+        }
     }
+    
+    func displayAlert(_ userMessage: String){
+        
+        let myAlert = UIAlertController(title: "Cart Empty", message: userMessage, preferredStyle: UIAlertController.Style.alert)
+        let okAction = UIAlertAction(title: "OK", style: UIAlertAction.Style.default, handler: nil)
+        myAlert.addAction(okAction)
+        self.present(myAlert, animated: true, completion: nil)
+    }
+
     
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
@@ -147,7 +162,7 @@ extension MenuViewController : UICollectionViewDelegate, UICollectionViewDataSou
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "menu", for: indexPath) as! SecondaryCell
             cell.backgroundColor = .white
-            cell.image.image = UIImage(named: "pizzaStockImg")//)(named: "category_\(indexPath.row)")
+            cell.image.image = UIImage(named: "\(categories[indexPath.row].image)")
             cell.layer.cornerRadius = 12
             cell.layer.shadowColor = UIColor.black.cgColor
             cell.layer.shadowOffset = CGSize(width: 3.0, height: 5.0)
@@ -155,7 +170,7 @@ extension MenuViewController : UICollectionViewDelegate, UICollectionViewDataSou
             cell.layer.shadowRadius = 5.0
             
             cell.contentView.alpha = 0
-        cell.title.text = "\(categories[indexPath.row])"
+            cell.title.text = "\(categories[indexPath.row].name)"
             DispatchQueue.main.async {
                 UIView.animate(withDuration: 1.0, animations: {
                     cell.contentView.alpha = 1.0
@@ -165,16 +180,32 @@ extension MenuViewController : UICollectionViewDelegate, UICollectionViewDataSou
         }
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        
+        let cell = collectionView.cellForItem(at: indexPath) as! SecondaryCell
+        cell.transform = CGAffineTransform(scaleX: 0.6, y: 0.6)
+        
+        
         var selectedCategory : String
         var selectedIndex : Int
                 
         let vc = SelectedMenuItem()
-        selectedCategory = categories[indexPath.row]
+        selectedCategory = categories[indexPath.row].name
         selectedIndex = indexPath.row
         
         vc.selectedCategoryName = selectedCategory
         vc.selectedCategoryIndex = selectedIndex
-        self.navigationController?.customPush(viewController: vc)
-    }
+
     
+        UIView.animate(withDuration: 0.5,
+                                   delay: 0,
+                                   usingSpringWithDamping: CGFloat(0.5),
+                                   initialSpringVelocity: CGFloat(1.0),
+                                   options: UIView.AnimationOptions.allowUserInteraction,
+                                   animations: {
+                                    cell.transform = CGAffineTransform.identity
+            }) { (true) in
+                self.navigationController?.customPush(viewController: vc)
+        }
+
+    }
 }

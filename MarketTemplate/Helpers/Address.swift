@@ -12,8 +12,8 @@ import Firebase
 import FirebaseFirestore
 
 struct Address {
-
-    var phoneNum : String
+    
+    var nickName : String?
     var streetAddress : String
     var city : String
     var state : String
@@ -23,8 +23,7 @@ struct Address {
     var instructions : String?
     var ref : String?
     
-    init(num : String, add : String, city : String, st : String, zip : String, apt : String, room : String, inst : String) {
-        self.phoneNum = num
+    init(ref : String, nn : String, add : String, city : String, st : String, zip : String, apt : String, room : String, inst : String) {
         self.streetAddress = add
         self.city = city
         self.state = st
@@ -32,11 +31,13 @@ struct Address {
         self.aptSuite = apt
         self.roomNum = room
         self.instructions = inst
+        self.nickName = nn
+        self.ref = ref
     }
     
     init(snapshot: QueryDocumentSnapshot) {
         let snapshotValue = snapshot.data() as [String: AnyObject]
-        phoneNum = snapshotValue["phonenumber"] as! String
+        nickName = snapshotValue["nickname"] as? String
         streetAddress = snapshotValue["streetaddress"] as! String
         city = snapshotValue["city"] as! String
         state = snapshotValue["state"] as! String
@@ -44,6 +45,6 @@ struct Address {
         aptSuite = snapshotValue["aptsuite"] as? String
         roomNum = snapshotValue["room"] as? String
         instructions = snapshotValue["instructions"] as? String
-        //ref = snapshot.ref
+        //ref = snapshot.reference
     }
 }

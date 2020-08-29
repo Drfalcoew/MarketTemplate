@@ -12,6 +12,7 @@ import FirebaseFirestore
 import GoogleSignIn
 import FirebaseCore
 import FirebaseAuth
+import FirebaseFunctions
 import Stripe
 
 
@@ -19,6 +20,21 @@ import Stripe
 class AppDelegate: UIResponder, UIApplicationDelegate, GIDSignInDelegate {
     
     var window: UIWindow?
+    lazy var functions = Functions.functions()
+    
+    
+    func getStripePublishableKey() {
+        functions.httpsCallable("getStripePublishablekey").call { (response, error) in
+           if let error = error {
+                print(error)
+            }
+            if let response = (response?.data as? [String: Any]) {
+                let stripePublishableKey = response["publishableKey"] as! String?
+                Stripe.setDefaultPublishableKey(stripePublishableKey!)
+                print(stripePublishableKey)
+            }
+        }
+    }
     
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         // Override point for customization after application launch.
@@ -53,9 +69,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, GIDSignInDelegate {
         }
         return
       } else {
-        let nc = NotificationCenter.default
-        nc.post(name: Notification.Name("UserLoggedIn"), object: nil)
-        
+            
             let userId = user.userID                  // For client-side use only!
             let idToken = user.authentication.idToken // Safe to send to the server
             let fullName = user.profile.name
@@ -73,12 +87,19 @@ class AppDelegate: UIResponder, UIApplicationDelegate, GIDSignInDelegate {
                                                           accessToken: authentication.accessToken)
         // googleAuthProvider is FirebaseAuth
         authenticateUser(credentials: credential)
+        
       // ...
     }
     
     private func authenticateUser(credentials : AuthCredential) {
         // Authenticate with Firebase using the credential object
         Auth.auth().signIn(with: credentials) { (authResult, error) in
+            
+            let newUser : Bool = authResult?.additionalUserInfo?.isNewUser ?? true
+            let nc = NotificationCenter.default
+            nc.post(name: Notification.Name("UserLoggedIn"), object: nil, userInfo: ["newUser" : newUser])
+
+            
             if let error = error {
                 print("authentication error \(error.localizedDescription)")
             }

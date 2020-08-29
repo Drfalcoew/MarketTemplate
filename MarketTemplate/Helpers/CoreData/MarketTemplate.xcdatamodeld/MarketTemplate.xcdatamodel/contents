@@ -1,5 +1,16 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="16119" systemVersion="19D76" minimumToolsVersion="Automatic" sourceLanguage="Swift" userDefinedModelVersionIdentifier="">
+    <entity name="Addresses" representedClassName="Addresses" syncable="YES">
+        <attribute name="aptSuite" optional="YES" attributeType="String"/>
+        <attribute name="city" optional="YES" attributeType="String"/>
+        <attribute name="instructions" optional="YES" attributeType="String"/>
+        <attribute name="nickname" optional="YES" attributeType="String"/>
+        <attribute name="ref" optional="YES" attributeType="String"/>
+        <attribute name="roomNum" optional="YES" attributeType="String"/>
+        <attribute name="state" optional="YES" attributeType="String"/>
+        <attribute name="streetAddress" optional="YES" attributeType="String"/>
+        <attribute name="zipCode" optional="YES" attributeType="String"/>
+    </entity>
     <entity name="ShoppingCartItems" representedClassName="ShoppingCartItems" syncable="YES">
         <attribute name="category" attributeType="String"/>
         <attribute name="name" attributeType="String"/>
@@ -7,7 +18,16 @@
         <attribute name="price" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
         <attribute name="quantity" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
     </entity>
+    <entity name="UserCoreData" representedClassName="UserCoreData" syncable="YES">
+        <attribute name="email" optional="YES" attributeType="String"/>
+        <attribute name="loyalty" optional="YES" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="reward" optional="YES" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="uid" optional="YES" attributeType="String"/>
+        <attribute name="userName" optional="YES" attributeType="String"/>
+    </entity>
     <elements>
+        <element name="Addresses" positionX="-54" positionY="27" width="128" height="178"/>
         <element name="ShoppingCartItems" positionX="-54" positionY="-9" width="128" height="118"/>
+        <element name="UserCoreData" positionX="-45" positionY="36" width="128" height="118"/>
     </elements>
 </model>

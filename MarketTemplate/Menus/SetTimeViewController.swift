@@ -88,14 +88,31 @@ class SetTimeViewController: UIViewController {
         settingsButton.addTarget(self, action: #selector(saveChanges), for: .touchDown)
         settingsButton.translatesAutoresizingMaskIntoConstraints = false
         
+        let backBtn = UIButton(type: .system)
+        backBtn.setTitle("back", for: .normal)
+        backBtn.tag = 2
+        backBtn.tintColor = UIColor(r: 75, g: 80, b: 120)
+        backBtn.addTarget(self, action: #selector(handleBack), for: .touchDown)
+        backBtn.translatesAutoresizingMaskIntoConstraints = false
+        
+        self.view.addSubview(backBtn)
         self.view.addSubview(settingsButton)
         
         NSLayoutConstraint.activate([
             settingsButton.topAnchor.constraint(equalTo: self.view.topAnchor, constant: 20),
             settingsButton.rightAnchor.constraint(equalTo: self.view.rightAnchor, constant: -20),
             settingsButton.widthAnchor.constraint(equalTo: self.view.widthAnchor, multiplier: 1/3),
-            settingsButton.heightAnchor.constraint(equalTo: settingsButton.widthAnchor, multiplier: 1/5)
+            settingsButton.heightAnchor.constraint(equalTo: settingsButton.widthAnchor, multiplier: 1/5),
+            
+            backBtn.topAnchor.constraint(equalTo: self.view.topAnchor, constant: 20),
+            backBtn.leftAnchor.constraint(equalTo: self.view.leftAnchor, constant: 20),
+            backBtn.widthAnchor.constraint(equalTo: self.view.widthAnchor, multiplier: 1/3.5),
+            backBtn.heightAnchor.constraint(equalTo: backBtn.widthAnchor, multiplier: 1/5)
         ])
+    }
+    
+    @objc func handleBack() {
+        self.dismiss(animated: true, completion: nil)
     }
     
     func setupHours() {

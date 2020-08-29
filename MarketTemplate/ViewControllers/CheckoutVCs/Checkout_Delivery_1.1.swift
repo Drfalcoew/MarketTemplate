@@ -12,14 +12,17 @@ import GoogleSignIn
 import FirebaseAuth
 import FirebaseFirestore
 
-class Checkout_Delivery: UIViewController {
+class Checkout_Delivery: UIViewController, UserEditedDelegate {
+    
+    
     
     var user : FirebaseAuth.User?
     let db = Firestore.firestore()
     //var ref: DatabaseReference!
     var userAddresses = [Address?]()
-    var userInformation : [String : String] = ["Phone Number" : "", "Street Address" : "", "City" : "", "State" : "", "ZipCode" : "", "Apt/Suite #" : "", "Room #" : "", "Delivery Instructions" : ""]
-//    var userInformation : Address?
+    var temporaryAddress : Address?
+    var selectedAddress : Int?
+    var tempAddy : Bool?
     
     let cellId = "cellId"
     
@@ -46,7 +49,7 @@ class Checkout_Delivery: UIViewController {
         btn.layer.shadowOpacity = 0.2
         btn.setTitle("New Address", for: .normal)
         btn.layer.shadowRadius = 5.0
-        btn.backgroundColor = UIColor.lightGray//(r: 255, g: 89, b: 89)
+        btn.backgroundColor = UIColor.gray//(r: 255, g: 89, b: 89)
         btn.addTarget(self, action: #selector(handleNewAddress), for: .touchUpInside)
         return btn
     }()
@@ -100,9 +103,10 @@ class Checkout_Delivery: UIViewController {
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(true)
         
-        user = Auth.auth().currentUser
+        if Auth.auth().currentUser != nil {
+            user = Auth.auth().currentUser
+        }
         
-        print(userInformation)
 
     }
     
@@ -110,7 +114,6 @@ class Checkout_Delivery: UIViewController {
         super.viewDidLoad()
         
         self.view.backgroundColor = UIColor(r: 240, g: 240, b: 240)
-        
         
         setupTableView()
         setupViews()
@@ -123,7 +126,7 @@ class Checkout_Delivery: UIViewController {
             checkSavedAddresses()
         }
     }
-        
+    
     func setupViews() {
         self.view.addSubview(containerView)
         self.containerView.addSubview(separatorView)
@@ -132,7 +135,9 @@ class Checkout_Delivery: UIViewController {
         view.addSubview(checkoutButton)
     }
     
-    func checkSavedAddresses() {
+    @objc func checkSavedAddresses() {
+        userAddresses.removeAll()
+        
         let userID = Auth.auth().currentUser?.uid
         let docRef = db.collection("users").document(userID!).collection("addresses")
         
@@ -145,6 +150,7 @@ class Checkout_Delivery: UIViewController {
                     addy.ref = item.documentID
                     self.userAddresses.append(addy)
                 }
+                print(self.userAddresses)
             } else {
                 print("Documents are empty")
             }
@@ -153,6 +159,9 @@ class Checkout_Delivery: UIViewController {
             } else {
                 self.tableView.reloadData()
             }
+        }
+        if temporaryAddress != nil {
+            self.tableView.reloadData()
         }
     }
     
@@ -169,16 +178,33 @@ class Checkout_Delivery: UIViewController {
         signInImage.centerYAnchor.constraint(equalTo: self.signInButton.centerYAnchor, constant: 0).isActive = true
         signInImage.widthAnchor.constraint(equalTo: self.signInButton.widthAnchor, multiplier: 0.65).isActive = true
         signInImage.heightAnchor.constraint(equalTo: self.signInImage.widthAnchor, multiplier: 0.45).isActive = true
-        
     }
     
     func setupNavigation() {
-        self.title = "Checkout"
-        
-        navigationItem.backBarButtonItem = UIBarButtonItem(title: "back", style: .plain, target: self, action: #selector(handleBack))
+        self.title = "Select Address"
+                
+        navigationItem.rightBarButtonItem = UIBarButtonItem(title: "edit", style: .plain, target: self, action: #selector(handleEdit))
     }
+    
     @objc func handleBack() {
         navigationController?.popToViewController(CheckoutVC(), animated: true)
+    }
+    
+    @objc func postNotif() {
+        NotificationCenter.default.post(name: NSNotification.Name(rawValue: "handleBack"), object: nil)
+    }
+    
+    @objc func handleEdit() {        
+        let vc = EditAddresses()
+        vc.userAddresses = self.userAddresses
+        vc.delegate = self
+        self.navigationController?.customPush(viewController: vc)
+    }
+    
+    func userEdited(edited: Bool) {
+        if edited {
+            checkSavedAddresses()
+        }
     }
     
     func setupConstraints() {
@@ -205,7 +231,7 @@ class Checkout_Delivery: UIViewController {
         
         tableView.topAnchor.constraint(equalTo: self.newAddressButton.bottomAnchor, constant: self.view.frame.height * 0.10).isActive = true
         tableView.widthAnchor.constraint(equalTo: self.view.widthAnchor, multiplier: 1).isActive = true
-        tableView.heightAnchor.constraint(equalTo: self.view.heightAnchor, multiplier: 2/5, constant: 0).isActive = true
+        tableView.bottomAnchor.constraint(equalTo: self.checkoutButton.topAnchor, constant: -30).isActive = true
         tableView.centerXAnchor.constraint(equalTo: self.view.centerXAnchor).isActive = true
     }
     
@@ -216,7 +242,7 @@ class Checkout_Delivery: UIViewController {
         tableView.register(SavedAddressTVCell.self, forCellReuseIdentifier: cellId)
         //xxtableView.backgroundColor = UIColor.clear
         tableView.layer.zPosition = 1
-        tableView.isScrollEnabled = false
+        tableView.isScrollEnabled = true
         tableView.allowsMultipleSelectionDuringEditing = false
         tableView.layoutMargins = UIEdgeInsets.init(top: 12, left: 12, bottom: 12, right: 10)
         //tableView.separatorColor = .black
@@ -246,34 +272,23 @@ class Checkout_Delivery: UIViewController {
     }
     
     @objc func handleCheckout() {
-        var j = 0
-        for i in 0..<tableView.visibleCells.count {
-            let indexPath = IndexPath(row: i, section: 0)
-            let cell = tableView.cellForRow(at: indexPath) as! AddressTableViewCell
-            if cell.textField.text!.removeWhitespaces().isEmpty { // checking (String - whitespace) if empty
-                if j < 5 {
-                    displayAlert("One or more required text fields are empty!")
-                    return
-                }
-                userInformation[cell.textField.placeholder!] = ""
-            } else {
-                userInformation[cell.textField.placeholder!] = cell.textField.text!
+        
+        if selectedAddress != nil {
+            let vc = PlaceOrderVC()
+            
+            vc.userInformation = self.userAddresses[selectedAddress!]
+            vc.carryout = false
+
+            
+            checkoutButton.transform = CGAffineTransform(scaleX: 0.6, y: 0.6)
+
+            UIView.animate(withDuration: 0.5, delay: 0, usingSpringWithDamping: CGFloat(0.5), initialSpringVelocity: CGFloat(1.0), options: UIView.AnimationOptions.allowUserInteraction, animations: {
+                self.checkoutButton.transform = CGAffineTransform.identity
+                }) { (true) in
+                self.navigationController?.customPush(viewController: vc)
             }
-            j += 1
-        }
-        
-        
-        let vc = PlaceOrderVC()
-        vc.userInformation = self.userInformation
-        vc.carryout = false
-
-        
-        checkoutButton.transform = CGAffineTransform(scaleX: 0.6, y: 0.6)
-
-        UIView.animate(withDuration: 0.5, delay: 0, usingSpringWithDamping: CGFloat(0.5), initialSpringVelocity: CGFloat(1.0), options: UIView.AnimationOptions.allowUserInteraction, animations: {
-            self.checkoutButton.transform = CGAffineTransform.identity
-            }) { (true) in
-            self.navigationController?.customPush(viewController: vc)
+        } else {
+            displayAlert("Please select an address")
         }
     }
     
@@ -284,34 +299,49 @@ class Checkout_Delivery: UIViewController {
         myAlert.addAction(okAction)
         self.present(myAlert, animated: true, completion: nil)
     }
-
 }
 
 extension Checkout_Delivery : UITableViewDelegate, UITableViewDataSource {
     
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return userAddresses.count
+        var r : Int
+        if temporaryAddress != nil {
+            r = 1
+        } else {
+            r = 0
+        }
+        
+        return userAddresses.count + r
     }
     
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        return self.view.frame.height / 5
+        return self.view.frame.height / 9
     }
     
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = self.tableView.dequeueReusableCell(withIdentifier: cellId) as! SavedAddressTVCell
         //cell.backgroundColor = .clear
-        if let address = userAddresses[indexPath.row] {
+        var i = indexPath.row
+        if temporaryAddress != nil {
+            if i == 0 && tempAddy == true {
+                cell.addressNameLbl.text = temporaryAddress?.nickName ?? ""
+                cell.streetAdd.text = temporaryAddress?.streetAddress
+                return cell
+            }
+            i -= 1
+            tempAddy = false
+        }
+        if let address = userAddresses[i] {
+            print(address)
+            cell.addressNameLbl.text = address.nickName ?? ""
             cell.streetAdd.text = address.streetAddress
-            cell.phoneNum.text = address.phoneNum
-            cell.room.text = address.roomNum
-            cell.city.text = address.city
-            cell.zip.text = address.zipCode
-            cell.instructions.text = address.instructions
-            cell.state.text = address.state
-            cell.aptSuite.text = address.aptSuite
         }
         return cell
+    }
+    
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        selectedAddress = indexPath.row
     }
 }

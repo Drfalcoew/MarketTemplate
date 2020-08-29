@@ -71,7 +71,6 @@ class Menu: NSObject {
         categories.append(Category(name: "Pasta", image: "bagIcon"))
         categories.append(Category(name: "Salad", image: "bagIcon"))
         categories.append(Category(name: "Drinks", image: "bagIcon"))
-
     }
     
     func initItems() {
@@ -79,7 +78,7 @@ class Menu: NSObject {
         items.append(Item(name: "Testing", category: 4, price: [4.59, 7.99], toppings: ["Cheese", "Tomatoes"], size: [6, 12], description: "Hello, this is a test description. One, two, three."))
         items.append(Item(name: "Testing", category: 4, price: [4.59, 7.99], toppings: ["Cheese", "Tomatoes"], size: [6, 12], description: "Hello, this is a test description. One, two, three."))
         items.append(Item(name: "Testing", category: 4, price: [4.59, 5.99, 7.49], toppings: ["Cheese", "Tomatoes"], size: [1, 2, 3], description: "Hello,  this is a test description. One, two, three."))
-        items.append(Item(name: "Sandwich_1", category: 1, price: [9.99, 11.99], toppings: ["Cheese", "Tomatoes"], size: [1, 2], description: "Hello, this is a test description. Sandwich Testing."))
+        items.append(Item(name: "Sandwich", category: 1, price: [9.99, 11.99], toppings: ["Cheese", "Tomatoes"], size: [1, 2], description: "Hello, this is a test description. Sandwich Testing."))
         
         // AM I THAT FUCKING OP
         

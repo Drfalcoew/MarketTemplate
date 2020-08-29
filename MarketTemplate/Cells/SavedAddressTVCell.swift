@@ -11,96 +11,62 @@ import UIKit
 
 class SavedAddressTVCell: UITableViewCell {
     
-    var phoneNum = UILabel()
-    var streetAdd = UILabel()
-    var city = UILabel()
-    var state = UILabel()
-    var zip = UILabel()
-    var aptSuite = UILabel()
-    var room = UILabel()
-    var instructions = UILabel()
-    
-    var containerView : UIView = {
-        let view = UIView()
-        view.translatesAutoresizingMaskIntoConstraints = false
-        view.layer.masksToBounds = true
-        return view
-    }()
-    
-    var stackViewLeft : UIStackView = {
-        let stack = UIStackView()
-        stack.translatesAutoresizingMaskIntoConstraints = false
-        stack.axis = .vertical
-        return stack
-    }()
-    
-    var stackViewRight : UIStackView = {
-        let stack = UIStackView()
-        stack.translatesAutoresizingMaskIntoConstraints = false
-        stack.axis = .vertical
-        return stack
-    }()
-    
-    override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
-        super.init(style: style, reuseIdentifier: reuseIdentifier)
-        
-        phoneNum.translatesAutoresizingMaskIntoConstraints = false
-        streetAdd.translatesAutoresizingMaskIntoConstraints = false
-        city.translatesAutoresizingMaskIntoConstraints = false
-        state.translatesAutoresizingMaskIntoConstraints = false
-        zip.translatesAutoresizingMaskIntoConstraints = false
-        aptSuite.translatesAutoresizingMaskIntoConstraints = false
-        room.translatesAutoresizingMaskIntoConstraints = false
-        instructions.translatesAutoresizingMaskIntoConstraints = false
-        
-        
-        
-        setupViews()
-        setupConstraints()
-    }
-    
-    required init?(coder aDecoder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
-    
-    func setupViews() {
-        
-        self.addSubview(containerView)
-        self.containerView.addSubview(stackViewLeft)
-        self.containerView.addSubview(stackViewRight)
-        
-        stackViewLeft.addArrangedSubview(streetAdd)
-        stackViewLeft.addArrangedSubview(state)
-        stackViewLeft.addArrangedSubview(city)
-        stackViewLeft.addArrangedSubview(zip)
-
-        stackViewRight.addArrangedSubview(phoneNum)
-        stackViewRight.addArrangedSubview(aptSuite)
-        stackViewRight.addArrangedSubview(room)
-        stackViewRight.addArrangedSubview(instructions)
-
-        stackViewLeft.arrangedSubviews[0].backgroundColor = .gray
-        stackViewLeft.arrangedSubviews[2].backgroundColor = .gray
-        stackViewRight.arrangedSubviews[1].backgroundColor = .gray
-        stackViewRight.arrangedSubviews[3].backgroundColor = .gray
-        self.selectionStyle = .default
-    }
-    
-    
-    func setupConstraints() {
-        self.containerView.widthAnchor.constraint(equalTo: self.widthAnchor, multiplier: 0.9).isActive = true
-        containerView.heightAnchor.constraint(equalTo: self.heightAnchor, multiplier: 0.9).isActive = true
-        containerView.centerXAnchor.constraint(equalTo: self.centerXAnchor, constant: 0).isActive = true
-        containerView.centerYAnchor.constraint(equalTo: self.centerYAnchor, constant: 0).isActive = true
-        
-        stackViewLeft.widthAnchor.constraint(equalTo: self.containerView.widthAnchor, multiplier: 1/2).isActive = true
-        stackViewLeft.heightAnchor.constraint(equalTo: self.containerView.heightAnchor, multiplier: 1).isActive = true
-        stackViewLeft.leftAnchor.constraint(equalTo: self.containerView.leftAnchor, constant: 0).isActive = true
-        stackViewLeft.centerYAnchor.constraint(equalTo: self.containerView.centerYAnchor, constant: 0).isActive = true
-        
-        stackViewRight.rightAnchor.constraint(equalTo: self.containerView.rightAnchor, constant: 0).isActive = true
-        stackViewRight.heightAnchor.constraint(equalTo: self.containerView.heightAnchor, multiplier: 1).isActive = true
-        stackViewRight.widthAnchor.constraint(equalTo: self.containerView.widthAnchor, multiplier: 1/2).isActive = true
-        stackViewRight.centerYAnchor.constraint(equalTo: self.containerView.centerYAnchor, constant: 0).isActive = true
-    }
+    var addressNameLbl : UILabel = {
+           let lbl = UILabel()
+           lbl.translatesAutoresizingMaskIntoConstraints = false
+           lbl.layer.masksToBounds = true
+           lbl.font = UIFont(name: "Helvetica Neue", size: 30)
+           lbl.adjustsFontSizeToFitWidth = true
+           lbl.minimumScaleFactor = 0.2
+           lbl.text = ""
+           return lbl
+       }()
+       
+       var streetAdd : UILabel = {
+           let lbl = UILabel()
+           lbl.translatesAutoresizingMaskIntoConstraints = false
+           lbl.layer.masksToBounds = true
+           lbl.font = UIFont(name: "Helvetica Neue", size: 30)
+           lbl.adjustsFontSizeToFitWidth = true
+           lbl.minimumScaleFactor = 0.2
+           lbl.text = ""
+           return lbl
+       }()
+       
+       
+       
+       override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
+           super.init(style: style, reuseIdentifier: reuseIdentifier)
+           
+           
+           setupViews()
+           setupConstraints()
+       }
+       
+       required init?(coder aDecoder: NSCoder) {
+           fatalError("init(coder:) has not been implemented")
+       }
+       
+       func setupViews() {
+           
+           self.addSubview(addressNameLbl)
+           self.addSubview(streetAdd)
+           
+           self.selectionStyle = .default
+       }
+       
+       
+       func setupConstraints() {
+           NSLayoutConstraint.activate([
+               addressNameLbl.leftAnchor.constraint(equalTo: self.leftAnchor, constant: self.frame.width * 0.10),
+               addressNameLbl.topAnchor.constraint(equalTo: self.topAnchor, constant: 0),
+               addressNameLbl.widthAnchor.constraint(equalTo: self.widthAnchor, multiplier: 1/3),
+               addressNameLbl.bottomAnchor.constraint(equalTo: self.centerYAnchor, constant: 5),
+           
+               streetAdd.leftAnchor.constraint(equalTo: self.leftAnchor, constant: self.frame.width * 0.10),
+               streetAdd.topAnchor.constraint(equalTo: self.centerYAnchor, constant: 0),
+               streetAdd.widthAnchor.constraint(equalTo: self.widthAnchor, multiplier: 1/3),
+               streetAdd.bottomAnchor.constraint(equalTo: self.bottomAnchor, constant: -5)
+           ])
+       }
 }

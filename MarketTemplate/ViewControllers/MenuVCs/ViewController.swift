@@ -13,7 +13,7 @@ import Firebase
 import FirebaseFirestore
 import FirebaseAuth
 import GoogleSignIn
-
+import Stripe
 
 class ViewController: UIViewController, UIGestureRecognizerDelegate {
     
@@ -92,8 +92,7 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
         view.backgroundColor = .white
         return view
     }()
-    
-    
+
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -101,9 +100,15 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
         if GIDSignIn.sharedInstance()?.currentUser == nil && Auth.auth().currentUser == nil {
             DispatchQueue.main.asyncAfter(deadline: .now()) {
                 //GIDSignIn.sharedInstance()?.presentingViewController = self
+                // if userJustLoggedOut != true {
                 GIDSignIn.sharedInstance()?.restorePreviousSignIn()
+                //}
             }
+        } else {
+            user = Auth.auth().currentUser
         }
+        
+        
         
         for item in Menu().items {
             //print(item)
@@ -121,11 +126,30 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
         self.view.tag = 0
         self.view.backgroundColor = UIColor(r: 240, g: 240, b: 240)
         
+        if user != nil {
+            setupDB()
+        }
+
         setupHours()
         setupNavigation()
         setupCollectionView()
         setupViews()
         setupConstraints()
+    }
+    
+    func setupDB() {
+        let userID = Auth.auth().currentUser?.uid
+        let docRef = db.collection("users").document(userID!)
+        
+        docRef.getDocument { (document, error) in
+            if let doc = document, document != nil {
+                for (key, value) in doc.data()! {
+                    if key == "userName" {
+                        UserDefaults.standard.set(value, forKey: key)
+                    }
+                }
+            }
+        }
     }
     
     func setupHours() {

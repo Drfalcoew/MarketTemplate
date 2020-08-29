@@ -194,7 +194,9 @@ class SettingsViewController: UIViewController, UITableViewDataSource, UITableVi
         
         let myAlert = UIAlertController(title: "Alert", message: userMessage, preferredStyle: UIAlertController.Style.alert)
         let act = UIAlertAction(title: "OK", style: .default) { (action) in
-            self.navigationController?.customPush(viewController: ViewController())
+            DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
+                self.navigationController?.customPush(viewController: ViewController())
+            }
         }
         myAlert.addAction(act)
         self.present(myAlert, animated: true, completion: nil)

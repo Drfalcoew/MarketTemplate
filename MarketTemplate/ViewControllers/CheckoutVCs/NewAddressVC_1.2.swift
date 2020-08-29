@@ -18,7 +18,7 @@ class NewAddressVC: UIViewController {
     let db = Firestore.firestore()
     //var ref: DatabaseReference!
 
-    var userInformation : [String : String] = ["Phone Number" : "", "Street Address" : "", "City" : "", "State" : "", "ZipCode" : "", "Apt/Suite #" : "", "Room #" : "", "Delivery Instructions" : ""]
+    var userInformation : [String : String] = ["Street Address" : "", "City" : "", "State" : "", "ZipCode" : "", "Apt/Suite #" : "", "Room #" : "", "Delivery Instructions" : "", "Nick Name" : ""]
 //    var userInformation : Address?
     
     let cellId = "cellId"
@@ -44,7 +44,27 @@ class NewAddressVC: UIViewController {
         return lbl
     }()
     
-    var saveAddressBtn : UIButton = {
+    var saveAddressSwitch : UISwitch = {
+        let save = UISwitch()
+        save.translatesAutoresizingMaskIntoConstraints = false
+        save.layer.masksToBounds = true
+        save.isOn = false
+        return save
+    }()
+    
+    var saveLabel : UILabel = {
+        let lbl = UILabel()
+        lbl.translatesAutoresizingMaskIntoConstraints = false
+        lbl.layer.masksToBounds = true
+        lbl.numberOfLines = 1
+        lbl.text = "Save address to profile?"
+        lbl.font = UIFont(name: "Helvetica Neue", size: 30)
+        lbl.adjustsFontSizeToFitWidth = true
+        lbl.minimumScaleFactor = 0.3
+        return lbl
+    }()
+    
+    var continueBtn : UIButton = {
         let btn = UIButton()
         btn.translatesAutoresizingMaskIntoConstraints = false
         //btn.layer.masksToBounds = true
@@ -55,7 +75,7 @@ class NewAddressVC: UIViewController {
         btn.layer.shadowRadius = 5.0
         btn.backgroundColor = UIColor(r: 255, g: 89, b: 89)
         btn.addTarget(self, action: #selector(handleSaveData), for: .touchUpInside)
-        btn.setTitle("Save Address", for: .normal)
+        btn.setTitle("Continue", for: .normal)
         btn.setTitleColor(.white, for: .normal)
         return btn
     }()
@@ -70,12 +90,32 @@ class NewAddressVC: UIViewController {
         setupViews()
         setupNavigation()
         setupConstraints()
+        if signedInUser ?? false {
+            setupSwitch()
+        }
+    }
+    
+    func setupSwitch() {
+        self.view.addSubview(saveAddressSwitch)
+        self.view.addSubview(saveLabel)
+        
+        NSLayoutConstraint.activate([
+            saveAddressSwitch.bottomAnchor.constraint(equalTo: self.continueBtn.topAnchor, constant: -10),
+            saveAddressSwitch.rightAnchor.constraint(equalTo: self.tableView.rightAnchor, constant: -10),
+            saveAddressSwitch.heightAnchor.constraint(equalToConstant: 35),
+            saveAddressSwitch.widthAnchor.constraint(equalToConstant: 50),
+            
+            saveLabel.rightAnchor.constraint(equalTo: self.saveAddressSwitch.leftAnchor, constant: -10),
+            saveLabel.bottomAnchor.constraint(equalTo: self.saveAddressSwitch.centerYAnchor, constant: 8),
+            saveLabel.widthAnchor.constraint(equalTo: self.tableView.widthAnchor, multiplier: 1/2),
+            saveLabel.heightAnchor.constraint(equalTo: saveLabel.widthAnchor, multiplier: 1/5.5)
+        ])        
     }
         
     func setupViews() {
         
         view.addSubview(tableView)
-        view.addSubview(saveAddressBtn)
+        view.addSubview(continueBtn)
     }
 
     
@@ -85,22 +125,24 @@ class NewAddressVC: UIViewController {
     
     func setupConstraints() {
         
-        saveAddressBtn.heightAnchor.constraint(equalTo: self.view.heightAnchor, multiplier: 0.105).isActive = true
-        saveAddressBtn.bottomAnchor.constraint(equalTo: self.view.bottomAnchor, constant: -15).isActive = true
-        saveAddressBtn.widthAnchor.constraint(equalTo: self.view.widthAnchor, multiplier: 0.9).isActive = true
-        saveAddressBtn.centerXAnchor.constraint(equalTo: self.view.centerXAnchor, constant: 0).isActive = true
-        
-        tableView.widthAnchor.constraint(equalTo: self.view.widthAnchor, multiplier: 1).isActive = true
-        tableView.heightAnchor.constraint(equalTo: self.view.heightAnchor, multiplier: 8/12, constant: 0).isActive = true
-        tableView.centerXAnchor.constraint(equalTo: self.view.centerXAnchor).isActive = true
-        tableView.bottomAnchor.constraint(equalTo: self.saveAddressBtn.topAnchor, constant: self.view.frame.height * -0.05).isActive = true
+        continueBtn.heightAnchor.constraint(equalTo: self.view.heightAnchor, multiplier: 0.105).isActive = true
+        continueBtn.bottomAnchor.constraint(equalTo: self.view.bottomAnchor, constant: -15).isActive = true
+        continueBtn.widthAnchor.constraint(equalTo: self.view.widthAnchor, multiplier: 0.9).isActive = true
+        continueBtn.centerXAnchor.constraint(equalTo: self.view.centerXAnchor, constant: 0).isActive = true
         
         self.view.addSubview(viewLbl)
                 
         viewLbl.centerXAnchor.constraint(equalTo: self.view.centerXAnchor, constant: 0).isActive = true
-        viewLbl.heightAnchor.constraint(equalTo: self.viewLbl.widthAnchor, multiplier: 1/4).isActive = true
+        viewLbl.heightAnchor.constraint(equalTo: self.viewLbl.widthAnchor, multiplier: 1/4.5).isActive = true
         viewLbl.widthAnchor.constraint(equalTo: self.view.widthAnchor, multiplier: 2/3).isActive = true
-        viewLbl.bottomAnchor.constraint(equalTo: self.tableView.topAnchor, constant: -5).isActive = true
+        viewLbl.topAnchor.constraint(equalTo: self.view.topAnchor, constant: 15).isActive = true
+        
+        tableView.widthAnchor.constraint(equalTo: self.view.widthAnchor, multiplier: 1).isActive = true
+        tableView.heightAnchor.constraint(equalTo: self.view.heightAnchor, multiplier: 4/7, constant: 0).isActive = true
+        tableView.centerXAnchor.constraint(equalTo: self.view.centerXAnchor).isActive = true
+        tableView.topAnchor.constraint(equalTo: self.viewLbl.bottomAnchor, constant: 10).isActive = true
+        
+        
     }
     
     func setupTableView() {
@@ -122,7 +164,7 @@ class NewAddressVC: UIViewController {
             let indexPath = IndexPath(row: i, section: 0)
             let cell = tableView.cellForRow(at: indexPath) as! AddressTableViewCell
             if cell.textField.text!.removeWhitespaces().isEmpty { // checking (String - whitespace) if empty
-                if j < 5 {
+                if j < 4 {
                     displayAlert("One or more required text fields are empty!")
                     return
                 }
@@ -132,31 +174,42 @@ class NewAddressVC: UIViewController {
             }
             j += 1
         }
+            
         
-        if self.signedInUser! {
+        let vc = Checkout_Delivery()
+        let x = userInformation
+
+        
+        let address = Address(ref: "", nn : x["Nick Name"]!, add: x["Street Address"]!, city: x["City"]!, st: x["State"]!, zip: x["ZipCode"]!, apt: x["Apt/Suite #"]!, room: x["Room #"]!, inst: x["Delivery Instructions"]!)
+        
+        if self.signedInUser! && saveAddressSwitch.isOn {
             setData()
+            vc.userAddresses.append(address)
+        } else {
+            // post to guest db?
+            vc.tempAddy = true
+            vc.temporaryAddress = address
         }
         
         
-        let vc = Checkout_Delivery()
-        vc.userInformation = self.userInformation
-        //vc.carryout = false
-        
-        saveAddressBtn.transform = CGAffineTransform(scaleX: 0.6, y: 0.6)
+        continueBtn.transform = CGAffineTransform(scaleX: 0.6, y: 0.6)
 
         UIView.animate(withDuration: 0.5, delay: 0, usingSpringWithDamping: CGFloat(0.5), initialSpringVelocity: CGFloat(1.0), options: UIView.AnimationOptions.allowUserInteraction, animations: {
-            self.saveAddressBtn.transform = CGAffineTransform.identity
+            self.continueBtn.transform = CGAffineTransform.identity
             }) { (true) in
             self.navigationController?.customPush(viewController: vc)
         }
     }
     
     func setData() {
-        let userID = Auth.auth().currentUser?.uid
-        let docRef = db.collection("users").document(userID!).collection("addresses").document()
+        guard let userID = Auth.auth().currentUser?.uid else {
+            displayAlert("User is not signed in")
+            return
+        }
+        let docRef = db.collection("users").document(userID).collection("addresses").document()
 
         docRef.setData([
-            "phonenumber": userInformation["Phone Number"] as Any,
+            "nickname": userInformation["Nick Name"] as Any,
             "streetaddress": userInformation["Street Address"] as Any,
             "city": userInformation["City"] as Any,
             "state": userInformation["State"] as Any,
@@ -191,7 +244,7 @@ extension NewAddressVC : UITableViewDelegate, UITableViewDataSource {
     }
     
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        return self.view.frame.height / 12
+        return self.view.frame.height / 14
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
@@ -199,43 +252,42 @@ extension NewAddressVC : UITableViewDelegate, UITableViewDataSource {
         switch indexPath.row {
         case 0:
             cell.textField.tag = 0
-            cell.textField.placeholder = "Phone Number"
+            cell.textField.placeholder = "Street Address"
             cell.optionalLbl.text = "required"
-            cell.textField.keyboardType = .phonePad
             break
         case 1:
             cell.textField.tag = 1
-            cell.textField.placeholder = "Street Address"
+            cell.textField.placeholder = "City"
             cell.optionalLbl.text = "required"
             break
         case 2:
             cell.textField.tag = 2
-            cell.textField.placeholder = "City"
+            cell.textField.placeholder = "State"
             cell.optionalLbl.text = "required"
             break
         case 3:
             cell.textField.tag = 3
-            cell.textField.placeholder = "State"
-            cell.optionalLbl.text = "required"
-            break
-        case 4:
-            cell.textField.tag = 4
             cell.textField.placeholder = "ZipCode"
             cell.textField.keyboardType = .numberPad
             cell.optionalLbl.text = "required"
             break
-        case 5:
-            cell.textField.tag = 5
+        case 4:
+            cell.textField.tag = 4
             cell.textField.placeholder = "Apt/Suite #"
             cell.optionalLbl.text = "optional"
             break
-        case 6:
-            cell.textField.tag = 6
+        case 5:
+            cell.textField.tag = 5
             cell.textField.placeholder = "Room #"
             cell.optionalLbl.text = "optional"
+        case 6:
+            cell.textField.tag = 6
+            cell.textField.placeholder = "Delivery Instructions"
+            cell.optionalLbl.text = "optional"
+            break
         default:
             cell.textField.tag = 7
-            cell.textField.placeholder = "Delivery Instructions"
+            cell.textField.placeholder = "Nick Name"
             cell.optionalLbl.text = "optional"
             break
         }

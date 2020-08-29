@@ -11,6 +11,8 @@ import UIKit
 import GoogleSignIn
 import FirebaseFirestore
 import FirebaseAuth
+import FirebaseFunctions
+import Stripe
 
 
 class LoginViewController: UIViewController {
@@ -20,6 +22,7 @@ class LoginViewController: UIViewController {
     var colorPalette : [UIColor] = [UIColor.gray, UIColor.black]
     var infoBlackView = UIView()
     var db : Firestore?
+    lazy var functions = Functions.functions()
     
     var bottomViewHeightAnchor: NSLayoutConstraint?
     var inputsContainerViewHeightAnchor: NSLayoutConstraint?
@@ -162,12 +165,13 @@ class LoginViewController: UIViewController {
         
         let tap: UITapGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(LoginViewController.dismissKeyboard))
         view.addGestureRecognizer(tap)
-        
-        
+  
         
         setupDatabase()
         setupConstraints()
     }
+    
+    
     
     func setupDatabase() {
         db = Firestore.firestore()
@@ -305,8 +309,7 @@ class LoginViewController: UIViewController {
         view.endEditing(true)
         displayAlert("Registering..")
         
-        
-        
+                
         guard let email = emailTextField.text, let password = passwordTextField.text, let name = nameTextField.text else {
             self.dismiss(animated: true, completion: {
                 self.errorAlert(error: "One or more text fields are empty.")
@@ -314,7 +317,6 @@ class LoginViewController: UIViewController {
             return
         }
         //print ("email: \(email), password: \(password), name: \(name)")
-        
         
         Auth.auth().createUser(withEmail: email, password: password, completion: { (user, error) in
             if error != nil {
@@ -326,7 +328,6 @@ class LoginViewController: UIViewController {
                 /*self.dismiss(animated: true, completion: {
                     self.displayAlert((error?.localizedDescription)!)
                 })*/
-                
             }
             
             guard let uid = user?.user.uid else {
@@ -336,7 +337,7 @@ class LoginViewController: UIViewController {
             //successfully authenticated user
             
             
-            let values = ["name": name, "email": email, "rep": 0.0] as [String : Any]
+            let values = ["name": name, "email": email, "reward" : 0, "loyalty" : 5] as [String : Any]
             self.registerUserIntoDatabaseWithUID(uid, values: values as [String : AnyObject])
             
             
@@ -353,19 +354,43 @@ class LoginViewController: UIViewController {
         db?.collection("users").document(uid).setData([
             "userName" : values["name"] ?? "Could not load userName",
             "email" : values["email"] ?? "Could not load email",
-            "completed" : 0,
-            "premium" : false
-            //"rep" : values["rep"] ?? 0.0
+            "loyalty" : values["loyalty"] ?? 5,
+            "reward" : values["reward"] ?? 0
         ])
         
         print(values)
         
-        let loggedUser = User(uid: uid, email: self.emailTextField.text!, userName: self.nameTextField.text!, rep: 0.0)
+        let loggedUser = User(uid: uid, email: self.emailTextField.text!, userName: self.nameTextField.text!, reward: 0, loyalty: 5)
         self.user = loggedUser
     }
     
     
-    @objc func userLoggedIn() {
+    @objc func userLoggedIn(notification : NSNotification) {
+        var newUser : Bool
+        
+        if let x = notification.userInfo!["newUser"] {
+            newUser = x as! Bool
+        } else {
+            newUser = false
+        }
+        
+        guard let user = Auth.auth().currentUser else {
+            return
+        }
+        
+        if newUser {
+            let values = ["name": user.displayName, "email": user.email, "reward" : 0, "loyalty" : 5] as [String : Any]
+            self.registerUserIntoDatabaseWithUID(user.uid, values: values as [String : AnyObject])
+            
+            functions.httpsCallable("createStripeCustomer").call(["full_name" : values["name"], "email" : values["email"], "user_id" : user.uid]) { (response, error) in
+                if let error = error {
+                    print(error)
+                } else {
+                    print("Successfull function trigger: \"createStripeCustomer\" - \(response?.data)")
+                }
+            }
+        }
+        
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.35) {
                 self.dismiss(animated: true) {
                     if self.delivery == true {

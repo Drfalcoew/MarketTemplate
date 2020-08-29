@@ -13,7 +13,10 @@ import Stripe
 
 class PlaceOrderVC: UIViewController {
     
-    var userInformation : [String : String] = [:]
+    let stripePublishableKey = "pk_test_51HDJ6wCOi0VJ8StcWb1qRXC4aGndiD0cIZHyj33u2VzO8alCmC6s5Wt4Ly6UnsJRL2GygtoJi7AkR77BxCynfSV300OwLlt5hG"
+    
+    weak var delegate: STPPaymentOptionsViewControllerDelegate?
+    var userInformation : Address?
     var carryout : Bool?
     
     var timeView : TimeView = {
@@ -63,7 +66,7 @@ class PlaceOrderVC: UIViewController {
         view.translatesAutoresizingMaskIntoConstraints = false
         return view
     }()
-        
+    
     var separatorView : UIView = {
         let view = UIView()
         view.translatesAutoresizingMaskIntoConstraints = false
@@ -71,7 +74,7 @@ class PlaceOrderVC: UIViewController {
         view.backgroundColor = .gray
         return view
     }()
-    
+
     override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -80,7 +83,6 @@ class PlaceOrderVC: UIViewController {
         let nc = NotificationCenter.default
         nc.addObserver(self, selector: #selector(handleLater), name: Notification.Name("handleLater"), object: nil)
         nc.addObserver(self, selector: #selector(setupTime(notification:)), name: Notification.Name("scheduledDate"), object: nil)
-
         
         setupViews()
         setupNavigation()
@@ -89,12 +91,11 @@ class PlaceOrderVC: UIViewController {
     
     func setupViews() {
 
-        self.view.addSubview(containerView)        
+        self.view.addSubview(containerView)
         self.containerView.addSubview(separatorView)
         self.view.addSubview(timeView)
         view.addSubview(addCardBtn)
         view.addSubview(checkoutButton)
-        
     }
     
     @objc func setupTime(notification : NSNotification) {
@@ -108,7 +109,6 @@ class PlaceOrderVC: UIViewController {
     @objc func handlePlaceOrder() {
         
     }
-
     
     @objc func handleLater() {
         let vc = SetTimeViewController()
@@ -118,7 +118,7 @@ class PlaceOrderVC: UIViewController {
         
     
     func setupNavigation() {
-        self.title = "Checkout"
+        self.title = "Select Payment"
     }
     
     func setupConstraints() {
@@ -151,24 +151,13 @@ class PlaceOrderVC: UIViewController {
     }
 
     @objc func handleAddCard() {
-        self.navigationController?.customPush(viewController: CardInformationVC())
+//        self.navigationController?.customPush(viewController: CardInformationVC())
+        self.present(CardInformationVC(), animated: true, completion: nil)
     }
+    
         
         @objc func handleCheckout() {
-            
-            // = paymentInformation
-            
-            let vc = PlaceOrderVC()
-            vc.userInformation = self.userInformation
-
-            
-            checkoutButton.transform = CGAffineTransform(scaleX: 0.6, y: 0.6)
-
-            UIView.animate(withDuration: 0.5, delay: 0, usingSpringWithDamping: CGFloat(0.5), initialSpringVelocity: CGFloat(1.0), options: UIView.AnimationOptions.allowUserInteraction, animations: {
-                self.checkoutButton.transform = CGAffineTransform.identity
-                }) { (true) in
-                self.navigationController?.customPush(viewController: vc)
-            }
+    
         }
         
         func displayAlert(_ userMessage: String){
@@ -180,4 +169,3 @@ class PlaceOrderVC: UIViewController {
         }
 
     }
-

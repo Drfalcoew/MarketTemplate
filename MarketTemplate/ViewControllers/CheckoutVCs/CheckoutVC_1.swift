@@ -74,7 +74,6 @@ class CheckoutVC: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        print(self.ttl)
         setupViews()
         setupNavigation()
         setupConstraints()

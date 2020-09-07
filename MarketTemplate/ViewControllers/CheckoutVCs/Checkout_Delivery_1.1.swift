@@ -113,7 +113,6 @@ class Checkout_Delivery: UIViewController, UserEditedDelegate, NewAddressDelegat
         super.viewDidLoad()
         
         self.view.backgroundColor = UIColor(r: 240, g: 240, b: 240)
-        print(self.ttl)
         
         setupTableView()
         setupViews()
@@ -138,8 +137,8 @@ class Checkout_Delivery: UIViewController, UserEditedDelegate, NewAddressDelegat
     @objc func checkSavedAddresses() {
         userAddresses.removeAll()
         
-        let userID = Auth.auth().currentUser?.uid
-        let docRef = db.collection("users").document(userID!).collection("addresses")
+        guard let userID = Auth.auth().currentUser?.uid else { return }
+        let docRef = db.collection("users").document(userID).collection("addresses")
         
         docRef.getDocuments { (document, error) in
             if let document = document, document.isEmpty == false {
@@ -150,7 +149,6 @@ class Checkout_Delivery: UIViewController, UserEditedDelegate, NewAddressDelegat
                     addy.ref = item.documentID
                     self.userAddresses.append(addy)
                 }
-                print(self.userAddresses)
             } else {
                 print("Documents are empty")
             }
@@ -347,7 +345,6 @@ extension Checkout_Delivery : UITableViewDelegate, UITableViewDataSource {
             tempAddy = false
         }
         if let address = userAddresses[i] {
-            print(address)
             cell.addressNameLbl.text = address.nickName ?? ""
             cell.streetAdd.text = address.streetAddress
         }

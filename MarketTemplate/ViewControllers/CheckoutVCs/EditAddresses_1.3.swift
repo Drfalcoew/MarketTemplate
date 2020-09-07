@@ -170,7 +170,6 @@ extension EditAddresses : UITableViewDelegate, UITableViewDataSource {
     
        //cell.backgroundColor = .clear
        if let address = userAddresses[indexPath.row] {
-           print(address)
            cell.addressNameLbl.text = address.nickName ?? ""
            cell.streetAdd.text = address.streetAddress
            cell.room.text = address.roomNum

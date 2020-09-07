@@ -20,6 +20,11 @@ class PlaceOrderVC: UIViewController {
     var userInformation : Address?
     var carryout : Bool?
     var db : Firestore?
+    var selectedCard : String?
+    var userCards = [Card]()
+    var temporaryCard : String?
+    var tempCard : Bool?
+    
     
     var timeView : TimeView = {
         let view = TimeView()
@@ -87,7 +92,6 @@ class PlaceOrderVC: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        print(self.ttl)
         self.view.backgroundColor = UIColor(r: 240, g: 240, b: 240)
         
         let nc = NotificationCenter.default
@@ -123,6 +127,8 @@ class PlaceOrderVC: UIViewController {
         let settings = db?.settings
         //settings?.areTimestampsInSnapshotsEnabled = true
         db?.settings = settings!
+        
+        getPaymentMethods()
     }
  
     
@@ -142,9 +148,34 @@ class PlaceOrderVC: UIViewController {
         }
     }
     
-    private func getPaymentToken() -> String {
+    private func getPaymentMethods() {
+        userCards.removeAll()
         
-        return "pm_card_visa"
+        guard let userID = Auth.auth().currentUser?.uid else { self.tableView.isHidden = true; return }
+        let docRef = db?.collection("users").document(userID).collection("payment_methods")
+
+        
+        docRef?.getDocuments { (document, error) in
+            if let document = document, document.isEmpty == false {
+                for item in document.documents { // if gets called right away, will fail. need to delay or find another way.  bc "card" isn't pushed to db yet
+                    let dict : NSDictionary = item.data()["card"] as! NSDictionary
+                    let brand = dict.value(forKey: "brand") as? String
+                    let last4 = dict.value(forKey: "last4") as? String
+                    self.userCards.append(Card(id: item.documentID, lastFour: last4, type: brand))
+                }
+                //print(self.userCards)
+            } else {
+                print("Documents are empty")
+            }
+            if error != nil {
+                print(error?.localizedDescription as Any)
+            } else {
+                self.tableView.reloadData()
+            }
+        }
+        if temporaryCard != nil {
+            self.tableView.reloadData()
+        }
     }
     
     @objc private func handlePlaceOrder(sender: UIButton) {
@@ -153,18 +184,23 @@ class PlaceOrderVC: UIViewController {
                 sender.transform = CGAffineTransform.identity
         }, completion: nil)
         
-        let token = getPaymentToken()
-        
-        if let uid = Auth.auth().currentUser?.uid {
-            //amount, currency, payment_method
-            guard let total = self.ttl else { displayAlert("Error. Could not retrieve total."); return }
-            if total <= 0 { displayAlert("Error. Could not retrieve total."); return }
-            let ttl = getTotal(subTotal: total)
-            db?.collection("users").document(uid).collection("payments").document().setData([
-                "amount" : ttl,
-                "currency" : "usd",
-                "payment_method" : token
-            ])
+        if selectedCard != nil {
+            print("SelectedCard =", selectedCard)
+
+            if let uid = Auth.auth().currentUser?.uid {
+                //amount, currency, payment_method
+                guard let total = self.ttl else { displayAlert("Error. Could not retrieve total."); return }
+                if total <= 0 { displayAlert("Error. Could not retrieve total."); return }
+                let ttl = getTotal(subTotal: total)
+                db?.collection("users").document(uid).collection("payments").document().setData([
+                    "amount" : ttl,
+                    "currency" : "usd",
+                    "payment_method" : selectedCard
+                ])
+            }
+        } else {
+            print("SelectedCard is nil")
+            displayAlert("Please select a payment method")
         }
     }
     
@@ -211,10 +247,10 @@ class PlaceOrderVC: UIViewController {
         checkoutButton.widthAnchor.constraint(equalTo: self.view.widthAnchor, multiplier: 0.9).isActive = true
         checkoutButton.centerXAnchor.constraint(equalTo: self.view.centerXAnchor, constant: 0).isActive = true
         
-        tableView.topAnchor.constraint(equalTo: addCardBtn.bottomAnchor, constant: 15).isActive = true
+        tableView.topAnchor.constraint(equalTo: addCardBtn.bottomAnchor, constant: 30).isActive = true
         tableView.centerXAnchor.constraint(equalTo: self.view.centerXAnchor, constant: 0).isActive = true
         tableView.widthAnchor.constraint(equalTo: self.view.widthAnchor, constant: 0).isActive = true
-        tableView.bottomAnchor.constraint(equalTo: self.checkoutButton.topAnchor, constant: -15).isActive = true
+        tableView.bottomAnchor.constraint(equalTo: self.checkoutButton.topAnchor, constant: -30).isActive = true
     }
 
     @objc func handleAddCard() {
@@ -250,20 +286,34 @@ class PlaceOrderVC: UIViewController {
 
 extension PlaceOrderVC : STPAddCardViewControllerDelegate, STPPaymentContextDelegate, UITableViewDelegate, UITableViewDataSource {
     
+    func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+        return self.view.frame.height / 12
+    }
+    
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return 5
+        return userCards.count
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = self.tableView.dequeueReusableCell(withIdentifier: cellId) as! CardInformationCell
-
+        if userCards.isEmpty == false {
+        let card = userCards[indexPath.row]
+            cell.cardTypeLbl.text = card.type
+            cell.lastFourLbl.text = card.lastFour
+            cell.lastFourLbl.sizeToFit()
+            cell.cardTypeLbl.sizeToFit()
+            
+        }
         return cell
     }
     
-
-    private func postPaymentMethod(payment : STPPaymentMethod) {
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        selectedCard = userCards[indexPath.row].id
+    }
+    
+    func saveCard(payment: STPPaymentMethod) {
         guard let userID = Auth.auth().currentUser?.uid else {
-            displayAlert("User is not signed in")
+            displayAlert("Could not retrieve user. Can not save card.")
             return
         }
         let docRef = db?.collection("users").document(userID).collection("payment_methods").document(payment.stripeId)
@@ -281,12 +331,15 @@ extension PlaceOrderVC : STPAddCardViewControllerDelegate, STPPaymentContextDele
     
     func addCardViewController(_ addCardViewController: STPAddCardViewController, didCreatePaymentMethod paymentMethod: STPPaymentMethod, completion: @escaping STPErrorBlock) {
         if Auth.auth().currentUser != nil {
-            postPaymentMethod(payment: paymentMethod)
+            saveCard(payment: paymentMethod)
+            getPaymentMethods()
         } else {
-            displayAlert("User must be signed in to save card details.")
+            temporaryCard = paymentMethod.stripeId
         }
+        
         navigationController?.customPop()
     }
+    
     func addCardViewControllerDidCancel(_ addCardViewController: STPAddCardViewController) {
         print("AddCardView canceled")
         navigationController?.customPop()

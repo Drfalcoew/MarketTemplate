@@ -7,9 +7,9 @@
 //
 
 import Foundation
-import FirebaseDatabase
+import FirebaseFirestore
 import GoogleSignIn
-
+import Stripe
 
 struct User {
     
@@ -29,8 +29,8 @@ struct User {
     }
     
     
-    init(snapshot: DataSnapshot) {
-        let snapshotValue = snapshot.value as! [String: AnyObject]
+    init(snapshot: QueryDocumentSnapshot) {
+        let snapshotValue = snapshot.data() as [String: AnyObject]
         userName = snapshotValue["userName"] as? String
         uid = snapshotValue["uid"] as? String
         email = snapshotValue["email"] as? String
@@ -46,5 +46,26 @@ struct User {
         self.userName = userName
         self.loyalty = loyalty
         self.reward = reward
+    }
+}
+
+
+class Card : STPPaymentMethodCard {
+    
+    var id: String?
+    var lastFour: String?
+    var type: String?
+    
+    init(snapshot: QueryDocumentSnapshot) {
+        let snapshotValue = snapshot.data() as [String: AnyObject]
+        id = snapshotValue["id"] as? String
+        lastFour = snapshotValue["last4"] as? String
+        type = snapshotValue["brand"] as? String
+    }
+  
+    init(id: String, lastFour: String?, type: String?) {
+        self.id = id
+        self.lastFour = lastFour
+        self.type = type
     }
 }

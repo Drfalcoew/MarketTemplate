@@ -192,7 +192,6 @@ class ShoppingCartVC: UIViewController {
     }
     
     @objc func handleCheckout(sender: UIButton) {
-        print(self.cartTotal)
         if Attributes().delivery == true {
             let vc = CheckoutVC()
             vc.ttl = self.ttl

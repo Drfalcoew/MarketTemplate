@@ -38,9 +38,205 @@ class HoursSubview: UIViewController {
         return view
     }()
     
+    var containerView : UIView = {
+        let view = UIView()
+        view.translatesAutoresizingMaskIntoConstraints = false
+        view.backgroundColor = .white
+        view.layer.shadowColor = UIColor.black.cgColor
+        view.layer.shadowOffset = CGSize(width: 3.0, height: 5.0)
+        view.layer.shadowOpacity = 0.2
+        view.layer.shadowRadius = 5.0
+        view.layer.cornerRadius = 10
+        return view
+    }()
     
+    var stackViewLeft : UIStackView = {
+        let stack = UIStackView()
+        stack.translatesAutoresizingMaskIntoConstraints = false
+        stack.axis = .vertical
+        return stack
+    }()
     
+    var stackViewRight : UIStackView = {
+        let stack = UIStackView()
+        stack.translatesAutoresizingMaskIntoConstraints = false
+        stack.axis = .vertical
+        return stack
+    }()
     
+    var day_0 : UILabel = {
+        let lbl = UILabel()
+        lbl.translatesAutoresizingMaskIntoConstraints = false
+        lbl.layer.masksToBounds = true
+        lbl.adjustsFontSizeToFitWidth = true
+        lbl.minimumScaleFactor = 0.5
+        lbl.backgroundColor = UIColor(r: 240, g: 240, b: 240)
+        lbl.layer.borderWidth = 0.2
+        lbl.font = UIFont(name: "Helvitica Neue", size: 25)
+        lbl.text = "Sunday"
+        return lbl
+    }()
+    
+    var day_1 : UILabel = {
+        let lbl = UILabel()
+        lbl.translatesAutoresizingMaskIntoConstraints = false
+        lbl.layer.masksToBounds = true
+        lbl.adjustsFontSizeToFitWidth = true
+        lbl.minimumScaleFactor = 0.5
+        lbl.layer.borderWidth = 0.2
+        lbl.font = UIFont(name: "Helvitica Neue", size: 25)
+        lbl.text = "Monday"
+        return lbl
+    }()
+    
+    var day_2 : UILabel = {
+        let lbl = UILabel()
+        lbl.translatesAutoresizingMaskIntoConstraints = false
+        lbl.layer.masksToBounds = true
+        lbl.adjustsFontSizeToFitWidth = true
+        lbl.minimumScaleFactor = 0.5
+        lbl.backgroundColor = UIColor(r: 240, g: 240, b: 240)
+        lbl.layer.borderWidth = 0.2
+        lbl.font = UIFont(name: "Helvitica Neue", size: 25)
+        lbl.text = "Tuesday"
+        return lbl
+    }()
+    
+    var day_3 : UILabel = {
+        let lbl = UILabel()
+        lbl.translatesAutoresizingMaskIntoConstraints = false
+        lbl.layer.masksToBounds = true
+        lbl.adjustsFontSizeToFitWidth = true
+        lbl.minimumScaleFactor = 0.5
+        lbl.layer.borderWidth = 0.2
+        lbl.font = UIFont(name: "Helvitica Neue", size: 25)
+        lbl.text = "Wednesday"
+        return lbl
+    }()
+    
+    var day_4 : UILabel = {
+        let lbl = UILabel()
+        lbl.translatesAutoresizingMaskIntoConstraints = false
+        lbl.layer.masksToBounds = true
+        lbl.adjustsFontSizeToFitWidth = true
+        lbl.minimumScaleFactor = 0.5
+        lbl.backgroundColor = UIColor(r: 240, g: 240, b: 240)
+        lbl.font = UIFont(name: "Helvitica Neue", size: 25)
+        lbl.text = "Thursday"
+        return lbl
+    }()
+    
+    var day_5 : UILabel = {
+        let lbl = UILabel()
+        lbl.translatesAutoresizingMaskIntoConstraints = false
+        lbl.layer.masksToBounds = true
+        lbl.adjustsFontSizeToFitWidth = true
+        lbl.minimumScaleFactor = 0.5
+        lbl.font = UIFont(name: "Helvitica Neue", size: 25)
+        lbl.text = "Friday"
+        return lbl
+    }()
+    
+    var day_6 : UILabel = {
+        let lbl = UILabel()
+        lbl.translatesAutoresizingMaskIntoConstraints = false
+        lbl.layer.masksToBounds = true
+        lbl.adjustsFontSizeToFitWidth = true
+        lbl.minimumScaleFactor = 0.5
+        lbl.backgroundColor = UIColor(r: 240, g: 240, b: 240)
+        lbl.font = UIFont(name: "Helvitica Neue", size: 25)
+        lbl.text = "Saturday"
+        return lbl
+    }()
+    
+    var hour_0 : UILabel = {
+        let lbl = UILabel()
+        lbl.translatesAutoresizingMaskIntoConstraints = false
+        lbl.layer.masksToBounds = true
+        lbl.adjustsFontSizeToFitWidth = true
+        lbl.minimumScaleFactor = 0.5
+        lbl.backgroundColor = UIColor(r: 240, g: 240, b: 240)
+        lbl.textAlignment = .right
+        lbl.font = UIFont(name: "Helvitica Neue", size: 25)
+        lbl.text = "00:00 - 00:00"
+        return lbl
+    }()
+    
+    var hour_1 : UILabel = {
+        let lbl = UILabel()
+        lbl.translatesAutoresizingMaskIntoConstraints = false
+        lbl.layer.masksToBounds = true
+        lbl.adjustsFontSizeToFitWidth = true
+        lbl.minimumScaleFactor = 0.5
+        lbl.font = UIFont(name: "Helvitica Neue", size: 25)
+        lbl.text = "00:00 - 00:00"
+        lbl.textAlignment = .right
+        return lbl
+    }()
+    
+    var hour_2 : UILabel = {
+        let lbl = UILabel()
+        lbl.translatesAutoresizingMaskIntoConstraints = false
+        lbl.layer.masksToBounds = true
+        lbl.adjustsFontSizeToFitWidth = true
+        lbl.minimumScaleFactor = 0.5
+        lbl.backgroundColor = UIColor(r: 240, g: 240, b: 240)
+        lbl.font = UIFont(name: "Helvitica Neue", size: 25)
+        lbl.text = "00:00 - 00:00"
+        lbl.textAlignment = .right
+        return lbl
+    }()
+    
+    var hour_3 : UILabel = {
+        let lbl = UILabel()
+        lbl.translatesAutoresizingMaskIntoConstraints = false
+        lbl.layer.masksToBounds = true
+        lbl.adjustsFontSizeToFitWidth = true
+        lbl.minimumScaleFactor = 0.5
+        lbl.font = UIFont(name: "Helvitica Neue", size: 25)
+        lbl.text = "00:00 - 00:00"
+        lbl.textAlignment = .right
+        return lbl
+    }()
+    
+    var hour_4 : UILabel = {
+        let lbl = UILabel()
+        lbl.translatesAutoresizingMaskIntoConstraints = false
+        lbl.layer.masksToBounds = true
+        lbl.adjustsFontSizeToFitWidth = true
+        lbl.minimumScaleFactor = 0.5
+        lbl.backgroundColor = UIColor(r: 240, g: 240, b: 240)
+        lbl.font = UIFont(name: "Helvitica Neue", size: 25)
+        lbl.text = "00:00 - 00:00"
+        lbl.textAlignment = .right
+        return lbl
+    }()
+    
+    var hour_5 : UILabel = {
+        let lbl = UILabel()
+        lbl.translatesAutoresizingMaskIntoConstraints = false
+        lbl.layer.masksToBounds = true
+        lbl.adjustsFontSizeToFitWidth = true
+        lbl.minimumScaleFactor = 0.5
+        lbl.font = UIFont(name: "Helvitica Neue", size: 25)
+        lbl.text = "00:00 - 00:00"
+        lbl.textAlignment = .right
+        return lbl
+    }()
+    
+    var hour_6 : UILabel = {
+        let lbl = UILabel()
+        lbl.translatesAutoresizingMaskIntoConstraints = false
+        lbl.layer.masksToBounds = true
+        lbl.adjustsFontSizeToFitWidth = true
+        lbl.minimumScaleFactor = 0.5
+        lbl.backgroundColor = UIColor(r: 240, g: 240, b: 240)
+        lbl.font = UIFont(name: "Helvitica Neue", size: 25)
+        lbl.text = "00:00 - 00:00"
+        lbl.textAlignment = .right
+        return lbl
+    }()
+
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -51,6 +247,12 @@ class HoursSubview: UIViewController {
         let calendar = Calendar.current
         hour = calendar.component(.hour, from: date)
         self.view.backgroundColor = UIColor(r: 240, g: 240, b: 240)
+        
+        stackViewLeft.alignment = .fill
+        stackViewRight.alignment = .fill
+        stackViewLeft.distribution = .fillEqually
+        stackViewRight.distribution = .fillEqually
+        
         
         setupViews()
         setupHours()
@@ -83,6 +285,20 @@ class HoursSubview: UIViewController {
     func setupViews() {
         self.view.addSubview(backBtn)
         self.view.addSubview(hourView)
+        
+        self.view.addSubview(containerView)
+        self.containerView.addSubview(stackViewLeft)
+        self.containerView.addSubview(stackViewRight)
+        
+        let leftViews : [UILabel] = [day_0, day_1, day_2, day_3, day_4, day_5, day_6]
+        let rightViews : [UILabel] = [hour_0, hour_1, hour_2, hour_3, hour_4, hour_5, hour_6]
+        
+        for i in 0..<7 {
+            stackViewLeft.addArrangedSubview(leftViews[i])
+            stackViewRight.addArrangedSubview(rightViews[i])
+        }
+        
+        
     }
     
     func setupConstraints() {
@@ -90,13 +306,26 @@ class HoursSubview: UIViewController {
         backBtn.topAnchor.constraint(equalTo: self.view.topAnchor, constant: 15).isActive = true
         backBtn.widthAnchor.constraint(equalTo: self.view.widthAnchor, multiplier: 1/6).isActive = true
         backBtn.heightAnchor.constraint(equalTo: self.backBtn.widthAnchor, multiplier: 1/3).isActive = true
-        
-        
+                
         hourView.topAnchor.constraint(equalTo: self.backBtn.bottomAnchor, constant: 30).isActive = true
         hourView.centerXAnchor.constraint(equalTo: self.view.centerXAnchor, constant: 0).isActive = true
         hourView.widthAnchor.constraint(equalTo: self.view.widthAnchor, multiplier: 0.95).isActive = true
         hourView.heightAnchor.constraint(equalTo: self.view.widthAnchor, multiplier: 1/5).isActive = true
+        
+        containerView.topAnchor.constraint(equalTo: hourView.bottomAnchor, constant: 20).isActive = true
+        containerView.widthAnchor.constraint(equalTo: self.view.widthAnchor, multiplier: 0.8).isActive = true
+        containerView.centerXAnchor.constraint(equalTo: self.view.centerXAnchor, constant: 0).isActive = true
+        containerView.heightAnchor.constraint(equalTo: self.view.heightAnchor, multiplier: 1/3).isActive = true
+        
+        stackViewLeft.leftAnchor.constraint(equalTo: containerView.leftAnchor, constant: 10).isActive = true
+        stackViewLeft.heightAnchor.constraint(equalTo: containerView.heightAnchor, multiplier: 0.95).isActive = true
+        stackViewLeft.widthAnchor.constraint(equalTo: containerView.widthAnchor, multiplier: 1/2).isActive = true
+        stackViewLeft.centerYAnchor.constraint(equalTo: containerView.centerYAnchor, constant: 0).isActive = true
 
+        stackViewRight.rightAnchor.constraint(equalTo: containerView.rightAnchor, constant: -10).isActive = true
+        stackViewRight.heightAnchor.constraint(equalTo: containerView.heightAnchor, multiplier: 0.95).isActive = true
+        stackViewRight.widthAnchor.constraint(equalTo: containerView.widthAnchor, multiplier: 1/2).isActive = true
+        stackViewRight.centerYAnchor.constraint(equalTo: containerView.centerYAnchor, constant: 0).isActive = true
     }
     
     @objc func handleBack() {

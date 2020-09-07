@@ -11,7 +11,6 @@ import UIKit
 import GoogleSignIn
 import FirebaseFirestore
 import FirebaseAuth
-import FirebaseFunctions
 import Stripe
 
 
@@ -22,7 +21,6 @@ class LoginViewController: UIViewController {
     var colorPalette : [UIColor] = [UIColor.gray, UIColor.black]
     var infoBlackView = UIView()
     var db : Firestore?
-    lazy var functions = Functions.functions()
     
     var bottomViewHeightAnchor: NSLayoutConstraint?
     var inputsContainerViewHeightAnchor: NSLayoutConstraint?
@@ -248,7 +246,7 @@ class LoginViewController: UIViewController {
                                    delay: 0,
                                    usingSpringWithDamping: CGFloat(0.5),
                                    initialSpringVelocity: CGFloat(1.0),
-                                   options: UIView.AnimationOptions.allowUserInteraction,
+                                   options: UIView.AnimationOptions.curveEaseOut,
                                    animations: {
                                     self.googleBtnContainer.transform = CGAffineTransform.identity
             }) { (true) in
@@ -264,7 +262,7 @@ class LoginViewController: UIViewController {
                                    delay: 0,
                                    usingSpringWithDamping: CGFloat(0.5),
                                    initialSpringVelocity: CGFloat(1.0),
-                                   options: UIView.AnimationOptions.allowUserInteraction,
+                                   options: UIView.AnimationOptions.curveEaseOut,
                                    animations: {
                                     self.loginRegisterButton.transform = CGAffineTransform.identity
             }) { (true) in
@@ -297,7 +295,7 @@ class LoginViewController: UIViewController {
                                    delay: 0,
                                    usingSpringWithDamping: CGFloat(0.5),
                                    initialSpringVelocity: CGFloat(1.0),
-                                   options: UIView.AnimationOptions.allowUserInteraction,
+                                   options: UIView.AnimationOptions.curveEaseOut,
                                    animations: {
                                     self.forgotPassword.transform = CGAffineTransform.identity
             }) { (true) in
@@ -357,47 +355,19 @@ class LoginViewController: UIViewController {
             "loyalty" : values["loyalty"] ?? 5,
             "reward" : values["reward"] ?? 0
         ])
-        
-        print(values)
-        
+                
         let loggedUser = User(uid: uid, email: self.emailTextField.text!, userName: self.nameTextField.text!, reward: 0, loyalty: 5)
         self.user = loggedUser
     }
-    
-    
+        
     @objc func userLoggedIn(notification : NSNotification) {
-        var newUser : Bool
-        
-        if let x = notification.userInfo!["newUser"] {
-            newUser = x as! Bool
-        } else {
-            newUser = false
-        }
-        
-        guard let user = Auth.auth().currentUser else {
-            return
-        }
-        
-        if newUser {
-            let values = ["name": user.displayName, "email": user.email, "reward" : 0, "loyalty" : 5] as [String : Any]
-            self.registerUserIntoDatabaseWithUID(user.uid, values: values as [String : AnyObject])
-            
-            functions.httpsCallable("createStripeCustomer").call(["full_name" : values["name"], "email" : values["email"], "user_id" : user.uid]) { (response, error) in
-                if let error = error {
-                    print(error)
-                } else {
-                    print("Successfull function trigger: \"createStripeCustomer\" - \(response?.data)")
-                }
-            }
-        }
-        
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.35) {
-                self.dismiss(animated: true) {
-                    if self.delivery == true {
-                        self.navigationController?.customPush(viewController: Checkout_Delivery())
-                    } else {
-                        self.navigationController?.customPopToRoot()
-                    }
+            self.dismiss(animated: true) {
+                if self.delivery == true {
+                    self.navigationController?.customPop()
+                } else {
+                    self.navigationController?.customPopToRoot()
+                }
             }
         }
     }

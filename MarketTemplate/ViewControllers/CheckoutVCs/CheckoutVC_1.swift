@@ -12,6 +12,7 @@ import UIKit
 
 class CheckoutVC: UIViewController {
     
+    var ttl : Int?
     
     var deliveryButton : UIButton = {
         let btn = UIButton()
@@ -73,7 +74,7 @@ class CheckoutVC: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
+        print(self.ttl)
         setupViews()
         setupNavigation()
         setupConstraints()
@@ -128,17 +129,20 @@ class CheckoutVC: UIViewController {
     @objc func handleOrderNow(sender: UIButton) {
         sender.transform = CGAffineTransform(scaleX: 0.6, y: 0.6)
 
-        UIView.animate(withDuration: 0.5, delay: 0, usingSpringWithDamping: CGFloat(0.5), initialSpringVelocity: CGFloat(1.0), options: UIView.AnimationOptions.allowUserInteraction, animations: {
+        UIView.animate(withDuration: 0.5, delay: 0, usingSpringWithDamping: CGFloat(0.5), initialSpringVelocity: CGFloat(1.0), options: UIView.AnimationOptions.curveEaseOut, animations: {
             sender.transform = CGAffineTransform.identity
             }) { (true) in
                 switch sender.tag {
                 case 0: // carry out
                     let vc = PlaceOrderVC()
                     vc.carryout = true
+                    vc.ttl = self.ttl
                     self.navigationController?.customPush(viewController: vc)
                     break
                 default: // deliver
-                    self.navigationController?.customPush(viewController: Checkout_Delivery())
+                    let vc = Checkout_Delivery()
+                    vc.ttl = self.ttl
+                    self.navigationController?.customPush(viewController: vc)
                     break
                 }
         }

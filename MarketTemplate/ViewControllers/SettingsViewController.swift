@@ -11,6 +11,8 @@ import UIKit
 import GoogleSignIn
 import FirebaseAuth
 import CoreData
+import FirebaseFirestore
+import Stripe
 //import GoogleMobileAds
 
 class SettingsViewController: UIViewController, UITableViewDataSource, UITableViewDelegate {
@@ -19,6 +21,7 @@ class SettingsViewController: UIViewController, UITableViewDataSource, UITableVi
     var y : Int?
     let notification = NotificationCenter.default
     var user : FirebaseAuth.User?
+    var db : Firestore?
     
     var tableView : UITableView = {
         let view = UITableView()
@@ -56,10 +59,20 @@ class SettingsViewController: UIViewController, UITableViewDataSource, UITableVi
         
         y = UserDefaults.standard.integer(forKey: "Notifications")
         
+        setupDatabase()
         setupTableView()
         setupViews()
         setupConstraints()
     }
+    
+    
+    func setupDatabase() {
+        db = Firestore.firestore()
+        let settings = db?.settings
+        //settings?.areTimestampsInSnapshotsEnabled = true
+        db?.settings = settings!
+    }
+
     
     func setupViews() {
         navigationController?.navigationBar.tintColor = UIColor(r: 75, g: 80, b: 120)
@@ -91,7 +104,11 @@ class SettingsViewController: UIViewController, UITableViewDataSource, UITableVi
     }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return 3
+        if GIDSignIn.sharedInstance()?.currentUser != nil || user != nil {
+            return 4
+        } else {
+            return 3
+        }
     }
     
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
@@ -118,12 +135,16 @@ class SettingsViewController: UIViewController, UITableViewDataSource, UITableVi
             break
         case 2:
             if GIDSignIn.sharedInstance()?.currentUser != nil || user != nil {
-                cell.nameLabel.text = "Sign out"
+                cell.nameLabel.text = "Delete account"
             } else {
                 cell.nameLabel.text = "Sign in"
             }
             break
-        default: break
+        default:
+            if GIDSignIn.sharedInstance()?.currentUser != nil || user != nil {
+                cell.nameLabel.text = "Sign out"
+            }
+            break
         }
         
         return cell
@@ -140,10 +161,18 @@ class SettingsViewController: UIViewController, UITableViewDataSource, UITableVi
             break
         case 2:
             if GIDSignIn.sharedInstance()?.currentUser != nil || user != nil {
+                deleteUser()
+            } else {
+                navigationController?.customPush(viewController: LoginViewController())
+            }
+            break
+        default:
+            if GIDSignIn.sharedInstance()?.currentUser != nil || user != nil {
+
                 if user != nil {
                     do {
                         try Auth.auth().signOut()
-                        
+                           
                     } catch let error {
                         displayAlert(error.localizedDescription)
                         return
@@ -152,12 +181,10 @@ class SettingsViewController: UIViewController, UITableViewDataSource, UITableVi
                     GIDSignIn.sharedInstance()?.signOut()
                 }
                 removeCoreData()
+                UserDefaults.standard.set(true, forKey: "userSignedOut")
                 displayAlert("Successfully signed out.")
-            } else {
-                navigationController?.customPush(viewController: LoginViewController())
+                
             }
-            break
-        default:
             break
         }
     }
@@ -190,12 +217,56 @@ class SettingsViewController: UIViewController, UITableViewDataSource, UITableVi
         present(myAlert, animated: true, completion: nil)
     }
     
+    func deleteUser() {
+      
+        let myAlert = UIAlertController(title: "Alert", message: "Are you sure you want to delete your account? We cannot retrieve it once deleted.", preferredStyle: UIAlertController.Style.alert)
+        let canc = UIAlertAction(title: "Cancel", style: .cancel, handler: nil)
+        let act = UIAlertAction(title: "Delete", style: .default) { (action) in
+            DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
+                self.user = Auth.auth().currentUser
+                self.deleteAuth()
+            }
+        }
+        myAlert.addAction(canc)
+        myAlert.addAction(act)
+        self.present(myAlert, animated: true, completion: nil)
+        removeCoreData()
+    }
+    
+    func deleteAuth() {
+        if Auth.auth().currentUser != nil || self.user != nil {
+            guard let user = Auth.auth().currentUser else {
+                return
+            }
+            self.db?.collection("users").document(user.uid).delete(completion: { (err) in
+            if err != nil {
+                self.displayAlert("\(err?.localizedDescription ?? "Error. Please try again after re-logging in.")")
+                return
+            } else {
+                Auth.auth().currentUser?.delete(completion: { (err) in
+                    if err != nil {
+                        self.displayAlert("\(err?.localizedDescription ?? "Error. Could not delete authentication.")")
+                        return
+                    } else {
+                        self.displayAlert("Successfully deleted account")
+                        UserDefaults.standard.set(true, forKey: "userSignedOut")
+                        }
+                    })
+                }
+            })
+        }
+    }
+    
     func displayAlert(_ userMessage: String){
         
         let myAlert = UIAlertController(title: "Alert", message: userMessage, preferredStyle: UIAlertController.Style.alert)
         let act = UIAlertAction(title: "OK", style: .default) { (action) in
             DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
-                self.navigationController?.customPush(viewController: ViewController())
+                if userMessage == "Sucessfully deleted account" {
+                    self.navigationController?.popToRootViewController(animated: true)
+                } else {
+                    self.navigationController?.customPush(viewController: ViewController())
+                }
             }
         }
         myAlert.addAction(act)

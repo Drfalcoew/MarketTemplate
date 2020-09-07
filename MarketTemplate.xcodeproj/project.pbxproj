@@ -7,7 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		4C0A807924DC249300CE73BC /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 4C0A807824DC249300CE73BC /* GoogleService-Info.plist */; };
 		4C0C89DD24DCB9A400359F6B /* TimeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C0C89DC24DCB9A400359F6B /* TimeView.swift */; };
 		4C0E6E9A24E601E900E75B11 /* SavedAddressTVCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C0E6E9924E601E900E75B11 /* SavedAddressTVCell.swift */; };
 		4C0E6E9C24EA05D100E75B11 /* User.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C0E6E9B24EA05D100E75B11 /* User.swift */; };
@@ -19,6 +18,9 @@
 		4C45571E24DB27220024471B /* Checkout_Delivery_1.1.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C45571D24DB27220024471B /* Checkout_Delivery_1.1.swift */; };
 		4C4C724124EF79480027C289 /* EditAddresses_1.3.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C4C724024EF79470027C289 /* EditAddresses_1.3.swift */; };
 		4C4C724324EF7F3E0027C289 /* EditAddressTVCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C4C724224EF7F3E0027C289 /* EditAddressTVCell.swift */; };
+		4C577E6524FECCF400CBAA68 /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C577E6424FECCF400CBAA68 /* Constants.swift */; };
+		4C577E6824FEF1CC00CBAA68 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 4C577E6624FED8BC00CBAA68 /* GoogleService-Info.plist */; };
+		4C577E6C2505AE5700CBAA68 /* CardInformationCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C577E6B2505AE5700CBAA68 /* CardInformationCell.swift */; };
 		4C586C3524DCEBC00048AA2C /* CardInformationVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C586C3424DCEBC00048AA2C /* CardInformationVC.swift */; };
 		4C586D2B24E4C0BE00C798E0 /* Address.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C586D2A24E4C0BE00C798E0 /* Address.swift */; };
 		4C7D583324E5D7A2008A4168 /* NewAddressVC_1.2.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C7D583224E5D7A2008A4168 /* NewAddressVC_1.2.swift */; };
@@ -31,7 +33,6 @@
 		4CC0575524A2E8D20094B2EB /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CC0575424A2E8D20094B2EB /* ViewController.swift */; };
 		4CC0575B24A2E8D20094B2EB /* MarketTemplate.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 4CC0575924A2E8D20094B2EB /* MarketTemplate.xcdatamodeld */; };
 		4CC0575D24A2E8D40094B2EB /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 4CC0575C24A2E8D40094B2EB /* Assets.xcassets */; };
-		4CC0576024A2E8D40094B2EB /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 4CC0575E24A2E8D40094B2EB /* LaunchScreen.storyboard */; };
 		4CC0576B24A2E8D40094B2EB /* MarketTemplateTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CC0576A24A2E8D40094B2EB /* MarketTemplateTests.swift */; };
 		4CC0577624A2E8D40094B2EB /* MarketTemplateUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CC0577524A2E8D40094B2EB /* MarketTemplateUITests.swift */; };
 		4CCD769C24F82B8F00441182 /* ShoppingCartItems+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CCD769B24F82B8F00441182 /* ShoppingCartItems+CoreDataClass.swift */; };
@@ -77,7 +78,6 @@
 /* Begin PBXFileReference section */
 		0FF46C81EC471300CFD8DADD /* Pods-MarketTemplate.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-MarketTemplate.release.xcconfig"; path = "Target Support Files/Pods-MarketTemplate/Pods-MarketTemplate.release.xcconfig"; sourceTree = "<group>"; };
 		3A06A93C34EA578F18CCC234 /* Pods-MarketTemplate.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-MarketTemplate.debug.xcconfig"; path = "Target Support Files/Pods-MarketTemplate/Pods-MarketTemplate.debug.xcconfig"; sourceTree = "<group>"; };
-		4C0A807824DC249300CE73BC /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = "GoogleService-Info.plist"; path = "../../../../../Downloads/GoogleService-Info.plist"; sourceTree = "<group>"; };
 		4C0C89DC24DCB9A400359F6B /* TimeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimeView.swift; sourceTree = "<group>"; };
 		4C0E6E9924E601E900E75B11 /* SavedAddressTVCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SavedAddressTVCell.swift; sourceTree = "<group>"; };
 		4C0E6E9B24EA05D100E75B11 /* User.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = User.swift; sourceTree = "<group>"; };
@@ -89,6 +89,9 @@
 		4C45571D24DB27220024471B /* Checkout_Delivery_1.1.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Checkout_Delivery_1.1.swift; sourceTree = "<group>"; };
 		4C4C724024EF79470027C289 /* EditAddresses_1.3.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditAddresses_1.3.swift; sourceTree = "<group>"; };
 		4C4C724224EF7F3E0027C289 /* EditAddressTVCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditAddressTVCell.swift; sourceTree = "<group>"; };
+		4C577E6424FECCF400CBAA68 /* Constants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Constants.swift; sourceTree = "<group>"; };
+		4C577E6624FED8BC00CBAA68 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
+		4C577E6B2505AE5700CBAA68 /* CardInformationCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CardInformationCell.swift; sourceTree = "<group>"; };
 		4C586C3424DCEBC00048AA2C /* CardInformationVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CardInformationVC.swift; sourceTree = "<group>"; };
 		4C586D2A24E4C0BE00C798E0 /* Address.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Address.swift; sourceTree = "<group>"; };
 		4C7D583224E5D7A2008A4168 /* NewAddressVC_1.2.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewAddressVC_1.2.swift; sourceTree = "<group>"; };
@@ -227,7 +230,7 @@
 				4CC0575C24A2E8D40094B2EB /* Assets.xcassets */,
 				4CC0575E24A2E8D40094B2EB /* LaunchScreen.storyboard */,
 				4CC0576124A2E8D40094B2EB /* Info.plist */,
-				4C0A807824DC249300CE73BC /* GoogleService-Info.plist */,
+				4C577E6624FED8BC00CBAA68 /* GoogleService-Info.plist */,
 			);
 			path = MarketTemplate;
 			sourceTree = "<group>";
@@ -253,6 +256,7 @@
 		4CE7EE1924F6E2260093D5F8 /* Stripe */ = {
 			isa = PBXGroup;
 			children = (
+				4C577E6424FECCF400CBAA68 /* Constants.swift */,
 			);
 			path = Stripe;
 			sourceTree = "<group>";
@@ -307,6 +311,7 @@
 				4C7FAEBC24DB418000FF7E32 /* AddressTableViewCell.swift */,
 				4C0E6E9924E601E900E75B11 /* SavedAddressTVCell.swift */,
 				4C4C724224EF7F3E0027C289 /* EditAddressTVCell.swift */,
+				4C577E6B2505AE5700CBAA68 /* CardInformationCell.swift */,
 			);
 			path = Cells;
 			sourceTree = "<group>";
@@ -328,8 +333,8 @@
 			children = (
 				4CC0575424A2E8D20094B2EB /* ViewController.swift */,
 				4CF4330D24AEEF8800D3E939 /* MenuViewController.swift */,
-				4CF4330F24AFBA1300D3E939 /* ProfileViewController.swift */,
 				4CAAD3D424D7826700646623 /* LoginViewController.swift */,
+				4CF4330F24AFBA1300D3E939 /* ProfileViewController.swift */,
 			);
 			path = MenuVCs;
 			sourceTree = "<group>";
@@ -450,9 +455,8 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				4CC0576024A2E8D40094B2EB /* LaunchScreen.storyboard in Resources */,
+				4C577E6824FEF1CC00CBAA68 /* GoogleService-Info.plist in Resources */,
 				4CC0575D24A2E8D40094B2EB /* Assets.xcassets in Resources */,
-				4C0A807924DC249300CE73BC /* GoogleService-Info.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -568,8 +572,10 @@
 				4CF4332924B5958B00D3E939 /* ItemOptionsCell.swift in Sources */,
 				4CF4330324AE531400D3E939 /* MenuCell.swift in Sources */,
 				4CC0575124A2E8D20094B2EB /* AppDelegate.swift in Sources */,
+				4C577E6C2505AE5700CBAA68 /* CardInformationCell.swift in Sources */,
 				4CF4331424B2266700D3E939 /* ShoppingCartVC_0.swift in Sources */,
 				4C31D27A24EEFD7F000B5238 /* UserCoreData+CoreDataClass.swift in Sources */,
+				4C577E6524FECCF400CBAA68 /* Constants.swift in Sources */,
 				4CC0575324A2E8D20094B2EB /* SceneDelegate.swift in Sources */,
 				4C31D27824EEF767000B5238 /* EditProfileView.swift in Sources */,
 				4CF4331024AFBA1300D3E939 /* ProfileViewController.swift in Sources */,

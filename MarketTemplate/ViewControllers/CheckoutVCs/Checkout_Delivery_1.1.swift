@@ -12,10 +12,9 @@ import GoogleSignIn
 import FirebaseAuth
 import FirebaseFirestore
 
-class Checkout_Delivery: UIViewController, UserEditedDelegate {
+class Checkout_Delivery: UIViewController, UserEditedDelegate, NewAddressDelegate {
     
-    
-    
+    var ttl : Int?
     var user : FirebaseAuth.User?
     let db = Firestore.firestore()
     //var ref: DatabaseReference!
@@ -114,6 +113,7 @@ class Checkout_Delivery: UIViewController, UserEditedDelegate {
         super.viewDidLoad()
         
         self.view.backgroundColor = UIColor(r: 240, g: 240, b: 240)
+        print(self.ttl)
         
         setupTableView()
         setupViews()
@@ -207,6 +207,18 @@ class Checkout_Delivery: UIViewController, UserEditedDelegate {
         }
     }
     
+    func newAddress(tmpAdd: Address?, svdAdd: Address?) {
+        if tmpAdd != nil {
+            tempAddy = true
+            temporaryAddress = tmpAdd
+            checkSavedAddresses()
+        } else if svdAdd != nil {
+            userAddresses.append(svdAdd)
+            tempAddy = false
+            checkSavedAddresses()
+        }
+    }
+    
     func setupConstraints() {
         newAddressButton.leftAnchor.constraint(equalTo: self.view.leftAnchor, constant: self.view.frame.width * 0.05).isActive = true
         newAddressButton.topAnchor.constraint(equalTo: self.view.topAnchor, constant: 30).isActive = true
@@ -257,7 +269,7 @@ class Checkout_Delivery: UIViewController, UserEditedDelegate {
                                    delay: 0,
                                    usingSpringWithDamping: CGFloat(0.5),
                                    initialSpringVelocity: CGFloat(1.0),
-                                   options: UIView.AnimationOptions.allowUserInteraction,
+                                   options: UIView.AnimationOptions.curveEaseOut,
                                    animations: {
                                     self.signInButton.transform = CGAffineTransform.identity
             }) { (true) in
@@ -268,6 +280,7 @@ class Checkout_Delivery: UIViewController, UserEditedDelegate {
     @objc func handleNewAddress() {
         let vc = NewAddressVC()
         vc.signedInUser = user != nil
+        vc.delegate = self
         navigationController?.customPush(viewController: vc)
     }
     
@@ -278,11 +291,11 @@ class Checkout_Delivery: UIViewController, UserEditedDelegate {
             
             vc.userInformation = self.userAddresses[selectedAddress!]
             vc.carryout = false
-
+            vc.ttl = self.ttl
             
             checkoutButton.transform = CGAffineTransform(scaleX: 0.6, y: 0.6)
 
-            UIView.animate(withDuration: 0.5, delay: 0, usingSpringWithDamping: CGFloat(0.5), initialSpringVelocity: CGFloat(1.0), options: UIView.AnimationOptions.allowUserInteraction, animations: {
+            UIView.animate(withDuration: 0.5, delay: 0, usingSpringWithDamping: CGFloat(0.5), initialSpringVelocity: CGFloat(1.0), options: UIView.AnimationOptions.curveEaseOut, animations: {
                 self.checkoutButton.transform = CGAffineTransform.identity
                 }) { (true) in
                 self.navigationController?.customPush(viewController: vc)

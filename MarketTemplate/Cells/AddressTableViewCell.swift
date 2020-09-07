@@ -35,7 +35,6 @@ class AddressTableViewCell: UITableViewCell {
     }()
 
     @objc func textFieldDidChange(_ txtField: UITextField) {
-        print(txtField.text)
         if txtField.text!.isEmpty == false {
             UIView.animate(withDuration: 0.5) {
                 self.optionalLbl.alpha = 0

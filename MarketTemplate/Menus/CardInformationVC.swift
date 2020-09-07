@@ -14,7 +14,6 @@ class CardInformationVC: UIViewController, STPPaymentCardTextFieldDelegate {
     
     let paymentTextField = STPPaymentCardTextField()
     
-    
     override func viewDidLoad() {
         super.viewDidLoad()
         

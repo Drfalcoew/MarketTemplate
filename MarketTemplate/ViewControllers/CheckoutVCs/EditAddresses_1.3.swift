@@ -99,8 +99,8 @@ class EditAddresses: UIViewController {
     }
     
     func deleteDB(uid : String) {
-        print(addressReference)
-        db.collection("users").document(uid).collection("addresses").document(addressReference!).delete { (error) in
+        guard let ref = addressReference else { displayAlert("Error, could not get the reference to this address."); return }
+        db.collection("users").document(uid).collection("addresses").document(ref).delete { (error) in
             if error != nil {
                 self.displayAlert(error?.localizedDescription ?? "Error deleting from the database")
                 return
@@ -181,14 +181,12 @@ extension EditAddresses : UITableViewDelegate, UITableViewDataSource {
            cell.aptSuite.text = address.aptSuite
        }
        return cell
-   }
-       
+    }
+
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         
         guard let ref = userAddresses[indexPath.row]?.ref else { return }
         self.addressIndex = indexPath.row
-        if ref.isEmpty == false {
-            self.addressReference = ref // remove from coreData and firebase
-        }
+        self.addressReference = ref // remove from coreData and firebase
     }
 }

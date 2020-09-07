@@ -12,12 +12,17 @@ import GoogleSignIn
 import FirebaseAuth
 import FirebaseFirestore
 
+
+protocol NewAddressDelegate {
+    func newAddress(tmpAdd : Address?, svdAdd : Address?)
+}
+
 class NewAddressVC: UIViewController {
     
     var signedInUser : Bool?
     let db = Firestore.firestore()
-    //var ref: DatabaseReference!
-
+    var delegate : NewAddressDelegate?
+    
     var userInformation : [String : String] = ["Street Address" : "", "City" : "", "State" : "", "ZipCode" : "", "Apt/Suite #" : "", "Room #" : "", "Delivery Instructions" : "", "Nick Name" : ""]
 //    var userInformation : Address?
     
@@ -84,7 +89,8 @@ class NewAddressVC: UIViewController {
         super.viewDidLoad()
         
         self.view.backgroundColor = UIColor(r: 240, g: 240, b: 240)
-        
+        //self.delegate?.newAddress(tmpAdd: nil, svdAdd: nil)
+
         
         setupTableView()
         setupViews()
@@ -176,7 +182,6 @@ class NewAddressVC: UIViewController {
         }
             
         
-        let vc = Checkout_Delivery()
         let x = userInformation
 
         
@@ -184,20 +189,19 @@ class NewAddressVC: UIViewController {
         
         if self.signedInUser! && saveAddressSwitch.isOn {
             setData()
-            vc.userAddresses.append(address)
+            self.delegate?.newAddress(tmpAdd: nil, svdAdd: address)
         } else {
             // post to guest db?
-            vc.tempAddy = true
-            vc.temporaryAddress = address
+            self.delegate?.newAddress(tmpAdd: address, svdAdd: nil)
         }
         
         
         continueBtn.transform = CGAffineTransform(scaleX: 0.6, y: 0.6)
 
-        UIView.animate(withDuration: 0.5, delay: 0, usingSpringWithDamping: CGFloat(0.5), initialSpringVelocity: CGFloat(1.0), options: UIView.AnimationOptions.allowUserInteraction, animations: {
+        UIView.animate(withDuration: 0.5, delay: 0, usingSpringWithDamping: CGFloat(0.5), initialSpringVelocity: CGFloat(1.0), options: UIView.AnimationOptions.curveEaseOut, animations: {
             self.continueBtn.transform = CGAffineTransform.identity
             }) { (true) in
-            self.navigationController?.customPush(viewController: vc)
+            self.navigationController?.customPop()
         }
     }
     

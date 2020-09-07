@@ -72,7 +72,7 @@ class TimeView: UIView {
     @objc func handleLater() {
         laterBtn.transform = CGAffineTransform(scaleX: 0.6, y: 0.6)
         
-        UIView.animate(withDuration: 0.5, delay: 0, usingSpringWithDamping: CGFloat(0.5), initialSpringVelocity: CGFloat(1.0), options: UIView.AnimationOptions.allowUserInteraction, animations: {
+        UIView.animate(withDuration: 0.5, delay: 0, usingSpringWithDamping: CGFloat(0.5), initialSpringVelocity: CGFloat(1.0), options: UIView.AnimationOptions.curveEaseOut, animations: {
             self.laterBtn.transform = CGAffineTransform.identity
         }) { (true) in
             NotificationCenter.default.post(name: NSNotification.Name(rawValue: "handleLater"), object: nil)

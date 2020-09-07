@@ -106,10 +106,9 @@ class CartTotalView: UIView {
     @objc func handleButtonPress(sender: UIButton) {
         sender.transform = CGAffineTransform(scaleX: 0.6, y: 0.6)
         
-        UIView.animate(withDuration: 0.5, delay: 0, usingSpringWithDamping: CGFloat(0.5), initialSpringVelocity: CGFloat(1.0), options: UIView.AnimationOptions.allowUserInteraction, animations: {
+        UIView.animate(withDuration: 0.5, delay: 0, usingSpringWithDamping: CGFloat(0.5), initialSpringVelocity: CGFloat(1.0), options: UIView.AnimationOptions.curveEaseOut, animations: {
             sender.transform = CGAffineTransform.identity
         }) { (true) in
-            print(sender.tag)
             switch sender.tag {
             case 0:
                 self.popView()

@@ -179,7 +179,7 @@ extension SelectedMenuItem : UICollectionViewDelegate, UICollectionViewDataSourc
                                    delay: 0,
                                    usingSpringWithDamping: CGFloat(0.5),
                                    initialSpringVelocity: CGFloat(1.0),
-                                   options: UIView.AnimationOptions.allowUserInteraction,
+                                   options: UIView.AnimationOptions.curveEaseOut,
                                    animations: {
                                     cell.transform = CGAffineTransform.identity
             }) { (true) in

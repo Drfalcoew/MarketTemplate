@@ -20,30 +20,16 @@ import Stripe
 class AppDelegate: UIResponder, UIApplicationDelegate, GIDSignInDelegate {
     
     var window: UIWindow?
-    lazy var functions = Functions.functions()
-    
-    
-    func getStripePublishableKey() {
-        functions.httpsCallable("getStripePublishablekey").call { (response, error) in
-           if let error = error {
-                print(error)
-            }
-            if let response = (response?.data as? [String: Any]) {
-                let stripePublishableKey = response["publishableKey"] as! String?
-                Stripe.setDefaultPublishableKey(stripePublishableKey!)
-                print(stripePublishableKey)
-            }
-        }
-    }
-    
+       
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         // Override point for customization after application launch.
-
+        FirebaseConfiguration.shared.setLoggerLevel(.min)
         Stripe.setDefaultPublishableKey("pk_test_51HDJ6wCOi0VJ8StcWb1qRXC4aGndiD0cIZHyj33u2VzO8alCmC6s5Wt4Ly6UnsJRL2GygtoJi7AkR77BxCynfSV300OwLlt5hG")
         FirebaseApp.configure()
-        GIDSignIn.sharedInstance().clientID = "234237475768-d424vos3md3910sdulptbt9dtvd4grbj.apps.googleusercontent.com"
+        GIDSignIn.sharedInstance().clientID = FirebaseApp.app()?.options.clientID
         GIDSignIn.sharedInstance().delegate = self
-
+        STPAPIClient.shared().publishableKey = Constants.publishableKey
+        //STPPaymentConfiguration.shared().publishableKey = Constants.publishableKey
         
         return true
     }

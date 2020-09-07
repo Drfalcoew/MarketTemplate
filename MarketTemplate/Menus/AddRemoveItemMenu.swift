@@ -203,11 +203,9 @@ class AddRemoveItemMenu: NSObject, UIGestureRecognizerDelegate {
 
         switch addRemoveSegmentedControl.selectedSegmentIndex {
         case 0: // Add
-            print("Add \(quantity)")
             addRemoveData(quantity: quantity, addRemove: 0)
             break
         default: // Remove
-            print("Remove \(quantity)")
             addRemoveData(quantity: quantity, addRemove: 1)
             break
         }
@@ -325,9 +323,6 @@ class AddRemoveItemMenu: NSObject, UIGestureRecognizerDelegate {
             }
             break
         }
-        
-        
-        print(quantity)
     }
     
     

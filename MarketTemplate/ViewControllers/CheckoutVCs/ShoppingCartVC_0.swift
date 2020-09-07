@@ -16,6 +16,7 @@ class ShoppingCartVC: UIViewController {
     var cartItems : [NSManagedObject] = [NSManagedObject]()
     var cartTotal : Double = 0.0
     var collectionView : UICollectionView!
+    var ttl : Int = 0
     
     var totalView : CartTotalView = {
         let view = CartTotalView()
@@ -35,7 +36,6 @@ class ShoppingCartVC: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
         self.view.backgroundColor = UIColor(r: 240, g: 240, b: 240)
         
         let nc = NotificationCenter.default
@@ -85,7 +85,7 @@ class ShoppingCartVC: UIViewController {
         getTotal()
     }
     
-    func getTotal() {
+    private func getTotal() {
         var total : Double = 0
         var price : Double
         var quantity : Int
@@ -159,7 +159,7 @@ class ShoppingCartVC: UIViewController {
     }
     
     func setupNavigation() {
-
+        
         let settingsButton = UIButton(type: .system)
         settingsButton.setTitle("Checkout", for: .normal)
         settingsButton.tag = 1
@@ -188,15 +188,20 @@ class ShoppingCartVC: UIViewController {
     func addSubtotal() {
         cartTotal = round(100.0 * cartTotal) / 100.0
         totalView.subTotal.text = ("$\(String(cartTotal))")
+        ttl = Int(cartTotal * 100)
     }
     
     @objc func handleCheckout(sender: UIButton) {
+        print(self.cartTotal)
         if Attributes().delivery == true {
-            self.navigationController?.customPush(viewController: CheckoutVC())
+            let vc = CheckoutVC()
+            vc.ttl = self.ttl
+            self.navigationController?.customPush(viewController: vc)
         } else {
-            self.navigationController?.customPush(viewController: PlaceOrderVC())
+            let vc = PlaceOrderVC()
+            vc.ttl = self.ttl
+            self.navigationController?.customPush(viewController: vc)
         }
-        
     }
     
     @objc func handlePopToRoot() {

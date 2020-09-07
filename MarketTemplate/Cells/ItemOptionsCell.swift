@@ -90,7 +90,7 @@ class ItemOptionsCell: UICollectionViewCell {
                                            delay: 0,
                                            usingSpringWithDamping: CGFloat(0.5),
                                            initialSpringVelocity: CGFloat(1.0),
-                                           options: UIView.AnimationOptions.allowUserInteraction,
+                                           options: UIView.AnimationOptions.curveEaseOut,
                                            animations: {
                                             self.backgroundColor = UIColor(r: 200, g: 200, b: 200)
                                             self.transform = CGAffineTransform.identity

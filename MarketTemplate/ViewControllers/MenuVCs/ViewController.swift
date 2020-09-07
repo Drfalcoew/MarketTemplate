@@ -66,8 +66,7 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
         return view
     }()
     
-    
-    
+
     var mapView : MKMapView = {
         let map = MKMapView()
         map.translatesAutoresizingMaskIntoConstraints = false
@@ -93,6 +92,10 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
         return view
     }()
 
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        user = Auth.auth().currentUser
+    }
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -100,14 +103,16 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
         if GIDSignIn.sharedInstance()?.currentUser == nil && Auth.auth().currentUser == nil {
             DispatchQueue.main.asyncAfter(deadline: .now()) {
                 //GIDSignIn.sharedInstance()?.presentingViewController = self
-                // if userJustLoggedOut != true {
-                GIDSignIn.sharedInstance()?.restorePreviousSignIn()
-                //}
+                if UserDefaults.standard.bool(forKey: "userSignedOut") != true {
+                    GIDSignIn.sharedInstance()?.restorePreviousSignIn()
+                } else {
+                    UserDefaults.standard.set(false, forKey: "userSignedOut")
+                    UserDefaults.standard.synchronize()
+                }
             }
         } else {
             user = Auth.auth().currentUser
         }
-        
         
         
         for item in Menu().items {
@@ -138,14 +143,19 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
     }
     
     func setupDB() {
-        let userID = Auth.auth().currentUser?.uid
-        let docRef = db.collection("users").document(userID!)
+        guard let userID = Auth.auth().currentUser?.uid else { return }
+        let docRef = db.collection("users").document(userID)
         
         docRef.getDocument { (document, error) in
             if let doc = document, document != nil {
-                for (key, value) in doc.data()! {
+                guard let x = doc.data() else { return }
+                for (key, value) in x {
                     if key == "userName" {
-                        UserDefaults.standard.set(value, forKey: key)
+                        if value is NSNull {
+                            return
+                        } else {
+                            UserDefaults.standard.set(value, forKey: key)
+                        }
                     }
                 }
             }
@@ -300,7 +310,7 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
                                    delay: 0,
                                    usingSpringWithDamping: CGFloat(0.5),
                                    initialSpringVelocity: CGFloat(1.0),
-                                   options: UIView.AnimationOptions.allowUserInteraction,
+                                   options: UIView.AnimationOptions.curveEaseOut,
                                    animations: {
                                     self.orderNowButton.transform = CGAffineTransform.identity
             }) { (true) in

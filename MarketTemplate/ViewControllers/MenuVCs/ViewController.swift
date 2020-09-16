@@ -100,6 +100,7 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view.
+        
         if GIDSignIn.sharedInstance()?.currentUser == nil && Auth.auth().currentUser == nil {
             DispatchQueue.main.asyncAfter(deadline: .now()) {
                 //GIDSignIn.sharedInstance()?.presentingViewController = self
@@ -114,10 +115,6 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
             user = Auth.auth().currentUser
         }
         
-        
-        for item in Menu().items {
-            //print(item)
-        }
         
         let date = Date()
         let calendar = Calendar.current
@@ -135,6 +132,10 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
             setupDB()
         }
 
+        let nc = NotificationCenter.default
+        nc.addObserver(self, selector: #selector(successfulOrder), name: Notification.Name("successfulOrder"), object: nil)
+        
+        successfulOrder()
         setupHours()
         setupNavigation()
         setupCollectionView()
@@ -338,7 +339,15 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
         self.present(myAlert, animated: true, completion: nil)
     }
     
-
+    lazy var successfulOrderMenu : SuccessfulOrderMenu = {
+        let menu = SuccessfulOrderMenu()
+        return menu
+    }()
+    
+    @objc func successfulOrder() {
+        print("ORDERED ITEMS")
+        successfulOrderMenu.handleMenu()          
+      }
     
 }
 

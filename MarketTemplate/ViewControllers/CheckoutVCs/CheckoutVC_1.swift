@@ -133,7 +133,7 @@ class CheckoutVC: UIViewController {
             }) { (true) in
                 switch sender.tag {
                 case 0: // carry out
-                    let vc = PlaceOrderVC()
+                    let vc = CheckoutViewController()
                     vc.carryout = true
                     vc.ttl = self.ttl
                     self.navigationController?.customPush(viewController: vc)

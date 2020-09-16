@@ -16,17 +16,19 @@
 		4C31D27C24EEFD8F000B5238 /* Addresses+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C31D27B24EEFD8F000B5238 /* Addresses+CoreDataClass.swift */; };
 		4C450DF624D372B500BA8DE2 /* AddRemoveItemMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C450DF524D372B500BA8DE2 /* AddRemoveItemMenu.swift */; };
 		4C45571E24DB27220024471B /* Checkout_Delivery_1.1.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C45571D24DB27220024471B /* Checkout_Delivery_1.1.swift */; };
+		4C48D68A250CC21100DA7A4A /* MyAPIClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C48D689250CC21100DA7A4A /* MyAPIClient.swift */; };
+		4C48D68C250CCA1F00DA7A4A /* PaymentOptions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C48D68B250CCA1F00DA7A4A /* PaymentOptions.swift */; };
+		4C48D68E25106CF800DA7A4A /* SuccessfulOrderMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C48D68D25106CF800DA7A4A /* SuccessfulOrderMenu.swift */; };
 		4C4C724124EF79480027C289 /* EditAddresses_1.3.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C4C724024EF79470027C289 /* EditAddresses_1.3.swift */; };
 		4C4C724324EF7F3E0027C289 /* EditAddressTVCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C4C724224EF7F3E0027C289 /* EditAddressTVCell.swift */; };
+		4C4DFD2A2506B6450091CB8F /* CheckoutViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C4DFD292506B6450091CB8F /* CheckoutViewController.swift */; };
 		4C577E6524FECCF400CBAA68 /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C577E6424FECCF400CBAA68 /* Constants.swift */; };
 		4C577E6824FEF1CC00CBAA68 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 4C577E6624FED8BC00CBAA68 /* GoogleService-Info.plist */; };
-		4C577E6C2505AE5700CBAA68 /* CardInformationCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C577E6B2505AE5700CBAA68 /* CardInformationCell.swift */; };
 		4C586C3524DCEBC00048AA2C /* CardInformationVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C586C3424DCEBC00048AA2C /* CardInformationVC.swift */; };
 		4C586D2B24E4C0BE00C798E0 /* Address.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C586D2A24E4C0BE00C798E0 /* Address.swift */; };
 		4C7D583324E5D7A2008A4168 /* NewAddressVC_1.2.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C7D583224E5D7A2008A4168 /* NewAddressVC_1.2.swift */; };
 		4C7FAEBB24DB2D0400FF7E32 /* ItemDetails.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C7FAEBA24DB2D0400FF7E32 /* ItemDetails.swift */; };
 		4C7FAEBD24DB418000FF7E32 /* AddressTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C7FAEBC24DB418000FF7E32 /* AddressTableViewCell.swift */; };
-		4C7FAEBF24DB699600FF7E32 /* PlaceOrderVC_2.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C7FAEBE24DB699600FF7E32 /* PlaceOrderVC_2.swift */; };
 		4CAAD3D524D7826700646623 /* LoginViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CAAD3D424D7826700646623 /* LoginViewController.swift */; };
 		4CC0575124A2E8D20094B2EB /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CC0575024A2E8D20094B2EB /* AppDelegate.swift */; };
 		4CC0575324A2E8D20094B2EB /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CC0575224A2E8D20094B2EB /* SceneDelegate.swift */; };
@@ -87,17 +89,19 @@
 		4C31D27B24EEFD8F000B5238 /* Addresses+CoreDataClass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Addresses+CoreDataClass.swift"; sourceTree = "<group>"; };
 		4C450DF524D372B500BA8DE2 /* AddRemoveItemMenu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddRemoveItemMenu.swift; sourceTree = "<group>"; };
 		4C45571D24DB27220024471B /* Checkout_Delivery_1.1.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Checkout_Delivery_1.1.swift; sourceTree = "<group>"; };
+		4C48D689250CC21100DA7A4A /* MyAPIClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MyAPIClient.swift; sourceTree = "<group>"; };
+		4C48D68B250CCA1F00DA7A4A /* PaymentOptions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaymentOptions.swift; sourceTree = "<group>"; };
+		4C48D68D25106CF800DA7A4A /* SuccessfulOrderMenu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SuccessfulOrderMenu.swift; sourceTree = "<group>"; };
 		4C4C724024EF79470027C289 /* EditAddresses_1.3.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditAddresses_1.3.swift; sourceTree = "<group>"; };
 		4C4C724224EF7F3E0027C289 /* EditAddressTVCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditAddressTVCell.swift; sourceTree = "<group>"; };
+		4C4DFD292506B6450091CB8F /* CheckoutViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CheckoutViewController.swift; sourceTree = "<group>"; };
 		4C577E6424FECCF400CBAA68 /* Constants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Constants.swift; sourceTree = "<group>"; };
 		4C577E6624FED8BC00CBAA68 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
-		4C577E6B2505AE5700CBAA68 /* CardInformationCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CardInformationCell.swift; sourceTree = "<group>"; };
 		4C586C3424DCEBC00048AA2C /* CardInformationVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CardInformationVC.swift; sourceTree = "<group>"; };
 		4C586D2A24E4C0BE00C798E0 /* Address.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Address.swift; sourceTree = "<group>"; };
 		4C7D583224E5D7A2008A4168 /* NewAddressVC_1.2.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewAddressVC_1.2.swift; sourceTree = "<group>"; };
 		4C7FAEBA24DB2D0400FF7E32 /* ItemDetails.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ItemDetails.swift; sourceTree = "<group>"; };
 		4C7FAEBC24DB418000FF7E32 /* AddressTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddressTableViewCell.swift; sourceTree = "<group>"; };
-		4C7FAEBE24DB699600FF7E32 /* PlaceOrderVC_2.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaceOrderVC_2.swift; sourceTree = "<group>"; };
 		4CAAD3D424D7826700646623 /* LoginViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginViewController.swift; sourceTree = "<group>"; };
 		4CC0574D24A2E8D20094B2EB /* MarketTemplate.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MarketTemplate.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		4CC0575024A2E8D20094B2EB /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -190,7 +194,7 @@
 				4C45571D24DB27220024471B /* Checkout_Delivery_1.1.swift */,
 				4C7D583224E5D7A2008A4168 /* NewAddressVC_1.2.swift */,
 				4C4C724024EF79470027C289 /* EditAddresses_1.3.swift */,
-				4C7FAEBE24DB699600FF7E32 /* PlaceOrderVC_2.swift */,
+				4C4DFD292506B6450091CB8F /* CheckoutViewController.swift */,
 			);
 			path = CheckoutVCs;
 			sourceTree = "<group>";
@@ -257,6 +261,8 @@
 			isa = PBXGroup;
 			children = (
 				4C577E6424FECCF400CBAA68 /* Constants.swift */,
+				4C48D689250CC21100DA7A4A /* MyAPIClient.swift */,
+				4C48D68B250CCA1F00DA7A4A /* PaymentOptions.swift */,
 			);
 			path = Stripe;
 			sourceTree = "<group>";
@@ -283,6 +289,7 @@
 				4CF4330024AE52A100D3E939 /* ShowMenu.swift */,
 				4C450DF524D372B500BA8DE2 /* AddRemoveItemMenu.swift */,
 				4CE28D8124E3635B00A05D8A /* SetTimeViewController.swift */,
+				4C48D68D25106CF800DA7A4A /* SuccessfulOrderMenu.swift */,
 			);
 			path = Menus;
 			sourceTree = "<group>";
@@ -311,7 +318,6 @@
 				4C7FAEBC24DB418000FF7E32 /* AddressTableViewCell.swift */,
 				4C0E6E9924E601E900E75B11 /* SavedAddressTVCell.swift */,
 				4C4C724224EF7F3E0027C289 /* EditAddressTVCell.swift */,
-				4C577E6B2505AE5700CBAA68 /* CardInformationCell.swift */,
 			);
 			path = Cells;
 			sourceTree = "<group>";
@@ -555,8 +561,9 @@
 				4C31D27C24EEFD8F000B5238 /* Addresses+CoreDataClass.swift in Sources */,
 				4CF4330E24AEEF8800D3E939 /* MenuViewController.swift in Sources */,
 				4CF4331224AFCF1200D3E939 /* SelectedMenuItem.swift in Sources */,
+				4C48D68C250CCA1F00DA7A4A /* PaymentOptions.swift in Sources */,
 				4C31D27624EEF74A000B5238 /* LoyaltyView.swift in Sources */,
-				4C7FAEBF24DB699600FF7E32 /* PlaceOrderVC_2.swift in Sources */,
+				4C48D68A250CC21100DA7A4A /* MyAPIClient.swift in Sources */,
 				4CF4332424B445C000D3E939 /* HoursView.swift in Sources */,
 				4CF4330C24AEC41500D3E939 /* PrimaryCell.swift in Sources */,
 				4CAAD3D524D7826700646623 /* LoginViewController.swift in Sources */,
@@ -572,7 +579,6 @@
 				4CF4332924B5958B00D3E939 /* ItemOptionsCell.swift in Sources */,
 				4CF4330324AE531400D3E939 /* MenuCell.swift in Sources */,
 				4CC0575124A2E8D20094B2EB /* AppDelegate.swift in Sources */,
-				4C577E6C2505AE5700CBAA68 /* CardInformationCell.swift in Sources */,
 				4CF4331424B2266700D3E939 /* ShoppingCartVC_0.swift in Sources */,
 				4C31D27A24EEFD7F000B5238 /* UserCoreData+CoreDataClass.swift in Sources */,
 				4C577E6524FECCF400CBAA68 /* Constants.swift in Sources */,
@@ -582,7 +588,9 @@
 				4C0E6E9C24EA05D100E75B11 /* User.swift in Sources */,
 				4C7FAEBB24DB2D0400FF7E32 /* ItemDetails.swift in Sources */,
 				4CC0575B24A2E8D20094B2EB /* MarketTemplate.xcdatamodeld in Sources */,
+				4C48D68E25106CF800DA7A4A /* SuccessfulOrderMenu.swift in Sources */,
 				4CCD769C24F82B8F00441182 /* ShoppingCartItems+CoreDataClass.swift in Sources */,
+				4C4DFD2A2506B6450091CB8F /* CheckoutViewController.swift in Sources */,
 				4C45571E24DB27220024471B /* Checkout_Delivery_1.1.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

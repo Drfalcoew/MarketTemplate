@@ -20,7 +20,7 @@ extension UserCoreData {
     @nonobjc public class func fetchRequest() -> NSFetchRequest<UserCoreData> {
         return NSFetchRequest<UserCoreData>(entityName: "UserCoreData")
     }
-
+    
     @NSManaged public var email: String?
     @NSManaged public var loyalty: NSNumber?
     @NSManaged public var uid: String?

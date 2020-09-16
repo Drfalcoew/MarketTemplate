@@ -10,6 +10,10 @@ import Foundation
 import UIKit
 import CoreData
 
+protocol addRemoveDelegate {
+    func checkNewPrice(newTotal: Float, originalTotal: Float, changedAmount: Float, added_Removed: Bool)
+}
+
 class AddRemoveItemMenu: NSObject, UIGestureRecognizerDelegate {
     
     var tap : UITapGestureRecognizer = UITapGestureRecognizer()
@@ -19,6 +23,11 @@ class AddRemoveItemMenu: NSObject, UIGestureRecognizerDelegate {
     var index : Int?
     var cartItems : [NSManagedObject] = [NSManagedObject]()
     var itemRemoved : Bool?
+    var originalTotal : Float?
+    var newTotal : Float?
+    var changedAmount : Float?
+    var added_Removed : Bool?
+    var delegate : addRemoveDelegate?
     
     let maxButton : UIButton = {
         let btn = UIButton()
@@ -118,6 +127,11 @@ class AddRemoveItemMenu: NSObject, UIGestureRecognizerDelegate {
 
     
     @objc func Settings() {
+        print("Original Total: ", originalTotal)
+        quantity = 0
+        changedAmount = 0
+        newTotal = 0
+        added_Removed = nil
         
         if let window = UIApplication.shared.keyWindow {
             blackView.backgroundColor = .black
@@ -169,13 +183,9 @@ class AddRemoveItemMenu: NSObject, UIGestureRecognizerDelegate {
     
     override init() {
         super.init()
-
-        
-        
         self.blackView.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(dismissSettings)))
         quantity = 0
         quantityLbl.text = "\(quantity)"
-        
         tap.delegate = self
         
     }
@@ -199,31 +209,31 @@ class AddRemoveItemMenu: NSObject, UIGestureRecognizerDelegate {
     }
     
     @objc func handleAddRemove() {
-        let imageDataDict:[String: Bool]
-
+        var data : (Float?, Float?)
+        var true_false : Bool
         switch addRemoveSegmentedControl.selectedSegmentIndex {
         case 0: // Add
-            addRemoveData(quantity: quantity, addRemove: 0)
+            true_false = true
+            data = addRemoveData(quantity: quantity, addRemove: 0)
             break
         default: // Remove
-            addRemoveData(quantity: quantity, addRemove: 1)
+            true_false = false
+            data = addRemoveData(quantity: quantity, addRemove: 1)
             break
         }
-        
-        imageDataDict = ["removedItem" : itemRemoved ?? true]
-        // Post a notification
-        NotificationCenter.default.post(name: NSNotification.Name(rawValue: "reloadCV"), object: nil, userInfo: imageDataDict)
-        
-        NotificationCenter.default.post(name: NSNotification.Name(rawValue: "reloadCV"), object: nil)
+        if data.0 != nil && data.1 != nil && originalTotal != nil {
+            delegate?.checkNewPrice(newTotal: data.1!, originalTotal: self.originalTotal!, changedAmount: data.0!, added_Removed: true_false)
+        }
         dismissSettings()
     }
 
     
-    func addRemoveData(quantity: Int, addRemove: Int) {
-        let quant : Int
-        
+    func addRemoveData(quantity: Int, addRemove: Int) -> (Float?, Float?) {
+        let originalQuant : Int
+        let price : Float
+        var changed : Float
         guard let appDelegate = UIApplication.shared.delegate as? AppDelegate else {
-             return // exit
+             return (nil, nil) // exit
          }
         let managedContext = appDelegate.persistentContainer.viewContext
         let fetchRequest = NSFetchRequest<NSManagedObject>(entityName: "ShoppingCartItems")
@@ -235,22 +245,31 @@ class AddRemoveItemMenu: NSObject, UIGestureRecognizerDelegate {
         }
         let item = cartItems[index!]
         
-        quant = item.value(forKeyPath: "quantity") as! Int
-
+        originalQuant = item.value(forKeyPath: "quantity") as! Int
+        price = item.value(forKeyPath: "price") as! Float
         
         if addRemove == 0 { // add data
             self.itemRemoved = false
-            item.setValue(quant + quantity, forKey: "quantity")
-
-            
+            item.setValue(originalQuant + quantity, forKey: "quantity")
+            if let ttl = originalTotal {
+                changed = Float(quantity) * price
+                return (changed, ttl + changed)
+            }
         } else { // remove data
             if quantity == maxQuantity { // remove whole item
                 managedContext.delete(item)
                 self.itemRemoved = true
-                
+                if let ttl = originalTotal {
+                    changed = Float(originalQuant) * price
+                    return (changed, ttl - changed)
+                }
             } else { // remove a quantity less than max
                 self.itemRemoved = false
-                item.setValue(quant - quantity, forKey: "quantity")
+                item.setValue(originalQuant - quantity, forKey: "quantity")
+                if let ttl = originalTotal {
+                    changed = Float(quantity) * price
+                    return (changed, ttl - changed)
+                }
             }
         }
         
@@ -260,6 +279,7 @@ class AddRemoveItemMenu: NSObject, UIGestureRecognizerDelegate {
         catch {
             print("Saving Core Data Failed: \(error)")
         }
+        return (nil, nil)
     }
     
     @objc func handleQuantity(sender: UIButton) {

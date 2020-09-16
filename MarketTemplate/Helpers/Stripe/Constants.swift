@@ -14,4 +14,5 @@ enum Constants {
     static let defaultCurrency = "usd"
     static let defaultDescription = "Purchase from mobile food app."
     static let taxRates = 0.075
+    static let API_Version = "2020-08-27"
 }

@@ -10,11 +10,11 @@ import Foundation
 import UIKit
 import CoreData
 
-class ShoppingCartVC: UIViewController {
+class ShoppingCartVC: UIViewController, addRemoveDelegate {
     
     // var cartItems : [Item] = []
     var cartItems : [NSManagedObject] = [NSManagedObject]()
-    var cartTotal : Double = 0.0
+    var cartTotal : Float = 0.0
     var collectionView : UICollectionView!
     var ttl : Int = 0
     
@@ -39,7 +39,6 @@ class ShoppingCartVC: UIViewController {
         self.view.backgroundColor = UIColor(r: 240, g: 240, b: 240)
         
         let nc = NotificationCenter.default
-        nc.addObserver(self, selector: #selector(reloadCV), name: Notification.Name("reloadCV"), object: nil)
         nc.addObserver(self, selector: #selector(handleCheckout(sender:)), name: Notification.Name("handleCheckout"), object: nil)
         nc.addObserver(self, selector: #selector(handlePopToRoot), name: Notification.Name("popToRoot"), object: nil)
 
@@ -49,16 +48,6 @@ class ShoppingCartVC: UIViewController {
         setupConstraints()
         setupNavigation()
         
-    }
-    
-    @objc func reloadCV(notification: NSNotification) {
-        if let boolean = notification.userInfo?["removedItem"] as? Bool {
-            if boolean {
-                getItems()
-            }
-        }
-        collectionView.reloadData()
-        addSubtotal()
     }
     
     func getItems() {
@@ -86,21 +75,41 @@ class ShoppingCartVC: UIViewController {
     }
     
     private func getTotal() {
-        var total : Double = 0
-        var price : Double
+        var total : Float = 0.0
+        var price : Float
         var quantity : Int
         
         for item in cartItems {
             quantity = item.value(forKeyPath: "quantity") as! Int
-            price = item.value(forKeyPath: "price") as! Double
+            price = item.value(forKeyPath: "price") as! Float
             
-            total = total + price * Double(quantity)
+            total = total + price * Float(quantity)
             total = round(100.0 * total) / 100.0
         }
         
         cartTotal = cartTotal + total
+        addSubtotal(newTotal: nil)
+    }
+    
+    func checkNewPrice(newTotal: Float, originalTotal: Float, changedAmount: Float, added_Removed: Bool) {
+        let string = added_Removed ? "plus" : "minus"
+        print(originalTotal, string, changedAmount, "=", newTotal)
+        
+        
 
-        addSubtotal()
+        getItems()
+        
+        collectionView.reloadData()
+        addSubtotal(newTotal: newTotal)
+    }
+    
+    func addSubtotal(newTotal: Float?) {
+        if newTotal != nil {
+            cartTotal = newTotal!
+        }
+        let formatted = String(format: "$%.2f", cartTotal)
+        totalView.subTotal.text = formatted
+        ttl = Int(cartTotal * 100)
     }
     
     func alert(title: String, message: String) {
@@ -182,25 +191,34 @@ class ShoppingCartVC: UIViewController {
         showMenu.quantity = 0
         showMenu.quantityLbl.text = "\(showMenu.quantity)"
         showMenu.index = index
+        showMenu.delegate = self
+        print("Cart Total: ", cartTotal)
+        showMenu.originalTotal = cartTotal
         showMenu.Settings()
     }
     
-    func addSubtotal() {
-        cartTotal = round(100.0 * cartTotal) / 100.0
-        totalView.subTotal.text = ("$\(String(cartTotal))")
-        ttl = Int(cartTotal * 100)
+    @objc func handleCheckout(sender: UIButton) {
+        if cartTotal > 0 {
+            if Attributes().delivery == true {
+                let vc = CheckoutVC()
+                vc.ttl = self.ttl
+                self.navigationController?.customPush(viewController: vc)
+            } else {
+                let vc = CheckoutViewController()
+                vc.ttl = self.ttl
+                self.navigationController?.customPush(viewController: vc)
+            }
+        } else {
+            displayAlert(title: "Cart Empty", message: "Add products to your cart before checking out.")
+        }
     }
     
-    @objc func handleCheckout(sender: UIButton) {
-        if Attributes().delivery == true {
-            let vc = CheckoutVC()
-            vc.ttl = self.ttl
-            self.navigationController?.customPush(viewController: vc)
-        } else {
-            let vc = PlaceOrderVC()
-            vc.ttl = self.ttl
-            self.navigationController?.customPush(viewController: vc)
-        }
+    func displayAlert(title : String, message userMessage: String){
+        
+        let myAlert = UIAlertController(title: title, message: userMessage, preferredStyle: UIAlertController.Style.alert)
+        let okAction = UIAlertAction(title: "OK", style: UIAlertAction.Style.default, handler: nil)
+        myAlert.addAction(okAction)
+        self.present(myAlert, animated: true, completion: nil)
     }
     
     @objc func handlePopToRoot() {
@@ -235,7 +253,7 @@ extension ShoppingCartVC : UICollectionViewDelegate, UICollectionViewDataSource 
         if self.cartItems.isEmpty == false { // safeGuard, because it returns nil when cells are reloaded
 
             if indexPath.row == 0 {
-                cartTotal = 0.0
+
             }
             let item = cartItems[indexPath.row]
             
@@ -247,7 +265,6 @@ extension ShoppingCartVC : UICollectionViewDelegate, UICollectionViewDataSource 
             
             var total = price! * Double(quantity)
             total = round(100.0 * total) / 100.0
-            
             
             cell.image.image = UIImage(named: "image_\(name!)")
             cell.title.text = name

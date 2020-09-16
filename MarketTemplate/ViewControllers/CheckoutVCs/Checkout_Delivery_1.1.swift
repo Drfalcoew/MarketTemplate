@@ -285,7 +285,7 @@ class Checkout_Delivery: UIViewController, UserEditedDelegate, NewAddressDelegat
     @objc func handleCheckout() {
         
         if selectedAddress != nil {
-            let vc = PlaceOrderVC()
+            let vc = CheckoutViewController()
             
             vc.userInformation = self.userAddresses[selectedAddress!]
             vc.carryout = false

@@ -22,7 +22,7 @@ extension ShoppingCartItems {
         return NSFetchRequest<ShoppingCartItems>(entityName: "ShoppingCartItems")
     }
 
-    @NSManaged public var price: Double
+    @NSManaged public var price: Float
     @NSManaged public var notes: String?
     @NSManaged public var name: String
     @NSManaged public var quantity: Int

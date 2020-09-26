@@ -13,10 +13,12 @@ import FirebaseFunctions
 import FirebaseAuth
 import CoreData
 import FirebaseFirestore
+import GoogleSignIn
 
 
 class CheckoutViewController: UIViewController {
-
+    
+    let db = Firestore.firestore()
     var ttl : Int?
     var carryout : Bool?
     var userInformation : Address?
@@ -24,6 +26,9 @@ class CheckoutViewController: UIViewController {
     var selectedCard : String?
     var paymentContext: STPPaymentContext?
     var customerContext : STPCustomerContext?
+    var cartItems : [NSManagedObject] = [NSManagedObject]()
+    var asap : Bool = true
+    var orderTime : String?
     
     lazy var cardTextField: STPPaymentCardTextField = {
         let cardTextField = STPPaymentCardTextField()
@@ -182,20 +187,26 @@ class CheckoutViewController: UIViewController {
     
     @objc func handleLater() {
         let vc = SetTimeViewController()
-        vc.carryout = self.carryout!
+        guard let x = self.carryout else {
+            self.present(vc, animated: true, completion: nil)
+            return
+        }
+        vc.carryout = x
         self.present(vc, animated: true, completion: nil)
     }
     
     @objc func setupTime(notification : NSNotification) {
         if let x = notification.userInfo!["ScheduledDate"] {
             timeView.timeLbl.text = "Order is scheduled for \(x)"
+            self.asap = false
+            self.orderTime = x as? String
         } else {
             timeView.timeLbl.text = "Order is scheduled for NOW/ASAP"
+            self.asap = true
         }
     }
     
     func displayAlert(title : String, message userMessage: String){
-        
         let myAlert = UIAlertController(title: title, message: userMessage, preferredStyle: UIAlertController.Style.alert)
         let okAction = UIAlertAction(title: "OK", style: UIAlertAction.Style.default, handler: nil)
         myAlert.addAction(okAction)
@@ -230,8 +241,6 @@ extension CheckoutViewController: STPAuthenticationContext, STPPaymentContextDel
             preferredStyle: .alert
         )
         let cancel = UIAlertAction(title: "Cancel", style: .cancel, handler: { action in
-            // Need to assign to _ because optional binding loses @discardableResult value
-            // https://bugs.swift.org/browse/SR-1681
             self.navigationController?.customPopToRoot()
         })
         let retry = UIAlertAction(title: "Retry", style: .default, handler: { action in
@@ -299,14 +308,11 @@ extension CheckoutViewController: STPAuthenticationContext, STPPaymentContextDel
         }
         
         self.dismiss(animated: true) {
-            let vc = ViewController()
             let alertController = UIAlertController(title: title, message: message, preferredStyle: .alert)
             let action = UIAlertAction(title: "Ok", style: .default) { (action) in
                 if title == "Success" {
-                    self.postToDB()
                     self.removeCoreData()
-                    NotificationCenter.default.post(name: NSNotification.Name(rawValue: "successfulOrder"), object: nil)
-                    self.navigationController?.customPush(viewController: vc)
+                    self.navigationController?.customPopToRoot()
                 }
             }
             alertController.addAction(action)
@@ -314,36 +320,143 @@ extension CheckoutViewController: STPAuthenticationContext, STPPaymentContextDel
         }
     }
     
-    func postToDB() {
-        let db = Firestore.firestore()
-        let docRef : DocumentReference
+    func postToDB(items: [CartItem]) {
+        var data : (String?, String?)
+        var updatedRank : Int?
+        let docRef : DocumentReference?
+        let name : String = Auth.auth().currentUser?.displayName ?? GIDGoogleUser().profile.name ?? "Guest"// "Guest"
+        var id : String
         
         if let userID = Auth.auth().currentUser?.uid  { // logged in
-            docRef = db.collection("orders").document(userID)
-
-        } else { // not logged in && ALSO MAKE STRIPE CUSTOMER IN CHECKOUTFLOW IF USER IS NOT AUTHENTICATED
-            docRef = db.collection("orders").document()
-        }
-
-        docRef.setData([
-            "Type" : carryout ?? true ? "Pickup" : "Delivery"
-        ]) { err in
+            id = userID
+            docRef = db.collection("users").document(id).collection("orders").document()
+        } else {
+            id = "guest"
+            docRef = db.collection("users").document(id).collection("orders").document()
+        }// not logged in && ALSO MAKE STRIPE CUSTOMER IN CHECKOUTFLOW IF USER IS NOT AUTHENTICATED
+        
+        let docData: [String: Any] = [
+            "items": convertItemsToDic(items: items),
+            "name" : name,
+            "id" : id,
+            "type" : carryout ?? true ? "Pickup" : "Delivery",
+            "orderDate" : Date().formattedDay,
+            "orderTime" : Date().formattedTime,
+            "active" : true,
+            "scheduled" : asap ? "ASAP" : orderTime ?? "Error. Please contact customer for desired order time."
+        ]
+        
+        /*if id != "guest" {
+            data = checkLoyalty(userID: id)
+            if let x = updateLoyalty(data: data) {
+                updatedRank = x
+            }
+        }*/
+        
+        docRef?.setData(docData) { err in
             if let err = err {
                 print("Error writing document: \(err)")
             } else {
+                docRef?.parent.parent?.setData([
+                    "recentOrder" : Date().formattedDay,
+                    "safeZone" : Date().getDay(days: Attributes().loyaltyRequirement * 14).formattedDay
+                ], merge: true)
                 print("Document successfully written!")
+                NotificationCenter.default.post(name: NSNotification.Name(rawValue: "successfulOrder"), object: nil)
+                UserDefaults.standard.set(true, forKey: "OrderPlaced")
+                UserDefaults.standard.set(false, forKey: "OrderCached")
             }
         }
     }
     
+    private func checkLoyalty(userID: String) -> (String?, String?) {
+        var recentOrder : String?
+        var safeZone : String?
+        db.collection("users").document(userID).getDocument { (document, error) in
+            if error != nil {
+                print(error?.localizedDescription as Any)
+            }
+            if let document = document, document.exists {
+                let doc = User(snapshot: document)
+                recentOrder = doc.recentOrder
+                safeZone = doc.safeZone
+                print(recentOrder)
+                print(safeZone)
+            } else {
+                print("Document does not exist")
+            }
+        }
+        return (recentOrder, safeZone)
+    }
+    
+    private func updateLoyalty(data: (String?, String?)) -> Int? {
+        if data.0 == nil && data.1 == nil {
+            let requirement = Attributes().loyaltyRequirement * 7
+            var rankLossed = 0
+            let days = Date().days(from: (data.1?.toDate())!) // check if today's past safezone
+            print(days)
+            for i in 1...4 {
+                if days > (requirement * i) {
+                    rankLossed = rankLossed + 1
+                } else {
+                    break
+                }
+            }
+        }
+        print("Data == nil, returning nil")
+        /*if rank != loyaltyRank && user?.uid != nil {
+            if rank > 3 { rank = 3 }
+            db.collection("users").document(user!.uid).setData(["loyalty" : rank], merge: true)
+        }*/
+        return nil
+    }
+    
+    
+    
+    private func convertItemsToDic(items: [CartItem]) -> [Any]{
+        var newItems = [Any]()
+        
+        for item in items {
+            newItems.append([
+                "name": item.name,
+                "price": item.price,
+                "category": item.category,
+                "notes": item.notes,
+                "quantity": item.quantity
+            ])
+        }
+        
+        return newItems
+    }
+    
     func removeCoreData() {
-        guard let appDelegate =
-          UIApplication.shared.delegate as? AppDelegate else {
+        var localItemsArray : [CartItem] = []
+        
+        guard let appDelegate = UIApplication.shared.delegate as? AppDelegate else {
             return
         }
         let managedContext = appDelegate.persistentContainer.viewContext
-        let fetchRequest: NSFetchRequest<NSFetchRequestResult> = NSFetchRequest(entityName: "ShoppingCartItems")
-        let deleteRequest = NSBatchDeleteRequest(fetchRequest: fetchRequest)
+        let fetchRequest = NSFetchRequest<NSManagedObject>(entityName: "ShoppingCartItems")
+        
+        do {
+          cartItems = try managedContext.fetch(fetchRequest)
+        } catch let error as NSError {
+          print("Could not fetch. \(error), \(error.userInfo)")
+        }
+
+        for item in cartItems { // get all values
+            let q = item.value(forKeyPath: "quantity") as! Int
+            let p = item.value(forKeyPath: "price") as! Float
+            let n = item.value(forKeyPath: "name") as! String
+            let s = item.value(forKeyPath: "notes") as! String
+            let c = item.value(forKeyPath: "category") as! String
+            let tempItem = CartItem(name: n, category: c, price: p, notes: s, quantity: q).self
+            localItemsArray.append(tempItem)
+        }
+        postToDB(items: localItemsArray)
+        
+        let fetchDeleteRequest: NSFetchRequest<NSFetchRequestResult> = NSFetchRequest(entityName: "ShoppingCartItems")
+        let deleteRequest = NSBatchDeleteRequest(fetchRequest: fetchDeleteRequest)
         
         do {
             try managedContext.execute(deleteRequest)
@@ -356,5 +469,4 @@ extension CheckoutViewController: STPAuthenticationContext, STPPaymentContextDel
     func authenticationPresentingViewController() -> UIViewController {
         return self
     }
-    
 }

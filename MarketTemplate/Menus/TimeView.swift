@@ -32,7 +32,7 @@ class TimeView: UIView {
         btn.layer.shadowOpacity = 0.2
         btn.layer.shadowRadius = 5.0
         btn.backgroundColor = .gray
-        btn.layer.cornerRadius = 5
+        btn.layer.cornerRadius = 10
         btn.setTitleColor(.white, for: .normal)
         btn.setTitle("Schedule for later", for: .normal)
         btn.addTarget(self, action: #selector(handleLater), for: .touchUpInside)
@@ -77,6 +77,5 @@ class TimeView: UIView {
         }) { (true) in
             NotificationCenter.default.post(name: NSNotification.Name(rawValue: "handleLater"), object: nil)
         }
-
     }
 }

@@ -17,7 +17,9 @@ import Stripe
 
 class ViewController: UIViewController, UIGestureRecognizerDelegate {
     
+    var userLogged : Bool?
     var cartItems : [NSManagedObject] = [NSManagedObject]()
+    var coreUser : [NSManagedObject] = []
     var collectionView : UICollectionView!
     var tap : UITapGestureRecognizer!
     let db = Firestore.firestore()
@@ -28,7 +30,7 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
         let btn = UIButton()
         btn.translatesAutoresizingMaskIntoConstraints = false
         //btn.layer.masksToBounds = true
-        btn.layer.cornerRadius = 5
+        btn.layer.cornerRadius = 10
         btn.backgroundColor = UIColor(r: 255, g: 89, b: 89)
         btn.setTitle("Order Now", for: .normal)
         btn.layer.shadowColor = UIColor.black.cgColor
@@ -66,7 +68,6 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
         return view
     }()
     
-
     var mapView : MKMapView = {
         let map = MKMapView()
         map.translatesAutoresizingMaskIntoConstraints = false
@@ -74,7 +75,6 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
         let location = CLLocationCoordinate2D(latitude: Attributes().location_Latitude, longitude: Attributes().location_Longitude)
         let region = MKCoordinateRegion(center: location, span: MKCoordinateSpan(latitudeDelta: 0.001, longitudeDelta: 0.001))
         map.setRegion(region, animated: true)
-        
         let pin = customPin(pinTitle: Attributes().name, pinSubTitle: Attributes().location, location: location)
         map.addAnnotation(pin)
         return map
@@ -113,29 +113,29 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
             }
         } else {
             user = Auth.auth().currentUser
+            userLogged = UserDefaults.standard.bool(forKey: "UserLogged") //loaded all user data from DB into core data
+            if userLogged == false {
+                cacheUser(user: user!.uid)
+                userLogged = true
+                UserDefaults.standard.set(true, forKey: "UserLogged")
+            }
         }
-        
-        
+                
         let date = Date()
         let calendar = Calendar.current
         
         hour = calendar.component(.hour, from: date)
         
-        tap = UITapGestureRecognizer(target: self, action: #selector(showHours))
-        
+        tap = UITapGestureRecognizer(target: self, action: #selector(showHours))        
         
         self.title = "Home"
         self.view.tag = 0
         self.view.backgroundColor = UIColor(r: 240, g: 240, b: 240)
-        
-        if user != nil {
-            setupDB()
-        }
 
         let nc = NotificationCenter.default
         nc.addObserver(self, selector: #selector(successfulOrder), name: Notification.Name("successfulOrder"), object: nil)
+        nc.addObserver(self, selector: #selector(sendToProfile), name: Notification.Name(rawValue: "sendToProfile"), object: nil)
         
-        successfulOrder()
         setupHours()
         setupNavigation()
         setupCollectionView()
@@ -143,24 +143,56 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
         setupConstraints()
     }
     
-    func setupDB() {
-        guard let userID = Auth.auth().currentUser?.uid else { return }
-        let docRef = db.collection("users").document(userID)
-        
-        docRef.getDocument { (document, error) in
-            if let doc = document, document != nil {
-                guard let x = doc.data() else { return }
-                for (key, value) in x {
-                    if key == "userName" {
-                        if value is NSNull {
-                            return
-                        } else {
-                            UserDefaults.standard.set(value, forKey: key)
-                        }
-                    }
-                }
+    func cacheUser(user: String) {
+        print(user)
+        db.collection("users").document(user).getDocument { (document, error) in
+            if error != nil {
+                print(error?.localizedDescription as Any)
+            }
+            if let document = document, document.exists {
+                let doc = User(snapshot: document)
+                // load "doc" into coreData for further use, without having to call db everytime.
+                self.loadCoreData(user: doc)
+            } else {
+                print("Document does not exist")
             }
         }
+    }
+    
+    private func loadCoreData(user: User) {
+        
+        UserDefaults.standard.set(user.uid, forKey: "userID")
+        UserDefaults.standard.set(user.loyalty, forKey: "userLoyalty")
+        UserDefaults.standard.set(user.reward, forKey: "userReward")
+        UserDefaults.standard.set(user.email, forKey: "userEmail")
+        UserDefaults.standard.set(user.userName, forKey: "userName")
+        UserDefaults.standard.set(user.recentOrder, forKey: "userRecentOrder")
+        UserDefaults.standard.set(user.safeZone, forKey: "userSafeZone")
+        UserDefaults.standard.set(user.accountTotal, forKey: "userAccountTotal")
+        
+//        let managedContext =
+//          appDelegate.persistentContainer.viewContext
+//
+//        let entity =
+//          NSEntityDescription.entity(forEntityName: "UserCoreData",
+//                                     in: managedContext)!
+//
+//        let item = NSManagedObject(entity: entity,
+//                                     insertInto: managedContext)
+//
+//        item.setValuesForKeys(loadUser)
+//
+//        do {
+//            try managedContext.save()
+//            coreUser.append(item)
+//
+//        } catch let error as NSError {
+//            print("Could not save. \(error), \(error.userInfo)")
+//        }
+    }
+    
+    @objc func sendToProfile() {
+        self.navigationController?.customPush(viewController: ProfileViewController())
     }
     
     func setupHours() {
@@ -208,7 +240,7 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
         orderNowButton.centerXAnchor.constraint(equalTo: self.view.centerXAnchor, constant: 0).isActive = true
         orderNowButton.heightAnchor.constraint(equalTo: self.orderNowButton.widthAnchor, multiplier: 1/4).isActive = true
         
-        mapContainerView.topAnchor.constraint(equalTo: self.orderNowButton.bottomAnchor, constant: 30).isActive = true
+        mapContainerView.topAnchor.constraint(equalTo: self.orderNowButton.bottomAnchor, constant: 25).isActive = true
         mapContainerView.widthAnchor.constraint(equalTo: self.view.widthAnchor, multiplier: 9/10).isActive = true
         mapContainerView.bottomAnchor.constraint(equalTo: self.view.centerYAnchor, constant: self.view.frame.height * 0.15).isActive = true
         mapContainerView.centerXAnchor.constraint(equalTo: self.view.centerXAnchor, constant: 0).isActive = true
@@ -346,9 +378,8 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
     
     @objc func successfulOrder() {
         print("ORDERED ITEMS")
-        successfulOrderMenu.handleMenu()          
+        successfulOrderMenu.handleMenu()
       }
-    
 }
 
 
@@ -396,7 +427,8 @@ extension ViewController : UICollectionViewDelegate, UICollectionViewDataSource 
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "custom", for: indexPath) as! PrimaryCell
         cell.backgroundColor = .white
         cell.image.image = UIImage(named: "pizzaStockImg")
-        cell.layer.cornerRadius = 12
+        cell.layer.cornerRadius = 10
+        
         cell.layer.shadowColor = UIColor.black.cgColor
         cell.layer.shadowOffset = CGSize(width: 3.0, height: 5.0)
         cell.layer.shadowOpacity = 0.2
@@ -435,8 +467,7 @@ public extension UINavigationController {
     func customPopToRoot(transitionType type: String = CATransitionType.fade.rawValue, duration: CFTimeInterval = 0.3) {
         self.addTransition(transitionType: type, duration: duration)
         self.popToRootViewController(animated: false)
-    }
-    
+    }    
     
     func customPush(viewController vc: UIViewController, transitionType type: String = CATransitionType.reveal.rawValue, duration: CFTimeInterval = 0.3) {
         self.addTransition(transitionType: type, duration: duration)

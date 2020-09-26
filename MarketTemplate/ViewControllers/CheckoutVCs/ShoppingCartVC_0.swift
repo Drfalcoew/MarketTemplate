@@ -12,7 +12,7 @@ import CoreData
 
 class ShoppingCartVC: UIViewController, addRemoveDelegate {
     
-    // var cartItems : [Item] = []
+
     var cartItems : [NSManagedObject] = [NSManagedObject]()
     var cartTotal : Float = 0.0
     var collectionView : UICollectionView!
@@ -23,7 +23,7 @@ class ShoppingCartVC: UIViewController, addRemoveDelegate {
         view.backgroundColor = .white
         view.translatesAutoresizingMaskIntoConstraints = false
         view.layer.masksToBounds = false
-        view.layer.cornerRadius = 12
+        view.layer.cornerRadius = 10
         view.layer.shadowColor = UIColor.black.cgColor
         view.layer.shadowOffset = CGSize(width: 0, height: -5.0)
         view.layer.shadowOpacity = 0.2

@@ -163,7 +163,7 @@ extension MenuViewController : UICollectionViewDelegate, UICollectionViewDataSou
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "menu", for: indexPath) as! SecondaryCell
             cell.backgroundColor = .white
             cell.image.image = UIImage(named: "\(categories[indexPath.row].image)")
-            cell.layer.cornerRadius = 12
+            cell.layer.cornerRadius = 10
             cell.layer.shadowColor = UIColor.black.cgColor
             cell.layer.shadowOffset = CGSize(width: 3.0, height: 5.0)
             cell.layer.shadowOpacity = 0.2

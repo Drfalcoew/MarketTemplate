@@ -19,15 +19,18 @@
         <attribute name="quantity" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
     </entity>
     <entity name="UserCoreData" representedClassName="UserCoreData" syncable="YES">
+        <attribute name="accountTotal" optional="YES" attributeType="Double" defaultValueString="0.0"/>
         <attribute name="email" optional="YES" attributeType="String"/>
         <attribute name="loyalty" optional="YES" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="recentOrder" optional="YES" attributeType="String"/>
         <attribute name="reward" optional="YES" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="safeZone" optional="YES" attributeType="String"/>
         <attribute name="uid" optional="YES" attributeType="String"/>
         <attribute name="userName" optional="YES" attributeType="String"/>
     </entity>
     <elements>
         <element name="Addresses" positionX="-54" positionY="27" width="128" height="178"/>
         <element name="ShoppingCartItems" positionX="-54" positionY="-9" width="128" height="118"/>
-        <element name="UserCoreData" positionX="-45" positionY="36" width="128" height="118"/>
+        <element name="UserCoreData" positionX="-45" positionY="36" width="128" height="163"/>
     </elements>
 </model>

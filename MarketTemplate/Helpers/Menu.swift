@@ -10,7 +10,7 @@ import Foundation
 import UIKit
 import MapKit
 
-struct Item {
+struct Item { // for use of the menu/customer
     
     let name: String
     let category: Int
@@ -39,6 +39,9 @@ struct Attributes {
     let openingHours : [Int] = [10, 10, 10, 10, 10, 10, 10] // index will be day of the week
     let closingHours : [Int] = [22, 22, 22, 22, 22, 22, 22] //(Keep these 2 digits or else crash)
     let delivery : Bool = true
+    let pickupPrep : Int = 20
+    let deliveryPrep : Int = 45
+    let loyaltyRequirement : Int = 2 // 1 order / 2 weeks minimum
 }
 
 struct Category {

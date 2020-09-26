@@ -198,8 +198,13 @@ class SettingsViewController: UIViewController, UITableViewDataSource, UITableVi
         let fetchRequest: NSFetchRequest<NSFetchRequestResult> = NSFetchRequest(entityName: "ShoppingCartItems")
         let deleteRequest = NSBatchDeleteRequest(fetchRequest: fetchRequest)
         
+        let userFetchRequest : NSFetchRequest<NSFetchRequestResult> = NSFetchRequest(entityName: "UserCoreData")
+        let userDeleteRequest = NSBatchDeleteRequest(fetchRequest: userFetchRequest)
+                
         do {
             try managedContext.execute(deleteRequest)
+            try managedContext.execute(userDeleteRequest)
+            UserDefaults.standard.set(false, forKey: "UserLogged")
         } catch let error as NSError {
             // TODO: handle the error
             print(error.localizedDescription)

@@ -36,7 +36,7 @@ class LoginViewController: UIViewController {
         btn.layer.shadowOffset = CGSize(width: 3.0, height: 5.0)
         btn.layer.shadowOpacity = 0.2
         btn.layer.shadowRadius = 5.0
-        btn.layer.cornerRadius = 5
+        btn.layer.cornerRadius = 10
         btn.setTitle("Sign in with Google", for: .normal)
         btn.setTitleColor(UIColor(r: 75, g: 80, b: 120), for: .normal)
         btn.addTarget(self, action: #selector(handleGoogleSignIn), for: .touchUpInside)
@@ -62,7 +62,7 @@ class LoginViewController: UIViewController {
         let view = UIView()
         view.backgroundColor = UIColor.white
         view.translatesAutoresizingMaskIntoConstraints = false
-        view.layer.cornerRadius = 2
+        view.layer.cornerRadius = 10
         view.layer.masksToBounds = true
         return view
     }()
@@ -71,7 +71,7 @@ class LoginViewController: UIViewController {
         let btn = UIButton()
         btn.backgroundColor = UIColor.white
         btn.setTitle("Forgot password?", for: UIControl.State.normal)
-        btn.layer.cornerRadius = 2
+        btn.layer.cornerRadius = 10
         btn.titleLabel?.font = UIFont(name: "Helvetica Neue", size: 18)
         btn.setTitleColor(UIColor(r: 75, g: 80, b: 120), for: UIControl.State.normal)
         btn.translatesAutoresizingMaskIntoConstraints = false
@@ -79,14 +79,14 @@ class LoginViewController: UIViewController {
         btn.layer.shadowOffset = CGSize(width: 3.0, height: 5.0)
         btn.layer.shadowOpacity = 0.2
         btn.layer.shadowRadius = 5.0
-        btn.layer.cornerRadius = 5
+        btn.layer.cornerRadius = 10
         btn.addTarget(self, action: #selector(handleForgotPassword(sender:)), for: .touchUpInside)
         return btn
     }()
     
     let forgotPassView : UIView = {
         let view = UIView()
-        view.layer.cornerRadius = 5
+        view.layer.cornerRadius = 10
         view.backgroundColor = UIColor.init(white: 1.0, alpha: 0.7)
         view.layer.masksToBounds = true
         view.alpha = 0
@@ -100,7 +100,7 @@ class LoginViewController: UIViewController {
         btn.setTitle("Login", for: UIControl.State())
         btn.titleLabel?.font = UIFont(name: "Helvetica Neue", size: 18)
         btn.translatesAutoresizingMaskIntoConstraints = false
-        btn.layer.cornerRadius = 2
+        btn.layer.cornerRadius = 10
         btn.setTitleColor(UIColor(red: 255/255, green: 255/255, blue: 255/255, alpha: 1), for: UIControl.State())
         btn.titleLabel?.font = UIFont.boldSystemFont(ofSize: 18)
         btn.addTarget(self, action: #selector(handleLoginRegister), for: .touchUpInside)
@@ -108,7 +108,6 @@ class LoginViewController: UIViewController {
         btn.layer.shadowOffset = CGSize(width: 3.0, height: 5.0)
         btn.layer.shadowOpacity = 0.2
         btn.layer.shadowRadius = 5.0
-        btn.layer.cornerRadius = 5
         return btn
     }()
     
@@ -335,7 +334,7 @@ class LoginViewController: UIViewController {
             //successfully authenticated user
             
             
-            let values = ["name": name, "email": email, "reward" : 0, "loyalty" : 5] as [String : Any]
+            let values = ["name": name, "email": email, "reward" : 0, "loyalty" : 3, "recentOrder": NSNull()] as [String : Any]
             self.registerUserIntoDatabaseWithUID(uid, values: values as [String : AnyObject])
             
             
@@ -352,11 +351,11 @@ class LoginViewController: UIViewController {
         db?.collection("users").document(uid).setData([
             "userName" : values["name"] ?? "Could not load userName",
             "email" : values["email"] ?? "Could not load email",
-            "loyalty" : values["loyalty"] ?? 5,
+            "loyalty" : values["loyalty"] ?? 3,
             "reward" : values["reward"] ?? 0
         ])
                 
-        let loggedUser = User(uid: uid, email: self.emailTextField.text!, userName: self.nameTextField.text!, reward: 0, loyalty: 5)
+        let loggedUser = User(uid: uid, email: self.emailTextField.text!, userName: self.nameTextField.text!, reward: 0, loyalty: 3, recentOrder: "", safeZone: "", accountTotal: 0.0)
         self.user = loggedUser
     }
         

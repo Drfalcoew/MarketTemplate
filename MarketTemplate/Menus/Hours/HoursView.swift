@@ -19,7 +19,7 @@ class HoursView: UIView, UIGestureRecognizerDelegate {
         let view = UIView()
         view.alpha = 0.0
         view.layer.zPosition = 1
-        view.layer.cornerRadius = 12
+        view.layer.cornerRadius = 10
         view.backgroundColor = UIColor.white//(r: 240, g: 240, b: 240)
         return view
     }()

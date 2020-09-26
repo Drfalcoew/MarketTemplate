@@ -98,7 +98,6 @@ class AddRemoveItemMenu: NSObject, UIGestureRecognizerDelegate {
         button.titleLabel?.adjustsFontSizeToFitWidth = true
         button.titleLabel?.minimumScaleFactor = 0.2
         button.translatesAutoresizingMaskIntoConstraints = false
-        button.layer.cornerRadius = 2
         button.setTitleColor(UIColor.black, for: UIControl.State())
         button.titleLabel?.font = UIFont.boldSystemFont(ofSize: 16)
         button.layer.cornerRadius = 10

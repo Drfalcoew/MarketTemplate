@@ -296,6 +296,8 @@ class HoursSubview: UIViewController {
         for i in 0..<7 {
             stackViewLeft.addArrangedSubview(leftViews[i])
             stackViewRight.addArrangedSubview(rightViews[i])
+            leftViews[i].textAlignment = .center
+            rightViews[i].textAlignment = .center
         }
         
         
@@ -317,13 +319,13 @@ class HoursSubview: UIViewController {
         containerView.centerXAnchor.constraint(equalTo: self.view.centerXAnchor, constant: 0).isActive = true
         containerView.heightAnchor.constraint(equalTo: self.view.heightAnchor, multiplier: 1/3).isActive = true
         
-        stackViewLeft.leftAnchor.constraint(equalTo: containerView.leftAnchor, constant: 10).isActive = true
-        stackViewLeft.heightAnchor.constraint(equalTo: containerView.heightAnchor, multiplier: 0.95).isActive = true
+        stackViewLeft.leftAnchor.constraint(equalTo: containerView.leftAnchor, constant: 0).isActive = true
+        stackViewLeft.heightAnchor.constraint(equalTo: containerView.heightAnchor, multiplier: 1).isActive = true
         stackViewLeft.widthAnchor.constraint(equalTo: containerView.widthAnchor, multiplier: 1/2).isActive = true
         stackViewLeft.centerYAnchor.constraint(equalTo: containerView.centerYAnchor, constant: 0).isActive = true
 
-        stackViewRight.rightAnchor.constraint(equalTo: containerView.rightAnchor, constant: -10).isActive = true
-        stackViewRight.heightAnchor.constraint(equalTo: containerView.heightAnchor, multiplier: 0.95).isActive = true
+        stackViewRight.rightAnchor.constraint(equalTo: containerView.rightAnchor, constant: 0).isActive = true
+        stackViewRight.heightAnchor.constraint(equalTo: containerView.heightAnchor, multiplier: 1).isActive = true
         stackViewRight.widthAnchor.constraint(equalTo: containerView.widthAnchor, multiplier: 1/2).isActive = true
         stackViewRight.centerYAnchor.constraint(equalTo: containerView.centerYAnchor, constant: 0).isActive = true
     }

@@ -8,6 +8,7 @@
 
 import Foundation
 import UIKit
+import FirebaseAuth
 import CoreData
 
 class SuccessfulOrderMenu: NSObject {
@@ -59,7 +60,7 @@ class SuccessfulOrderMenu: NSObject {
         let btn = UIButton()
         btn.translatesAutoresizingMaskIntoConstraints = false
         //btn.layer.masksToBounds = true
-        btn.layer.cornerRadius = 5
+        btn.layer.cornerRadius = 10
         btn.layer.shadowColor = UIColor.black.cgColor
         btn.layer.shadowOffset = CGSize(width: 3.0, height: 5.0)
         btn.layer.shadowOpacity = 0.2
@@ -79,22 +80,24 @@ class SuccessfulOrderMenu: NSObject {
     }
     
     func handleMenu() {
-        if let window = UIApplication.shared.keyWindow {
-            window.addSubview(background)
-            background.addSubview(profileBtn)
-            background.addSubview(label)
-            background.addSubview(countLabel)
-            
-            let x = window.frame.height / -5
-            self.background.frame = CGRect(x: 0, y: x, width: window.frame.width, height: x)
-            
-            setupConstraints()
+        if Auth.auth().currentUser != nil {
+            if let window = UIApplication.shared.keyWindow {
+                window.addSubview(background)
+                background.addSubview(profileBtn)
+                background.addSubview(label)
+                background.addSubview(countLabel)
+                
+                let x = window.frame.height / -5
+                self.background.frame = CGRect(x: 0, y: x, width: window.frame.width, height: x)
+                
+                setupConstraints()
 
-            UIView.animate(withDuration: 0.8, delay: 2.0, options: .curveEaseOut, animations: {
-                self.triggerCount()
-                self.background.frame = CGRect(x: 0, y: 0, width: window.frame.width, height: -x)
-                self.background.alpha = 1.0
-            })
+                UIView.animate(withDuration: 0.8, delay: 2.0, options: .curveEaseOut, animations: {
+                    self.triggerCount()
+                    self.background.frame = CGRect(x: 0, y: 0, width: window.frame.width, height: -x)
+                    self.background.alpha = 1.0
+                })
+            }
         }
     }
     
@@ -130,7 +133,10 @@ class SuccessfulOrderMenu: NSObject {
             self.profileBtn.transform = CGAffineTransform.identity
         }, completion: nil)
         
-        ViewController().navigationController?.customPush(viewController: ProfileViewController())
+        dismissMenu()
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) {
+            NotificationCenter.default.post(name: NSNotification.Name(rawValue: "sendToProfile"), object: nil)
+        }
     }
     
     func setupConstraints() {

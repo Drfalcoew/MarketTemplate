@@ -104,7 +104,7 @@ class CartItemCell: UICollectionViewCell {
     
     func setupView() {
         self.backgroundColor = .white
-        self.layer.cornerRadius = 12
+        self.layer.cornerRadius = 10
         self.layer.shadowColor = UIColor.black.cgColor
         self.layer.shadowOffset = CGSize(width: 3.0, height: 5.0)
         self.layer.shadowOpacity = 0.2

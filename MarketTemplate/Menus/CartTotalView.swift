@@ -13,7 +13,7 @@ class CartTotalView: UIView {
     var checkoutButton : UIButton = {
         let btn = UIButton()
         btn.translatesAutoresizingMaskIntoConstraints = false
-        btn.layer.cornerRadius = 5
+        btn.layer.cornerRadius = 10
         btn.setTitle("Checkout", for: .normal)
         btn.setTitleColor(.white, for: .normal)
         btn.layer.shadowColor = UIColor.black.cgColor
@@ -29,7 +29,7 @@ class CartTotalView: UIView {
     var keepShopping : UIButton = {
         let btn = UIButton()
         btn.translatesAutoresizingMaskIntoConstraints = false
-        btn.layer.cornerRadius = 5
+        btn.layer.cornerRadius = 10
         btn.setTitle("Continue Shopping", for: .normal)
         btn.setTitleColor(UIColor.white, for: .normal)
         btn.layer.shadowColor = UIColor.black.cgColor

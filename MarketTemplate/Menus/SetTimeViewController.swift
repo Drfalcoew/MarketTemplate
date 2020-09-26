@@ -21,7 +21,7 @@ class SetTimeViewController: UIViewController {
     var now : Int!
     
     var scheduledDate : [String : String] = [:]
-    var carryout : Bool = true // true == pickup, false == delivery
+    var carryout : Bool? // true == pickup, false == delivery
     var prepTime : Int!
     
     var label : UILabel = {
@@ -61,23 +61,22 @@ class SetTimeViewController: UIViewController {
     
     override func viewDidAppear(_ animated: Bool) {
         //setupSchedule()
-
         now = (hour * 3600) + (min * 60) + (sec) // now in seconds based on 24 hr clock
         
         if now < (close * 3600) { // store is open
             label.text = "Schedule a time for your order"
             datePicker.isEnabled = true
             if carryout == true {
-                prepTime = 15 * 60
+                prepTime = (Attributes().pickupPrep) * 60
             } else {
-                prepTime = 45 * 60
+                prepTime = (Attributes().deliveryPrep) * 60
             }
             setupSchedule2()
         } else { // store is closed
             label.text = "We are closed today! Would you like to schedule for another day?"
             datePicker.isEnabled = false
         }
-        scheduledDate = ["ScheduledDate" : datePicker.date.formatted]
+        scheduledDate = ["ScheduledDate" : datePicker.date.formattedTime]
     }
     
     func setupNavigation() {
@@ -169,7 +168,7 @@ class SetTimeViewController: UIViewController {
     }
     
     @objc func handleDateChange() {
-        scheduledDate = ["ScheduledDate" : datePicker.date.formatted]
+        scheduledDate = ["ScheduledDate" : datePicker.date.formattedTime]
     }
     
     @objc func saveChanges() {
@@ -186,12 +185,28 @@ class SetTimeViewController: UIViewController {
 
 extension Date {
     
-    var formatted: String {
+    var formattedTime: String {
         let formatter = DateFormatter()
         formatter.locale = Locale(identifier: "en_US")
         
         formatter.setLocalizedDateFormatFromTemplate("hh mm")
         //formatter.timeStyle = .none
         return  formatter.string(from: self as Date)
+    }
+    
+    var formattedDay: String {
+        let formatter = DateFormatter()
+        formatter.locale = Locale(identifier: "en_US")
+        
+        formatter.setLocalizedDateFormatFromTemplate("dd MM yy")
+        return formatter.string(from: self as Date)
+    }
+    
+    var formattedTime_24 : String {
+        let formatter = DateFormatter()
+        formatter.locale = Locale(identifier: "en_US")
+        
+        formatter.setLocalizedDateFormatFromTemplate("HH mm")
+        return formatter.string(from: self as Date)
     }
 }

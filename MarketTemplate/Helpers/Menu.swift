@@ -13,13 +13,13 @@ import MapKit
 struct Item { // for use of the menu/customer
     
     let name: String
-    let category: Int
+    let category: Int?
     let price: [Double]
     let toppings: [String]?
     let size : [Int]
     let description : String
                 
-    init(name: String, category: Int, price: [Double], toppings: [String]?, size: [Int], description : String) {
+    init(name: String, category: Int?, price: [Double], toppings: [String]?, size: [Int], description : String) {
         self.name = name
         self.category = category
         self.price = price
@@ -32,7 +32,7 @@ struct Item { // for use of the menu/customer
 struct Attributes {
     
     let color : Bool = true // t if black, f if white
-    let name : String = "Antonious Pizza"
+    let name : String = "Your Business Name"
     let location : String = "10400 Beaumont Ave, Cherry Valley, CA 92223"
     let location_Longitude : CLLocationDegrees = -116.9768625
     let location_Latitude : CLLocationDegrees = 33.9704476
@@ -41,7 +41,10 @@ struct Attributes {
     let delivery : Bool = true
     let pickupPrep : Int = 20
     let deliveryPrep : Int = 45
-    let loyaltyRequirement : Int = 2 // 1 order / 2 weeks minimum
+    let specialIndex : Int = 0
+    let rewardRequirement : Int = 2 // 1 order / 2 weeks minimum
+    let rewardImage : String = "image_Fiesta"
+    let rewardTitle : String = "Free Pizza"
 }
 
 struct Category {
@@ -59,12 +62,18 @@ struct Category {
 class Menu: NSObject {
     var items : [Item] = [Item]()
     var categories : [Category] = [Category]()
+    var specials : [Item] = [Item]()
     
     override init() {
         super.init()
         
         initItems()
         initCategories()
+        initSpecials()
+    }
+    
+    func initSpecials() {
+        specials.append(Item(name: "Free Pizza", category: nil, price: [0.0], toppings: ["Cheese", "Pepperoni"], size: [14], description: "Your free pizza gained upon completing the reward system."))
     }
     
     func initCategories() {
@@ -82,9 +91,6 @@ class Menu: NSObject {
         items.append(Item(name: "Testing", category: 4, price: [4.59, 7.99], toppings: ["Cheese", "Tomatoes"], size: [6, 12], description: "Hello, this is a test description. One, two, three."))
         items.append(Item(name: "Testing", category: 4, price: [4.59, 5.99, 7.49], toppings: ["Cheese", "Tomatoes"], size: [1, 2, 3], description: "Hello,  this is a test description. One, two, three."))
         items.append(Item(name: "Sandwich", category: 1, price: [9.99, 11.99], toppings: ["Cheese", "Tomatoes"], size: [1, 2], description: "Hello, this is a test description. Sandwich Testing."))
-        
-        // AM I THAT FUCKING OP
-        
         
     }
 }

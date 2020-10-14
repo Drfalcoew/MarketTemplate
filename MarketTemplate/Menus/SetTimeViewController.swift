@@ -10,6 +10,7 @@ import Foundation
 import UIKit
 
 class SetTimeViewController: UIViewController {
+    var settingsButton : UIButton!
     let att = Attributes()
     var sec : Int!
     var min : Int!
@@ -73,14 +74,15 @@ class SetTimeViewController: UIViewController {
             }
             setupSchedule2()
         } else { // store is closed
-            label.text = "We are closed today! Would you like to schedule for another day?"
+            label.text = "We are sorry for the inconvenience, but we are closed. Please retry during open hours."
             datePicker.isEnabled = false
+            settingsButton.isEnabled = false
         }
         scheduledDate = ["ScheduledDate" : datePicker.date.formattedTime]
     }
     
     func setupNavigation() {
-        let settingsButton = UIButton(type: .system)
+        settingsButton = UIButton(type: .system)
         settingsButton.setTitle("Schedule Time", for: .normal)
         settingsButton.tag = 1
         settingsButton.tintColor = UIColor(r: 75, g: 80, b: 120)

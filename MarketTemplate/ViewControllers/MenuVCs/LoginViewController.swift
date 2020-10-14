@@ -352,10 +352,11 @@ class LoginViewController: UIViewController {
             "userName" : values["name"] ?? "Could not load userName",
             "email" : values["email"] ?? "Could not load email",
             "loyalty" : values["loyalty"] ?? 3,
-            "reward" : values["reward"] ?? 0
+            "reward" : values["reward"] ?? 0,
+            "activeReward" : false
         ])
                 
-        let loggedUser = User(uid: uid, email: self.emailTextField.text!, userName: self.nameTextField.text!, reward: 0, loyalty: 3, recentOrder: "", safeZone: "", accountTotal: 0.0)
+        let loggedUser = User(uid: uid, email: self.emailTextField.text!, userName: self.nameTextField.text!, reward: 0, loyalty: 3, accountTotal: 0.0, activeReward: false)
         self.user = loggedUser
     }
         

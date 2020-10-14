@@ -12,6 +12,9 @@ import UIKit
 class HoursSubview: UIViewController {
     
     var hour : Int?
+    var hourViews : [UILabel] = []
+    
+    let attributes = Attributes()
     
     var backBtn : UIButton = {
         let btn = UIButton()
@@ -271,14 +274,19 @@ class HoursSubview: UIViewController {
             
             hourView.hoursLbl.text = "Closes:"
             hourView.hoursValue.text = timeConversion12(time24: "\(String(closes[index - 1])):00")
-            
-            
+                        
         } else {
             hourView.statusValue.text = "Closed"
             hourView.statusValue.textColor = UIColor(r: 255, g: 89, b: 89)
             hourView.hoursLbl.text = "Opens:"
             hourView.hoursValue.text = timeConversion12(time24: "\(String(opens[index - 1])):00")
-
+        }
+        
+        for i in 0 ..< 7 {
+            let o = timeConversion12(time24: "\(String(attributes.openingHours[i])):00")
+            let c = timeConversion12(time24: "\(String(attributes.openingHours[i])):00")
+            
+            hourViews[i].text = "\(o) - \(c)"
         }
     }
     
@@ -300,7 +308,13 @@ class HoursSubview: UIViewController {
             rightViews[i].textAlignment = .center
         }
         
-        
+        hourViews.append(hour_0)
+        hourViews.append(hour_1)
+        hourViews.append(hour_2)
+        hourViews.append(hour_3)
+        hourViews.append(hour_4)
+        hourViews.append(hour_5)
+        hourViews.append(hour_6)
     }
     
     func setupConstraints() {
@@ -311,22 +325,22 @@ class HoursSubview: UIViewController {
                 
         hourView.topAnchor.constraint(equalTo: self.backBtn.bottomAnchor, constant: 30).isActive = true
         hourView.centerXAnchor.constraint(equalTo: self.view.centerXAnchor, constant: 0).isActive = true
-        hourView.widthAnchor.constraint(equalTo: self.view.widthAnchor, multiplier: 0.95).isActive = true
+        hourView.widthAnchor.constraint(equalTo: self.view.widthAnchor, multiplier: 0.9).isActive = true
         hourView.heightAnchor.constraint(equalTo: self.view.widthAnchor, multiplier: 1/5).isActive = true
         
         containerView.topAnchor.constraint(equalTo: hourView.bottomAnchor, constant: 20).isActive = true
-        containerView.widthAnchor.constraint(equalTo: self.view.widthAnchor, multiplier: 0.8).isActive = true
+        containerView.widthAnchor.constraint(equalTo: self.view.widthAnchor, multiplier: 0.9).isActive = true
         containerView.centerXAnchor.constraint(equalTo: self.view.centerXAnchor, constant: 0).isActive = true
         containerView.heightAnchor.constraint(equalTo: self.view.heightAnchor, multiplier: 1/3).isActive = true
         
-        stackViewLeft.leftAnchor.constraint(equalTo: containerView.leftAnchor, constant: 0).isActive = true
+        stackViewLeft.leftAnchor.constraint(equalTo: containerView.leftAnchor, constant: 5).isActive = true
         stackViewLeft.heightAnchor.constraint(equalTo: containerView.heightAnchor, multiplier: 1).isActive = true
-        stackViewLeft.widthAnchor.constraint(equalTo: containerView.widthAnchor, multiplier: 1/2).isActive = true
+        stackViewLeft.widthAnchor.constraint(equalTo: containerView.widthAnchor, multiplier: 2/5).isActive = true
         stackViewLeft.centerYAnchor.constraint(equalTo: containerView.centerYAnchor, constant: 0).isActive = true
 
-        stackViewRight.rightAnchor.constraint(equalTo: containerView.rightAnchor, constant: 0).isActive = true
+        stackViewRight.rightAnchor.constraint(equalTo: containerView.rightAnchor, constant: -5).isActive = true
         stackViewRight.heightAnchor.constraint(equalTo: containerView.heightAnchor, multiplier: 1).isActive = true
-        stackViewRight.widthAnchor.constraint(equalTo: containerView.widthAnchor, multiplier: 1/2).isActive = true
+        stackViewRight.widthAnchor.constraint(equalTo: containerView.widthAnchor, multiplier: 3/5, constant: -10).isActive = true
         stackViewRight.centerYAnchor.constraint(equalTo: containerView.centerYAnchor, constant: 0).isActive = true
     }
     

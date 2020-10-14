@@ -107,10 +107,39 @@ class CheckoutViewController: UIViewController {
         nc.addObserver(self, selector: #selector(handleLater), name: Notification.Name("handleLater"), object: nil)
         nc.addObserver(self, selector: #selector(setupTime(notification:)), name: Notification.Name("scheduledDate"), object: nil)
 
-
+        checkStoreHours()
         setupViews()
-        setupCheckout()
         setupConstraints()
+    }
+    
+    func checkStoreHours() {
+        let att = Attributes()
+        var day : Int!
+        var close : Int!
+        var open : Int!
+        var sec : Int!
+        var min : Int!
+        var hour : Int!
+
+        sec = Calendar.current.component(.second, from: Date())
+        min = Calendar.current.component(.minute, from: Date())
+        hour = Calendar.current.component(.hour, from: Date())
+        day = Calendar.current.component(.weekday, from: Date()) // 1 is sunday
+        
+        close = att.closingHours[day - 1]
+        open = att.openingHours[day - 1]
+
+        var now : Int!
+        
+        now = (hour * 3600) + (min * 60) + (sec) // now in seconds based on 24 hr clock
+        if now >= (close * 3600) || now < (open * 3600) { // store is closed
+            addCardBtn.isEnabled = false
+            addCardBtn.alpha = 0.5
+            checkoutButton.isEnabled = false
+            displayAlert(title: "We are closed!", message: "We are sorry for the inconvenience. Please retry during open hours.")
+        } else {
+            setupCheckout()
+        }
     }
     
     func setupCheckout() {
@@ -138,7 +167,7 @@ class CheckoutViewController: UIViewController {
     }
     
     @objc func handleAddCard() { // called on add card button click
-        guard ((paymentContext?.hostViewController) != nil) else { displayAlert(title: "Error", message: "paymentContext hostViewController = nil"); return }
+        guard ((paymentContext?.hostViewController) != nil) else { displayAlert(title: "Error", message: "Please restart the app and try again."); return }
         
         self.paymentContext?.pushPaymentOptionsViewController()
     }
@@ -301,6 +330,7 @@ extension CheckoutViewController: STPAuthenticationContext, STPPaymentContextDel
         case .success:
             title = "Success"
             message = "Your order was placed! The team will now start making it."
+            self.removeCoreData()
         case .userCancellation:
             return()
         @unknown default:
@@ -311,7 +341,6 @@ extension CheckoutViewController: STPAuthenticationContext, STPPaymentContextDel
             let alertController = UIAlertController(title: title, message: message, preferredStyle: .alert)
             let action = UIAlertAction(title: "Ok", style: .default) { (action) in
                 if title == "Success" {
-                    self.removeCoreData()
                     self.navigationController?.customPopToRoot()
                 }
             }
@@ -321,19 +350,48 @@ extension CheckoutViewController: STPAuthenticationContext, STPPaymentContextDel
     }
     
     func postToDB(items: [CartItem]) {
-        var data : (String?, String?)
-        var updatedRank : Int?
+
+        var reward = UserDefaults.standard.integer(forKey: "userReward")
+        let accTotal = UserDefaults.standard.double(forKey: "userAccountTotal")
+        let newAccountTotal : Double = Double((ttl ?? 0)/100) + accTotal
+        var activeReward = UserDefaults.standard.bool(forKey: "userActiveReward")
+        
+        UserDefaults.standard.set(newAccountTotal, forKey: "userAccountTotal")
+        
         let docRef : DocumentReference?
+        let userDocRef : DocumentReference?
+        
         let name : String = Auth.auth().currentUser?.displayName ?? GIDGoogleUser().profile.name ?? "Guest"// "Guest"
         var id : String
         
         if let userID = Auth.auth().currentUser?.uid  { // logged in
             id = userID
-            docRef = db.collection("users").document(id).collection("orders").document()
+            docRef = db.collection("orders").document()
+            userDocRef = db.collection("users").document(id).collection("orders").document()
+            if ttl ?? 0 > 1000 {
+                if (reward ?? 0) <= 5 { // still in progress
+                    reward = reward + 1
+                    UserDefaults.standard.set(reward, forKey: "userReward")
+                }
+            }
+            userDocRef?.setData([
+            "orderDate" : Date().formattedDay,
+            "orderTime" : Date().formattedTime,
+            "active" : true
+            ], completion: { (error) in
+                if error != nil {
+                    print(error)
+                } else {
+                    userDocRef?.parent.parent?.setData([
+                        "reward" : reward,
+                        "accountTotal" : newAccountTotal
+                    ], merge: true)
+                }
+            })
         } else {
             id = "guest"
-            docRef = db.collection("users").document(id).collection("orders").document()
-        }// not logged in && ALSO MAKE STRIPE CUSTOMER IN CHECKOUTFLOW IF USER IS NOT AUTHENTICATED
+            docRef = db.collection("orders").document()
+        } // not logged in && ALSO MAKE STRIPE CUSTOMER IN CHECKOUTFLOW IF USER IS NOT AUTHENTICATED
         
         let docData: [String: Any] = [
             "items": convertItemsToDic(items: items),
@@ -343,24 +401,21 @@ extension CheckoutViewController: STPAuthenticationContext, STPPaymentContextDel
             "orderDate" : Date().formattedDay,
             "orderTime" : Date().formattedTime,
             "active" : true,
+            "total" : ttl,
             "scheduled" : asap ? "ASAP" : orderTime ?? "Error. Please contact customer for desired order time."
         ]
         
-        /*if id != "guest" {
-            data = checkLoyalty(userID: id)
-            if let x = updateLoyalty(data: data) {
-                updatedRank = x
-            }
-        }*/
-        
+        if id != "guest" {
+            //data = checkLoyalty(userID: id)
+//            if let x = updateLoyalty(data: data) {
+//                updatedRank = x
+//            }
+        }
+            
         docRef?.setData(docData) { err in
             if let err = err {
                 print("Error writing document: \(err)")
             } else {
-                docRef?.parent.parent?.setData([
-                    "recentOrder" : Date().formattedDay,
-                    "safeZone" : Date().getDay(days: Attributes().loyaltyRequirement * 14).formattedDay
-                ], merge: true)
                 print("Document successfully written!")
                 NotificationCenter.default.post(name: NSNotification.Name(rawValue: "successfulOrder"), object: nil)
                 UserDefaults.standard.set(true, forKey: "OrderPlaced")
@@ -369,49 +424,24 @@ extension CheckoutViewController: STPAuthenticationContext, STPPaymentContextDel
         }
     }
     
-    private func checkLoyalty(userID: String) -> (String?, String?) {
-        var recentOrder : String?
-        var safeZone : String?
+    private func checkReward(userID: String) -> (Int?, Bool?) {
+        var reward : Int?
+        var activeReward : Bool?
         db.collection("users").document(userID).getDocument { (document, error) in
             if error != nil {
                 print(error?.localizedDescription as Any)
             }
             if let document = document, document.exists {
                 let doc = User(snapshot: document)
-                recentOrder = doc.recentOrder
-                safeZone = doc.safeZone
-                print(recentOrder)
-                print(safeZone)
+                reward = doc.reward ?? 0
+                activeReward = doc.activeReward ?? false
+                
             } else {
-                print("Document does not exist")
+                print("Document does not exist")                
             }
         }
-        return (recentOrder, safeZone)
+        return (reward, activeReward)
     }
-    
-    private func updateLoyalty(data: (String?, String?)) -> Int? {
-        if data.0 == nil && data.1 == nil {
-            let requirement = Attributes().loyaltyRequirement * 7
-            var rankLossed = 0
-            let days = Date().days(from: (data.1?.toDate())!) // check if today's past safezone
-            print(days)
-            for i in 1...4 {
-                if days > (requirement * i) {
-                    rankLossed = rankLossed + 1
-                } else {
-                    break
-                }
-            }
-        }
-        print("Data == nil, returning nil")
-        /*if rank != loyaltyRank && user?.uid != nil {
-            if rank > 3 { rank = 3 }
-            db.collection("users").document(user!.uid).setData(["loyalty" : rank], merge: true)
-        }*/
-        return nil
-    }
-    
-    
     
     private func convertItemsToDic(items: [CartItem]) -> [Any]{
         var newItems = [Any]()

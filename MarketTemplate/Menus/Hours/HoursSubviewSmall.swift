@@ -11,14 +11,25 @@ import UIKit
 
 class HoursSubviewSmall: UIView {
   
+    let stackView : UIStackView = {
+        let view = UIStackView()
+        view.translatesAutoresizingMaskIntoConstraints = false
+        view.layer.masksToBounds = true
+        view.distribution = .fillProportionally
+        view.alignment = .fill
+        view.spacing = 10
+        view.axis = .horizontal
+        return view
+    }()
+    
     var statusLbl : UILabel = {
         let lbl = UILabel()
         lbl.translatesAutoresizingMaskIntoConstraints = false
         lbl.layer.masksToBounds = true
-        lbl.text = "Status: "
+        lbl.text = "Status:"
         lbl.adjustsFontSizeToFitWidth = true
         lbl.minimumScaleFactor = 0.2
-        lbl.font = UIFont(name: "Helvetica Neue", size: 30)
+        lbl.font = UIFont(name: "Helvetica Neue", size: 50)
         return lbl
     }()
     
@@ -28,8 +39,8 @@ class HoursSubviewSmall: UIView {
         lbl.layer.masksToBounds = true
         lbl.adjustsFontSizeToFitWidth = true
         lbl.minimumScaleFactor = 0.2
-        lbl.font = UIFont(name: "Helvetica Neue", size: 23)
-        lbl.font = UIFont.boldSystemFont(ofSize: 23)
+        lbl.font = UIFont(name: "Helvetica Neue", size: 50)
+        lbl.font = UIFont.boldSystemFont(ofSize: 50)
         return lbl
     }()
     
@@ -37,10 +48,10 @@ class HoursSubviewSmall: UIView {
         let lbl = UILabel()
         lbl.translatesAutoresizingMaskIntoConstraints = false
         lbl.layer.masksToBounds = true
-        lbl.text = "Closes: "
+        lbl.text = "Closes:"
         lbl.adjustsFontSizeToFitWidth = true
         lbl.minimumScaleFactor = 0.2
-        lbl.font = UIFont(name: "Helvetica Neue", size: 30)
+        lbl.font = UIFont(name: "Helvetica Neue", size: 50)
         return lbl
     }()
     
@@ -50,7 +61,7 @@ class HoursSubviewSmall: UIView {
         lbl.layer.masksToBounds = true
         lbl.adjustsFontSizeToFitWidth = true
         lbl.minimumScaleFactor = 0.2
-        lbl.font = UIFont(name: "Helvetica Neue", size: 23)
+        lbl.font = UIFont(name: "Helvetica Neue", size: 50)
         return lbl
     }()
     
@@ -62,36 +73,24 @@ class HoursSubviewSmall: UIView {
     }
     
     func setupViews() {
-        self.addSubview(hoursLbl)
-        self.addSubview(statusLbl)
-        self.addSubview(hoursValue)
-        self.addSubview(statusValue)
+        self.addSubview(stackView)
+        stackView.addArrangedSubview(statusLbl)
+        stackView.addArrangedSubview(statusValue)
+        stackView.addArrangedSubview(hoursLbl)
+        stackView.addArrangedSubview(hoursValue)
     }
     
     func setupConstraints() {
-        statusLbl.leftAnchor.constraint(equalTo: self.leftAnchor, constant: 10).isActive = true
-        statusLbl.bottomAnchor.constraint(equalTo: self.centerYAnchor, constant: 10).isActive = true
-        statusLbl.widthAnchor.constraint(equalTo: self.widthAnchor, multiplier: 1/5).isActive = true
-        statusLbl.heightAnchor.constraint(equalTo: self.heightAnchor, multiplier: 1/2).isActive = true
-        
-        statusValue.widthAnchor.constraint(equalTo: self.widthAnchor, multiplier: 1/5.5).isActive = true
-        statusValue.leftAnchor.constraint(equalTo: self.statusLbl.rightAnchor, constant: 5).isActive = true
-        statusValue.heightAnchor.constraint(equalTo: self.heightAnchor, multiplier: 1/2).isActive = true
-        statusValue.bottomAnchor.constraint(equalTo: self.centerYAnchor, constant: 12).isActive = true
-        
-        hoursLbl.leftAnchor.constraint(equalTo: self.centerXAnchor, constant: 5).isActive = true
-        hoursLbl.bottomAnchor.constraint(equalTo: self.centerYAnchor, constant: 10).isActive = true
-        hoursLbl.heightAnchor.constraint(equalTo: self.heightAnchor, multiplier: 1/2).isActive = true
-        hoursLbl.widthAnchor.constraint(equalTo: self.widthAnchor, multiplier: 1/5).isActive = true
-        
+        stackView.layer.borderWidth = 5
+        stackView.layer.borderColor = UIColor.blue.cgColor
 
-        hoursValue.heightAnchor.constraint(equalTo: self.heightAnchor, multiplier: 1/2).isActive = true
-        hoursValue.bottomAnchor.constraint(equalTo: self.centerYAnchor, constant: 12).isActive = true
-        hoursValue.rightAnchor.constraint(equalTo: self.rightAnchor, constant: -10).isActive = true
-        hoursValue.leftAnchor.constraint(equalTo: self.hoursLbl.rightAnchor, constant: 5).isActive = true
-
-
-        
+        NSLayoutConstraint.activate([
+            stackView.centerXAnchor.constraint(equalTo: self.centerXAnchor),
+            stackView.centerYAnchor.constraint(equalTo: self.centerYAnchor, constant: 0),
+            stackView.widthAnchor.constraint(equalTo: self.widthAnchor, multiplier: 0.9),
+            stackView.heightAnchor.constraint(equalTo: self.heightAnchor, multiplier: 0.8)
+            
+        ])
     }
     
     

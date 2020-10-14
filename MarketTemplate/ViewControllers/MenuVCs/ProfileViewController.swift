@@ -62,6 +62,7 @@ class ProfileViewController: UIViewController {
         lbl.layer.masksToBounds = true
         lbl.adjustsFontSizeToFitWidth = true
         lbl.textAlignment = .center
+        lbl.textColor = UIColor(r: 40, g: 43, b: 53)
         lbl.font = UIFont(name: "Helvetica Neue", size: 45)
         return lbl
     }()
@@ -92,11 +93,19 @@ class ProfileViewController: UIViewController {
         return view
     }()
     
-    var rewardView : RewardView = {
+    lazy var rewardView : RewardView = {
         let view = RewardView()
         view.translatesAutoresizingMaskIntoConstraints = false
-        view.backgroundColor = UIColor.white//(r: 255, g: 89, b: 89)
+        view.layer.shadowColor = UIColor.black.cgColor
+        view.layer.shadowOffset = CGSize(width: 3.0, height: 5.0)
+        view.layer.shadowOpacity = 0.2
+        view.layer.shadowRadius = 5.0
         view.layer.cornerRadius = 10
+        return view 
+    }()
+    
+    var rewardProgressView : RewardProgressView = {
+        let view = RewardProgressView()
         view.layer.shadowColor = UIColor.black.cgColor
         view.layer.shadowOffset = CGSize(width: 3.0, height: 5.0)
         view.layer.shadowOpacity = 0.2
@@ -104,7 +113,16 @@ class ProfileViewController: UIViewController {
         return view
     }()
     
-    var infoImage : UIButton = {
+    var loyaltyInfoBtn : UIButton = {
+        let btn = UIButton()
+        btn.translatesAutoresizingMaskIntoConstraints = false
+        btn.layer.masksToBounds = true
+        btn.setImage(UIImage(named: "info"), for: .normal)
+        btn.addTarget(self, action: #selector(handleLoyaltyInfo), for: .touchUpInside)
+        return btn
+    }()
+    
+    var rewardInfoBtn : UIButton = {
         let btn = UIButton()
         btn.translatesAutoresizingMaskIntoConstraints = false
         btn.layer.masksToBounds = true
@@ -139,6 +157,12 @@ class ProfileViewController: UIViewController {
             listener?.remove()
             print("Removing Listener")
         }
+    }
+
+    override func viewDidLayoutSubviews() {
+        print(self.view.frame.height)
+        rewardProgressView.itemSize = self.rewardProgressView.frame.size
+        rewardProgressView.resizeCollectionView()
         
     }
     
@@ -149,13 +173,7 @@ class ProfileViewController: UIViewController {
         self.view.backgroundColor = UIColor(r: 240, g: 240, b: 240)
         cached = UserDefaults.standard.bool(forKey: "OrderCached") // new order
         
-        if cached == false {
-            getOrders() // get from DB, set to CoreData
-            print("gettingOrders")
-            UserDefaults.standard.set(true, forKey: "OrderCached")
-        } else {
-            loadOrders() // load from CoreData, save to local
-        }
+        getOrders() // get from DB
         setupListener()
         loadUser() // load from UserDefaults
         sendData() // send local data to loyaltyView
@@ -169,32 +187,56 @@ class ProfileViewController: UIViewController {
 
         self.cachedUser["userName"] = UserDefaults.standard.string(forKey: "userName")
         self.cachedUser["userReward"] = UserDefaults.standard.integer(forKey: "userReward")
-        self.cachedUser["userLoyalty"] = UserDefaults.standard.integer(forKey: "userLoyalty")
-        self.cachedUser["userAccountTotal"] = UserDefaults.standard.string(forKey: "userAccountTotal")
+        self.cachedUser["userAccountTotal"] = UserDefaults.standard.double(forKey: "userAccountTotal")
         self.cachedUser["userID"] = Auth.auth().currentUser?.uid ?? UserDefaults.standard.string(forKey: "userID")
 
-        self.loyaltyLabel.text = "Loyalty Status: \(x[cachedUser["userLoyalty"] as! Int])"
+        // load loyalty
+        switch self.cachedUser["userAccountTotal"] as! Double {
+        case 0..<50: // None
+            self.loyaltyLabel.text = "New Member"
+            break
+        case 50..<100: // Bronze
+            self.loyaltyLabel.text = x[3]
+            self.loyaltyLaurel.image = UIImage(named: "loyalty_\(x[3])")
+            break
+        case 100..<200: // Silver
+            self.loyaltyLabel.text = x[2]
+            self.loyaltyLaurel.image = UIImage(named: "loyalty_\(x[2])")
+            break
+        case 200..<400: // Gold
+            self.loyaltyLabel.text = x[1]
+            self.loyaltyLaurel.image = UIImage(named: "loyalty_\(x[1])")
+            break
+        default: // Diamond
+            self.loyaltyLabel.text = x[0]
+            self.loyaltyLaurel.image = UIImage(named: "loyalty_\(x[0])")
+            break
+        }
         
-        self.loyaltyLaurel.image = UIImage(named: "loyalty_\(x[cachedUser["userLoyalty"] as! Int])")
+        // setup rewards
+        rewardProgressView.progress = UserDefaults.standard.integer(forKey: "userReward")
+        rewardProgressView.setupRewardProgress()
+
     }
     
     func sendData() {
         DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
             let h = self.activeOrder.count > 0 ? self.activeOrder.count : 1
-            var height = 50
-            height = height - (h * 5)
+            var height = self.view.frame.height * 0.08
+            height = height - CGFloat((h * 5))
             UIView.animate(withDuration: 0.5, animations: {
-                self.orderStatusView.heightAnchor.constraint(equalToConstant: CGFloat(height * h)).isActive = true
+                self.orderStatusView.heightAnchor.constraint(equalToConstant: CGFloat(height * CGFloat(h))).isActive = true
                 self.view.layoutIfNeeded()
             }, completion: nil)
             self.orderStatusView.activeOrder.append(contentsOf: self.activeOrder)
+            print(self.activeOrder)
             self.orderStatusView.setupStatus()
         }
     }
     
     func getOrders() {
         if let userID = Auth.auth().currentUser?.uid  { // logged in
-            let docRef = db.collection("users").document(userID).collection("orders")
+            let docRef = db.collection("users").document(userID).collection("orders").whereField("orderDate", isEqualTo: Date().formattedDay)
                 
             docRef.getDocuments { (documents, error) in
                 if error != nil {
@@ -203,59 +245,14 @@ class ProfileViewController: UIViewController {
                 if let documents = documents, documents.isEmpty == false {
                     for item in documents.documents {
                         let order = ItemGet(snapshot: item)
-                        if order.active != false {
-                            if order.orderDate == Date().formattedDay {
-                                self.activeOrder.append(ItemGet(ref: order.ref ?? "", date: order.orderDate ?? "", time: order.orderTime ?? "", active: order.active ?? false))
-                                print(self.activeOrder)
-                            } // today != orderDate
-                        } else {
-                            print("Inactive order: \(item.documentID)")
-                        }
+                        self.activeOrder.append(ItemGet(ref: order.ref ?? "", date: order.orderDate ?? "", time: order.orderTime ?? "", active: order.active ?? false))
+                        print(self.activeOrder)
                     }
-                    self.cacheOrders(orders: self.activeOrder)
                 }
             }
         }
     }
     
-    func cacheOrders(orders: [ItemGet]) { // setting Orders to CoreData
-        if orders.isEmpty == false {
-            
-            let x = orders.count <= 3 ? orders.count : 3 // maximum 3
-            for i in 0..<x {
-                for item in activeOrder {
-                    UserDefaults.standard.set(item.orderTime, forKey: "date_\(i)")
-                    UserDefaults.standard.set(item.active, forKey: "active_\(i)")
-                    UserDefaults.standard.set(item.ref, forKey: "ref_\(i)")
-                }
-            }
-
-        }
-        else { print("Orders == nil")}
-    }
-    
-    private func loadOrders() {
-        var keys : [String] = []
-        var values : [Bool] = []
-        var ids : [String] = []
-        var tempKey : String
-        var tempValue : Bool
-        var tempRef : String
-        
-        for i in 0..<3 {
-            tempKey = UserDefaults.standard.string(forKey: "date_\(i)") ?? ""
-            tempValue = UserDefaults.standard.bool(forKey: "active_\(i)")
-            tempRef = UserDefaults.standard.string(forKey: "ref_\(i)") ?? ""
-            if tempKey != "" {
-                keys.append(tempKey)
-                values.append(tempValue)
-                ids.append(tempRef)
-                idToIndexDict[tempRef] = i
-                self.activeOrder.append(ItemGet(ref: ids[i], date: "", time: keys[i], active: values[i]))
-            }
-        }
-        print("ActiveOrders count = \(self.activeOrder.count)")
-    }
     
     func setupListener() {
         if self.activeOrder.count > 0 {
@@ -274,7 +271,7 @@ class ProfileViewController: UIViewController {
                                 }
                                 if (diff.type == .removed) {
                                     print("Removed document: \(diff.document.documentID)")
-                                    self.removeActiveOrder(withIndex: self.idToIndexDict[diff.document.documentID]!)
+                                    //self.removeActiveOrder(withIndex: self.idToIndexDict[diff.document.documentID]!)
                                     // use this key ^ to find the index, and ultimately setting the status of that index to true.
                                 }
                             }
@@ -286,56 +283,7 @@ class ProfileViewController: UIViewController {
             print("IN ELSE, ln 286")
         }
     }
-    
-    func removeActiveOrder(withIndex: Int) {
-        print(withIndex)
-        
-        UserDefaults.standard.removeObject(forKey: "date_\(withIndex)")
-        UserDefaults.standard.removeObject(forKey: "active_\(withIndex)")
-        UserDefaults.standard.removeObject(forKey: "ref_\(withIndex)")
-        print("Removing \(activeOrder[withIndex]) at index: \(withIndex)")
-        self.activeOrder.remove(at: withIndex)
-        loadOrders()
-        sendData()
-        // delete and register a completion notification somewhere in the app.
-    }
-    
-    /*func checkLoyalty(userID: String) {
-        let docRef = db.collection("users").document(userID)
-        docRef.getDocument { (document, error) in
-            if error != nil {
-                print(error?.localizedDescription as Any)
-            }
-            if let document = document, document.exists {
-                let doc = User(snapshot: document)
-            } else {
-                print("Document does not exist")
-            }
-        }
-    }*/
-    
-    /*func updateLoyalty(loyaltyRank: Int, recentOrder: String?) {
-        var rank = loyaltyRank
-        let requirement = Attributes().loyaltyRequirement * 7
-        
 
-        // Replace the hour (time) of both dates with 00:00
-        if recentOrder != nil {
-            let days = Date().days(from: (recentOrder?.toDate())!)
-            print(days)
-            for i in 1...4 {
-                if days > (requirement * i) {
-                    rank = rank + 1
-                } else {
-                    break
-                }
-            }
-        }
-        if rank != loyaltyRank && user?.uid != nil {
-            if rank > 3 { rank = 3 }
-            db.collection("users").document(user!.uid).setData(["loyalty" : rank], merge: true)
-        }
-    }*/
     
     func setupViews() {
         self.view.addSubview(backgroundView)
@@ -343,9 +291,10 @@ class ProfileViewController: UIViewController {
         self.profileImg.addSubview(loyaltyLaurel)
         self.backgroundView.addSubview(userName)
         self.backgroundView.addSubview(loyaltyLabel)
-        self.backgroundView.addSubview(infoImage)
+        self.backgroundView.addSubview(loyaltyInfoBtn)
         
         self.view.addSubview(orderStatusView)
+        self.view.addSubview(rewardProgressView)
         self.view.addSubview(rewardView)
     }
     
@@ -363,30 +312,35 @@ class ProfileViewController: UIViewController {
             backgroundView.centerXAnchor.constraint(equalTo: self.view.centerXAnchor, constant: 0),
             backgroundView.widthAnchor.constraint(equalTo: self.view.widthAnchor, constant: 0),
             backgroundView.heightAnchor.constraint(equalTo: self.view.heightAnchor, multiplier: 1/3),
-                        
+            
             userName.centerXAnchor.constraint(equalTo: self.backgroundView.centerXAnchor, constant: 0),
             userName.topAnchor.constraint(equalTo: self.profileImg.bottomAnchor, constant: 0),
-            userName.widthAnchor.constraint(equalTo: self.backgroundView.widthAnchor, multiplier: 1/3),
+            userName.widthAnchor.constraint(equalTo: self.backgroundView.widthAnchor, multiplier: 1.2/3),
             userName.heightAnchor.constraint(equalTo: self.userName.widthAnchor, multiplier: 1/3.4),
             
             loyaltyLabel.topAnchor.constraint(equalTo: self.userName.bottomAnchor, constant: 5),
             loyaltyLabel.centerXAnchor.constraint(equalTo: self.userName.centerXAnchor, constant: 0),
-            loyaltyLabel.widthAnchor.constraint(equalTo: self.userName.widthAnchor, multiplier: 1.6),
-            loyaltyLabel.bottomAnchor.constraint(equalTo: backgroundView.bottomAnchor, constant: -10),
+            loyaltyLabel.widthAnchor.constraint(equalTo: self.userName.widthAnchor, multiplier: 0.8),
+            loyaltyLabel.bottomAnchor.constraint(equalTo: backgroundView.bottomAnchor, constant: self.view.frame.height * -0.015),
             
-            infoImage.leftAnchor.constraint(equalTo: loyaltyLabel.rightAnchor, constant: 5),
-            infoImage.bottomAnchor.constraint(equalTo: loyaltyLabel.topAnchor, constant: 10),
-            infoImage.heightAnchor.constraint(equalToConstant: 25),
-            infoImage.widthAnchor.constraint(equalToConstant: 25),
+            loyaltyInfoBtn.leftAnchor.constraint(equalTo: loyaltyLabel.rightAnchor, constant: 10),
+            loyaltyInfoBtn.centerYAnchor.constraint(equalTo: loyaltyLabel.centerYAnchor, constant: 0),
+            loyaltyInfoBtn.heightAnchor.constraint(equalToConstant: 22),
+            loyaltyInfoBtn.widthAnchor.constraint(equalToConstant: 22),
             
             orderStatusView.centerXAnchor.constraint(equalTo: self.view.centerXAnchor, constant: 0),
-            orderStatusView.topAnchor.constraint(equalTo: self.backgroundView.bottomAnchor, constant: 25),
+            orderStatusView.topAnchor.constraint(equalTo: self.backgroundView.bottomAnchor, constant: self.view.frame.height * 0.041),
             orderStatusView.widthAnchor.constraint(equalTo: self.view.widthAnchor, multiplier: 0.9),
             
-            rewardView.bottomAnchor.constraint(equalTo: self.view.bottomAnchor, constant: -25),
+            rewardProgressView.heightAnchor.constraint(equalTo: self.view.heightAnchor, multiplier: 1/10),
+            rewardProgressView.widthAnchor.constraint(equalTo: self.orderStatusView.widthAnchor, multiplier: 1),
+            rewardProgressView.centerXAnchor.constraint(equalTo: self.view.centerXAnchor, constant: 0),
+            rewardProgressView.topAnchor.constraint(equalTo: orderStatusView.bottomAnchor, constant: self.view.frame.height * 0.025),
+            
+            rewardView.bottomAnchor.constraint(equalTo: self.view.bottomAnchor, constant: self.view.frame.height * -0.041),
             rewardView.centerXAnchor.constraint(equalTo: self.view.centerXAnchor, constant: 0),
             rewardView.widthAnchor.constraint(equalTo: self.view.widthAnchor, multiplier: 0.9),
-            self.rewardView.topAnchor.constraint(equalTo: self.orderStatusView.bottomAnchor, constant: 15)
+            rewardView.topAnchor.constraint(equalTo: self.rewardProgressView.bottomAnchor, constant: self.view.frame.height * 0.025)
         ])
     }
     

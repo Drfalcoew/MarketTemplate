@@ -22,8 +22,6 @@ extension UserCoreData {
     }
     
     @NSManaged public var accountTotal : NSNumber?
-    @NSManaged public var safeZone : String?
-    @NSManaged public var recentOrder: String?
     @NSManaged public var email: String?
     @NSManaged public var loyalty: NSNumber?
     @NSManaged public var uid: String?

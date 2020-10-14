@@ -18,10 +18,8 @@ struct User {
     let userName: String?
     let loyalty : Int?
     let reward : Int?
-    let recentOrder : String?
-    let safeZone : String? // 4 weeks after 1st recent order
     let accountTotal : Double?
-
+    let activeReward : Bool?
     
     init(authData: User) {
         uid = authData.uid
@@ -29,9 +27,8 @@ struct User {
         userName = authData.userName!
         reward = authData.reward
         loyalty = authData.loyalty
-        recentOrder = authData.recentOrder
-        safeZone = authData.safeZone
         accountTotal = authData.accountTotal
+        activeReward = authData.activeReward
     }
     
     
@@ -51,22 +48,20 @@ struct User {
         email = snapshotValue?["email"] as? String
         reward = snapshotValue?["reward"] as? Int
         loyalty = snapshotValue?["loyalty"] as? Int
-        recentOrder = snapshotValue?["recentOrder"] as? String
-        safeZone = snapshotValue?["safeZone"] as? String
         accountTotal = snapshotValue?["accountTotal"] as? Double
-    }
+        activeReward = snapshotValue?["activeReward"] as? Bool
+     }
     
     
     
-    init(uid: String, email: String, userName: String, reward: Int, loyalty: Int, recentOrder: String, safeZone: String, accountTotal: Double) {
+    init(uid: String, email: String, userName: String, reward: Int, loyalty: Int, accountTotal: Double, activeReward : Bool) {
         self.uid = uid
         self.email = email
         self.userName = userName
         self.loyalty = loyalty
         self.reward = reward
-        self.recentOrder = recentOrder
-        self.safeZone = safeZone
         self.accountTotal = accountTotal
+        self.activeReward = activeReward
     }
 }
 

@@ -107,6 +107,7 @@ class SuccessfulOrderMenu: NSObject {
             self.countLabel.text = "\(i)"
             if i == 0 {
                 self.dismissMenu()
+                self.dismissMenu()
                 timer.invalidate()
            }
            i -= 1

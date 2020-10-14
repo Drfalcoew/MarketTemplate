@@ -29,11 +29,11 @@ class OrderStatusView: UIView {
         let lbl = UILabel()
         lbl.translatesAutoresizingMaskIntoConstraints = false
         lbl.layer.masksToBounds = true
-        lbl.font = UIFont(name: "Helvetica Neue", size: 18)
-        lbl.font = UIFont.boldSystemFont(ofSize: 18)
+        lbl.font = UIFont(name: "Helvetica Neue", size: 17)
+        lbl.font = UIFont.boldSystemFont(ofSize: 17)
         lbl.adjustsFontSizeToFitWidth = true
         lbl.minimumScaleFactor = 0.5
-        lbl.text = "Active"
+        lbl.text = "My"
         lbl.numberOfLines = 1
         lbl.textAlignment = .center
         lbl.textColor = UIColor.white
@@ -173,7 +173,7 @@ class OrderStatusView: UIView {
         lbl.minimumScaleFactor = 0.5
         lbl.textAlignment = .center
         lbl.textColor = UIColor.gray
-        lbl.text = "No Active Orders"
+        lbl.text = "No Recent Orders"
         lbl.layer.zPosition = 4
         lbl.isHidden = true
         return lbl

@@ -209,6 +209,14 @@ class SettingsViewController: UIViewController, UITableViewDataSource, UITableVi
             // TODO: handle the error
             print(error.localizedDescription)
         }
+        
+        UserDefaults.standard.set(nil, forKey: "userID")
+        UserDefaults.standard.set(nil, forKey: "userLoyalty")
+        UserDefaults.standard.set(nil, forKey: "userReward")
+        UserDefaults.standard.set(nil, forKey: "userEmail")
+        UserDefaults.standard.set(nil, forKey: "userName")
+        UserDefaults.standard.set(nil, forKey: "userAccountTotal")
+        
     }
     
     

@@ -131,7 +131,11 @@ class AddRemoveItemMenu: NSObject, UIGestureRecognizerDelegate {
         changedAmount = 0
         newTotal = 0
         added_Removed = nil
-        
+        removeButton.isEnabled = false
+        addButton.isEnabled = true
+        removeButton.setTitleColor(.gray, for: .normal)
+        addButton.setTitleColor(.white, for: .normal)
+
         if let window = UIApplication.shared.keyWindow {
             blackView.backgroundColor = .black
             blackView.alpha = 0

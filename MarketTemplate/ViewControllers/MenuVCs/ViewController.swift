@@ -25,7 +25,18 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
     let db = Firestore.firestore()
     var hour : Int?
     var user : FirebaseAuth.User?
-        
+    
+    var ownershipLbl : UILabel = {
+        let lbl = UILabel()
+        lbl.text = "By Drew Foster (Drfalcoew)"
+        lbl.translatesAutoresizingMaskIntoConstraints = false
+        lbl.adjustsFontSizeToFitWidth = true
+        lbl.minimumScaleFactor = 0.2
+        lbl.font = UIFont(name: "Helvetica Neue", size: 20)
+        lbl.textColor = UIColor(r: 40, g: 43, b: 53)
+        return lbl
+    }()
+    
     var orderNowButton : UIButton = {
         let btn = UIButton()
         btn.translatesAutoresizingMaskIntoConstraints = false
@@ -34,6 +45,9 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
         btn.backgroundColor = UIColor(r: 255, g: 89, b: 89)
         btn.setTitle("Order Now", for: .normal)
         btn.layer.shadowColor = UIColor.black.cgColor
+        btn.titleLabel?.minimumScaleFactor = 0.2
+        btn.titleLabel?.adjustsFontSizeToFitWidth = true
+        btn.titleLabel?.font = UIFont(name: "Helvetica Neue", size: 30)
         btn.layer.shadowOffset = CGSize(width: 3.0, height: 5.0)
         btn.layer.shadowOpacity = 0.2
         btn.layer.shadowRadius = 5.0
@@ -95,6 +109,7 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         user = Auth.auth().currentUser
+        
     }
     
     override func viewDidLoad() {
@@ -115,7 +130,11 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
             user = Auth.auth().currentUser
             userLogged = UserDefaults.standard.bool(forKey: "UserLogged") //loaded all user data from DB into core data
             if userLogged == false {
-                cacheUser(user: user!.uid)
+                if let x = user {
+                    cacheUser(user: x.uid)
+                } else if let x = GIDSignIn.sharedInstance()?.currentUser.userID {
+                    cacheUser(user: x)
+                }
                 userLogged = true
                 UserDefaults.standard.set(true, forKey: "UserLogged")
             }
@@ -135,6 +154,7 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
         let nc = NotificationCenter.default
         nc.addObserver(self, selector: #selector(successfulOrder), name: Notification.Name("successfulOrder"), object: nil)
         nc.addObserver(self, selector: #selector(sendToProfile), name: Notification.Name(rawValue: "sendToProfile"), object: nil)
+                
         
         setupHours()
         setupNavigation()
@@ -160,35 +180,16 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
     }
     
     private func loadCoreData(user: User) {
+        let requirement = Attributes().rewardRequirement
         
         UserDefaults.standard.set(user.uid, forKey: "userID")
-        UserDefaults.standard.set(user.loyalty, forKey: "userLoyalty")
         UserDefaults.standard.set(user.reward, forKey: "userReward")
+        UserDefaults.standard.set(user.activeReward, forKey: "userActiveReward")
         UserDefaults.standard.set(user.email, forKey: "userEmail")
         UserDefaults.standard.set(user.userName, forKey: "userName")
-        UserDefaults.standard.set(user.recentOrder, forKey: "userRecentOrder")
-        UserDefaults.standard.set(user.safeZone, forKey: "userSafeZone")
         UserDefaults.standard.set(user.accountTotal, forKey: "userAccountTotal")
         
-//        let managedContext =
-//          appDelegate.persistentContainer.viewContext
-//
-//        let entity =
-//          NSEntityDescription.entity(forEntityName: "UserCoreData",
-//                                     in: managedContext)!
-//
-//        let item = NSManagedObject(entity: entity,
-//                                     insertInto: managedContext)
-//
-//        item.setValuesForKeys(loadUser)
-//
-//        do {
-//            try managedContext.save()
-//            coreUser.append(item)
-//
-//        } catch let error as NSError {
-//            print("Could not save. \(error), \(error.userInfo)")
-//        }
+        
     }
     
     @objc func sendToProfile() {
@@ -229,18 +230,19 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
         self.view.addSubview(orderNowButton)
         self.view.addSubview(mapContainerView)
         self.view.addSubview(hourView)
+        self.view.addSubview(ownershipLbl)
         
         self.mapContainerView.addSubview(mapView)
     }
     
     func setupConstraints() {
        
-        orderNowButton.topAnchor.constraint(equalTo: self.view.topAnchor, constant: 30).isActive = true
+        orderNowButton.topAnchor.constraint(equalTo: self.view.topAnchor, constant: self.view.frame.height * 0.05).isActive = true
         orderNowButton.widthAnchor.constraint(equalTo: self.view.widthAnchor, multiplier: 0.8).isActive = true
         orderNowButton.centerXAnchor.constraint(equalTo: self.view.centerXAnchor, constant: 0).isActive = true
         orderNowButton.heightAnchor.constraint(equalTo: self.orderNowButton.widthAnchor, multiplier: 1/4).isActive = true
         
-        mapContainerView.topAnchor.constraint(equalTo: self.orderNowButton.bottomAnchor, constant: 25).isActive = true
+        mapContainerView.topAnchor.constraint(equalTo: self.orderNowButton.bottomAnchor, constant: self.view.frame.height * 0.041).isActive = true
         mapContainerView.widthAnchor.constraint(equalTo: self.view.widthAnchor, multiplier: 9/10).isActive = true
         mapContainerView.bottomAnchor.constraint(equalTo: self.view.centerYAnchor, constant: self.view.frame.height * 0.15).isActive = true
         mapContainerView.centerXAnchor.constraint(equalTo: self.view.centerXAnchor, constant: 0).isActive = true
@@ -250,14 +252,18 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
         mapView.centerXAnchor.constraint(equalTo: self.view.centerXAnchor, constant: 0).isActive = true
         mapView.centerYAnchor.constraint(equalTo: self.mapContainerView.centerYAnchor, constant: 0).isActive = true
         
-        hourView.topAnchor.constraint(equalTo: self.mapContainerView.bottomAnchor, constant: 15).isActive = true
+        hourView.topAnchor.constraint(equalTo: self.mapContainerView.bottomAnchor, constant: self.view.frame.height * 0.025).isActive = true
         hourView.heightAnchor.constraint(equalTo: self.orderNowButton.heightAnchor, constant: 0).isActive = true
         hourView.centerXAnchor.constraint(equalTo: self.view.centerXAnchor, constant: 0).isActive = true
         hourView.widthAnchor.constraint(equalTo: self.mapContainerView.widthAnchor, multiplier: 1).isActive = true
+        
+        ownershipLbl.centerXAnchor.constraint(equalTo: self.view.centerXAnchor).isActive = true
+        ownershipLbl.widthAnchor.constraint(equalTo: self.view.widthAnchor, multiplier: 1/3).isActive = true
+        ownershipLbl.heightAnchor.constraint(equalTo: self.ownershipLbl.widthAnchor, multiplier: 1/4).isActive = true
+        ownershipLbl.bottomAnchor.constraint(equalTo: self.view.bottomAnchor).isActive = true
     }
     
     func setupCollectionView() {
-        
         let layout = UICollectionViewFlowLayout()
         layout.itemSize = CGSize(width: (self.view.frame.width/2.2), height: (self.view.frame.width)/2.2)
         layout.minimumInteritemSpacing = 0

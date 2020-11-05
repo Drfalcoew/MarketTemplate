@@ -50,7 +50,6 @@ class CheckoutViewController: UIViewController {
         btn.setTitle("Place Order", for: .normal)
         btn.setTitleColor(.white, for: .normal)
         btn.isEnabled = false
-        btn.alpha = 0.5
         return btn
     }()
     
@@ -73,7 +72,8 @@ class CheckoutViewController: UIViewController {
         btn.addTarget(self, action: #selector(handleAddCard), for: .touchUpInside)
         btn.setTitle("Add Card", for: .normal)
         btn.setTitleColor(.white, for: .normal)
-        btn.isHidden = true
+        btn.isHidden = false
+        btn.alpha = 0.5
         return btn
     }()
     
@@ -106,10 +106,19 @@ class CheckoutViewController: UIViewController {
         let nc = NotificationCenter.default
         nc.addObserver(self, selector: #selector(handleLater), name: Notification.Name("handleLater"), object: nil)
         nc.addObserver(self, selector: #selector(setupTime(notification:)), name: Notification.Name("scheduledDate"), object: nil)
-
-        checkStoreHours()
+        
+        checkAuthentication()
         setupViews()
         setupConstraints()
+    }
+    
+    func checkAuthentication() {
+        print("AUTH!!!! --- \(Auth.auth().currentUser)")
+        if Auth.auth().currentUser != nil {
+            checkStoreHours()
+        } else {
+            displayLoginAlert()
+        }
     }
     
     func checkStoreHours() {
@@ -248,6 +257,20 @@ class CheckoutViewController: UIViewController {
             self.navigationController?.customPopToRoot()
         }
         myAlert.addAction(okAction)
+        self.present(myAlert, animated: true, completion: nil)
+    }
+    
+    func displayLoginAlert(){
+        
+        let myAlert = UIAlertController(title: "You are not signed in!", message: "Sign in to earn points for this order, or continue as guest.", preferredStyle: UIAlertController.Style.alert)
+        let act = UIAlertAction(title: "Sign in", style: .default) { (action) in
+            DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
+                self.navigationController?.customPush(viewController: LoginViewController())
+            }
+        }
+        let guest = UIAlertAction(title: "Continue", style: .cancel, handler: nil)
+        myAlert.addAction(guest)
+        myAlert.addAction(act)
         self.present(myAlert, animated: true, completion: nil)
     }
 }
